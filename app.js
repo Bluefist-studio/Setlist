@@ -165,7 +165,7 @@ function renderHome() {
     <section class="hero-grid"><article class="quick-card"><div class="quick-kicker"><span>✳</span> QUICK START</div><h2>Pick a focus.<br>We’ll shape the session.</h2><p>${Store.data.user.duration} min · Based on your gear &amp; favorites</p><div class="quick-actions"><button class="button button-primary" data-action="quick-start">QUICK WORKOUT <span>↗</span></button><span class="quick-action-note">No plan required</span></div></article>
     <article class="level-card"><div><div class="level-top"><span class="eyebrow">YOUR PACE</span><span class="streak-flame">✳</span></div><div class="level-number">${xpLevel(xp)}<small>LEVEL</small></div></div><div><div class="xp-label"><span>${levelProgress} / ${nextLevelXp} XP</span><span>${percentage}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${percentage}%"></div></div><p class="level-caption">Consistency counts. Every session.</p></div></article></section>
     <section class="section-head"><h2>Your workouts</h2><button class="text-button" data-view="workouts">VIEW ALL &nbsp;→</button></section>
-    ${workouts.length ? `<div class="workout-list">${workouts.map((workout, index) => `<div class="workout-row" data-action="open-template" data-id="${workout.id}"><div class="workout-stamp">${String(index + 1).padStart(2, '0')}</div><div class="workout-row-main"><strong>${safeText(workout.name)}</strong><small>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min${workout.lastUsed ? ` · last ${dateLabel(workout.lastUsed)}` : ''}</small></div><span class="row-arrow">→</span></div>`).join('')}</div>` : `<div class="empty-state">Your workout bank is ready when you are.</div>`}
+    ${workouts.length ? `<div class="workout-list">${workouts.map((workout, index) => { const lastCompleted = latestCompletedTemplateSession(workout); return `<div class="workout-row" data-action="open-template" data-id="${workout.id}"><div class="workout-stamp">${String(index + 1).padStart(2, '0')}</div><div class="workout-row-main"><strong>${safeText(workout.name)}</strong><small>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min${lastCompleted ? ` · last ${dateLabel(lastCompleted.endedAt)}` : ''}</small></div><span class="row-arrow">→</span></div>`; }).join('')}</div>` : `<div class="empty-state">Your workout bank is ready when you are.</div>`}
     <div class="create-strip"><div><strong>Have a session in mind?</strong><small>Build it your way, then save it for later.</small></div><button class="button button-secondary button-small" data-action="create-workout">＋ CREATE WORKOUT</button></div>
     <div class="home-bottom"><div class="metric-mini"><strong>${savedCount}</strong><span>Workouts logged</span></div><div class="metric-mini"><strong>${formatHours(minutes)}</strong><span>Training time</span></div><div class="metric-mini"><strong>${formatNumber(volume)} <small>lb</small></strong><span>Volume moved</span></div></div>`;
 }
@@ -217,7 +217,7 @@ function latestExerciseHistory(id) { return Store.data.history.flatMap(workout =
 function renderWorkouts() {
   const workouts = Store.data.workouts;
   return `<div class="page-heading"><div><div class="eyebrow">YOUR WORKOUT BANK</div><h1>Workouts</h1><p>Reusable plans, ready when you are.</p></div><button class="button button-primary" data-action="create-workout">＋ CREATE WORKOUT</button></div>
-    ${workouts.length ? `<div class="template-grid">${workouts.map(workout => `<article class="template-card"><div class="template-card-top"><div><h3>${safeText(workout.name)}</h3><p>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min</p></div><span class="template-count">${workout.uses || 0}×</span></div><div class="template-exercises">${workout.items.slice(0, 6).map(item => `<span class="exercise-tag">${safeText(itemExercise(item)?.name || 'Exercise')}</span>`).join('')}${workout.items.length > 6 ? `<span class="exercise-tag">+${workout.items.length - 6}</span>` : ''}</div><div class="template-footer"><span class="template-meta">${workout.lastUsed ? `LAST ${dateLabel(workout.lastUsed).toUpperCase()}` : 'NOT STARTED YET'}</span><div class="template-actions"><button data-action="edit-template" data-id="${workout.id}">EDIT</button><button class="start-template" data-action="start-template" data-id="${workout.id}">START</button></div></div></article>`).join('')}</div>` : '<div class="empty-state">No saved workouts yet. Create one to get started.</div>'}
+    ${workouts.length ? `<div class="template-grid">${workouts.map(workout => { const lastCompleted = latestCompletedTemplateSession(workout); return `<article class="template-card"><div class="template-card-top"><div><h3>${safeText(workout.name)}</h3><p>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min</p></div><span class="template-count">${workout.uses || 0}×</span></div><div class="template-exercises">${workout.items.slice(0, 6).map(item => `<span class="exercise-tag">${safeText(itemExercise(item)?.name || 'Exercise')}</span>`).join('')}${workout.items.length > 6 ? `<span class="exercise-tag">+${workout.items.length - 6}</span>` : ''}</div><div class="template-footer"><span class="template-meta">${lastCompleted ? `LAST ${dateLabel(lastCompleted.endedAt).toUpperCase()}` : 'NOT STARTED YET'}</span><div class="template-actions"><button data-action="edit-template" data-id="${workout.id}">EDIT</button><button class="start-template" data-action="start-template" data-id="${workout.id}">START</button></div></div></article>`; }).join('')}</div>` : '<div class="empty-state">No saved workouts yet. Create one to get started.</div>'}
     <div class="create-strip"><div><strong>Want a different mix today?</strong><small>Quick Start builds a fresh session around your preferences.</small></div><button class="button button-secondary button-small" data-action="quick-start">QUICK START ↗</button></div>`;
 }
 function renderStats() {
@@ -248,9 +248,13 @@ function addHistoryControls(root) {
     row.append(button);
   });
 }
-function completedTemplateUses(template) {
-  return Store.data.history.filter(session => !session.quick && (session.templateId === template.id || (!session.templateId && session.name === template.name))).length;
+function completedTemplateSessions(template) {
+  return Store.data.history.filter(session => !session.quick && (session.templateId === template.id || (!session.templateId && session.name === template.name)));
 }
+function latestCompletedTemplateSession(template) {
+  return completedTemplateSessions(template).sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt))[0] || null;
+}
+function completedTemplateUses(template) { return completedTemplateSessions(template).length; }
 function addWorkoutCardControls(root) {
   $$('.template-card', root).forEach((card, index) => {
     const template = Store.data.workouts[index], actions = $('.template-actions', card);
@@ -439,12 +443,12 @@ function linkExerciseLabels(root, items, rowSelector, labelSelector = 'strong') 
 }
 function quickModal(restore = false) {
   const durations = [15, 20, 30, 45, 60];
-  const focus = restore ? state.quickFocus : 'Full Body';
+  const focus = restore ? (Array.isArray(state.quickFocus) ? state.quickFocus : [state.quickFocus || 'Full Body']) : ['Full Body'];
   const duration = restore ? state.quickDuration : Store.data.user.duration;
   const equipment = restore ? state.quickEquipment : 'available';
   const standardDuration = durations.includes(duration);
   state.quickFocus = focus; state.quickDuration = duration; state.quickEquipment = equipment;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Core', 'Custom'].map(part => `<button class="option-chip ${part === focus ? 'selected' : ''}" data-quick-part="${part}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${durations.map(item => `<option value="${item}" ${item === duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom" ${standardDuration ? '' : 'selected'}>Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${duration}" style="display:${standardDuration ? 'none' : 'block'};margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available" ${equipment === 'available' ? 'selected' : ''}>My available equipment</option><option value="bodyweight" ${equipment === 'bodyweight' ? 'selected' : ''}>Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Core', 'Custom'].map(part => `<button class="option-chip ${focus.includes(part) ? 'selected' : ''}" data-quick-part="${part}" aria-pressed="${focus.includes(part)}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${durations.map(item => `<option value="${item}" ${item === duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom" ${standardDuration ? '' : 'selected'}>Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${duration}" style="display:${standardDuration ? 'none' : 'block'};margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available" ${equipment === 'available' ? 'selected' : ''}>My available equipment</option><option value="bodyweight" ${equipment === 'bodyweight' ? 'selected' : ''}>Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
 }
 function availableForEquipment(exercise, mode) {
   if (mode === 'bodyweight') return exercise.equipment.includes('Bodyweight');
@@ -452,12 +456,16 @@ function availableForEquipment(exercise, mode) {
   return exercise.equipment.some(item => available.includes(item)) || (exercise.equipment.includes('Bodyweight') && available.includes('Bodyweight'));
 }
 function focusMatches(exercise, focus) {
-  if (!focus || focus === 'Full Body' || focus === 'Custom') return true;
-  if (focus === 'Upper Body') return exercise.parts.some(part => ['Chest', 'Back', 'Shoulders', 'Arms'].includes(part));
-  if (focus === 'Lower Body') return exercise.parts.includes('Legs');
-  return exercise.parts.includes(focus);
+  const focuses = Array.isArray(focus) ? focus : [focus];
+  if (!focuses.length || focuses.includes('Full Body') || focuses.includes('Custom')) return true;
+  return focuses.some(selectedFocus => {
+    if (selectedFocus === 'Upper Body') return exercise.parts.some(part => ['Chest', 'Back', 'Shoulders', 'Arms'].includes(part));
+    if (selectedFocus === 'Lower Body') return exercise.parts.includes('Legs');
+    return exercise.parts.includes(selectedFocus);
+  });
 }
 function generateQuickWorkout(focus, duration, equipmentMode) {
+  const focuses = Array.isArray(focus) ? focus : [focus];
   const history = Store.data.history;
   const usage = new Map(), recent = new Map();
   history.forEach((workout, index) => (workout.items || []).forEach(item => {
@@ -484,7 +492,8 @@ function generateQuickWorkout(focus, duration, equipmentMode) {
     if (!next) break;
     chosen.push(next.setItem); estimated += next.addedMinutes; next.exercise.parts.forEach(part => chosenParts.add(part));
   }
-  return { id: `quick-${Date.now()}`, name: focus === 'Custom' ? 'Quick Workout' : focus, items: chosen, uses: 0, lastUsed: null, quick: true };
+  const name = focuses.includes('Custom') ? 'Quick Workout' : focuses.includes('Full Body') ? 'Full Body' : focuses.join(' + ');
+  return { id: `quick-${Date.now()}`, name, items: chosen, uses: 0, lastUsed: null, quick: true };
 }
 function seedStarterWorkouts() {
   if (Store.data.workouts.length) return;
@@ -797,7 +806,7 @@ function handleAction(action, target) {
     case 'exercise-detail': showExerciseDetail(id); break;
     case 'start-template': case 'open-template': {
       const template = Store.data.workouts.find(item => item.id === id); if (!template) break;
-      if (action === 'open-template') { openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT TEMPLATE</div><h2>${safeText(template.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${template.items.length} exercises · estimated ${estimateWorkout(template.items)} minutes</p><div class="quick-summary-list">${template.items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} × ${itemReps(item)}</span></div>`).join('')}</div><div class="modal-actions"><button class="button button-secondary" data-action="edit-template" data-id="${id}">EDIT</button><button class="button button-primary" data-action="start-template" data-id="${id}">START WORKOUT →</button></div>`, 'template-detail'); }
+      if (action === 'open-template' || target.closest('.template-card')) { openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT TEMPLATE</div><h2>${safeText(template.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${template.items.length} exercises · estimated ${estimateWorkout(template.items)} minutes</p><div class="quick-summary-list">${template.items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} × ${itemReps(item)}</span></div>`).join('')}</div><div class="modal-actions"><button class="button button-secondary" data-action="edit-template" data-id="${id}">EDIT</button><button class="button button-primary" data-action="start-template" data-id="${id}">START WORKOUT →</button></div>`, 'template-detail'); }
       else startWorkout(template); break;
     }
     case 'edit-template': { const template = Store.data.workouts.find(item => item.id === id); if (template) openBuilder(template); break; }
@@ -812,7 +821,8 @@ function handleAction(action, target) {
       closeModal(); state.view = 'workouts'; saveAndRender(); toast('Workout removed from your bank.'); break;
     case 'return-workout': state.view = 'active'; closeModal(); render(); break;
     case 'generate-quick': {
-      const focus = $('.option-chip.selected')?.dataset.quickPart || 'Full Body';
+      const focus = $$('.option-chip[data-quick-part].selected').map(button => button.dataset.quickPart);
+      if (!focus.length) focus.push('Full Body');
       const durationSelect = $('#quick-duration'), duration = durationSelect.value === 'custom' ? Math.max(10, Number($('#quick-custom-duration').value) || Store.data.user.duration) : Number(durationSelect.value);
       const generated = generateQuickWorkout(focus, duration, $('#quick-equipment').value);
       if (!generated.items.length) { toast('No matching movements found. Check your equipment preferences.'); break; }
@@ -852,7 +862,8 @@ function handleAction(action, target) {
     case 'remove-active-item': removeActiveItem(Number(target.dataset.index)); break;
     case 'pause-workout': pauseWorkout(); break;
     case 'resume-workout': resumeWorkout(); break;
-    case 'finish-workout': finishWorkout(); break;
+    case 'finish-workout': openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Finish this session?</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">Your workout will be marked complete. You can review it before saving it to history.</p><div class="modal-actions"><button class="button button-secondary" data-action="close-modal">KEEP WORKING OUT</button><button class="button button-primary" data-action="confirm-finish-workout">FINISH WORKOUT</button></div>`, 'confirm-finish-workout'); break;
+    case 'confirm-finish-workout': closeModal(); finishWorkout(); break;
     case 'discard-workout': openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Discard this session?</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">This removes today’s progress. Your saved workout template won’t be changed.</p><div class="modal-actions"><button class="button button-secondary" data-action="close-modal">KEEP WORKING OUT</button><button class="button button-danger" data-action="confirm-discard">DISCARD SESSION</button></div>`, 'confirm-discard'); break;
     case 'confirm-discard': closeModal(); Store.data.active = null; state.view = 'home'; saveAndRender(); toast('Session discarded.'); break;
     case 'save-completed': saveCompletedWorkout(); break;
@@ -928,7 +939,20 @@ document.addEventListener('click', event => {
   const category = event.target.closest('[data-category]');
   if (category) { state.categoryFilter = category.dataset.category; render(); return; }
   const quickPart = event.target.closest('[data-quick-part]');
-  if (quickPart) { $$('.option-chip[data-quick-part]').forEach(button => button.classList.toggle('selected', button === quickPart)); return; }
+  if (quickPart) {
+    const part = quickPart.dataset.quickPart, selected = new Set(Array.isArray(state.quickFocus) ? state.quickFocus : [state.quickFocus || 'Full Body']);
+    if (part === 'Full Body' || part === 'Custom') state.quickFocus = selected.has(part) ? ['Full Body'] : [part];
+    else {
+      selected.delete('Full Body'); selected.delete('Custom');
+      if (selected.has(part)) selected.delete(part); else selected.add(part);
+      state.quickFocus = selected.size ? [...selected] : ['Full Body'];
+    }
+    $$('.option-chip[data-quick-part]').forEach(button => {
+      const isSelected = state.quickFocus.includes(button.dataset.quickPart);
+      button.classList.toggle('selected', isSelected); button.setAttribute('aria-pressed', String(isSelected));
+    });
+    return;
+  }
   const builderPart = event.target.closest('[data-builder-part]');
   if (builderPart) {
     updateBuilderFromModal();

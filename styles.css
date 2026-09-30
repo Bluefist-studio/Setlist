@@ -309,6 +309,8 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
 .modal-close { width: 31px; height: 31px; border: 1px solid var(--line); border-radius: 50%; background: #fff; cursor: pointer; color: var(--muted); }
 .modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 19px; }
 .modal-actions.spread { justify-content: space-between; }
+.modal-panel[data-modal-mode="confirm-discard"] .modal-actions,
+.modal-panel[data-modal-mode="confirm-finish-workout"] .modal-actions { justify-content: center; }
 .quick-summary-list { display: grid; gap: 0; margin: 15px 0; border-top: 1px solid var(--line); }
 .quick-summary-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 11px; }
 .quick-summary-row strong { flex: 1; }
@@ -420,6 +422,10 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .modal-panel .modal-heading { align-items: center; }
   .modal-panel .modal-close { flex: 0 0 44px; width: 44px; height: 44px; font-size: 22px; }
   .modal-panel .modal-actions { flex-wrap: wrap; gap: 10px; }
+  .modal-panel[data-modal-mode="confirm-discard"] .modal-actions,
+  .modal-panel[data-modal-mode="confirm-finish-workout"] .modal-actions { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .modal-panel[data-modal-mode="confirm-discard"] .modal-actions .button,
+  .modal-panel[data-modal-mode="confirm-finish-workout"] .modal-actions .button { width: min(100%, 320px); }
   .modal-panel .button { min-height: 52px; padding-inline: 15px; font-size: 14px; }
   .modal-panel .button-small { min-height: 48px; padding-inline: 14px; font-size: 13px; }
   .modal-panel .button-plain { min-height: 46px; font-size: 14px; }
