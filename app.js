@@ -274,7 +274,7 @@ function renderDock() {
   if (!workout || workout.completed || workout.discarded) { dock.className = 'active-dock'; dock.innerHTML = ''; return; }
   const item = activeItem(workout), exercise = itemExercise(item), setNumber = Math.min((item?.completedSets?.length || 0) + 1, itemSets(item));
   dock.className = 'active-dock visible';
-  dock.innerHTML = `<span class="dock-pulse"></span><div class="dock-info"><strong>${workout.pausedAt ? 'WORKOUT PAUSED' : 'WORKOUT ACTIVE'} · ${formatDuration(workoutElapsed(workout))}</strong><span>${safeText(exercise?.name || workout.name)} · Set ${setNumber}/${itemSets(item)}</span></div><span class="dock-time">${formatDuration(workoutElapsed(workout))}</span><button class="button dock-return" data-action="return-workout">RETURN ↗</button>`;
+  dock.innerHTML = `<span class="dock-pulse"></span><div class="dock-info"><strong>${workout.pausedAt ? 'WORKOUT PAUSED' : 'WORKOUT'} · ${safeText(workout.name || 'Workout')}</strong><span>${safeText(exercise?.name || workout.name)} · Set ${setNumber}/${itemSets(item)}</span></div><span class="dock-time">${formatDuration(workoutElapsed(workout))}</span><button class="button dock-return" data-action="return-workout">RETURN ↗</button>`;
 }
 function renderActiveWorkout() {
   const workout = currentWorkout();
@@ -749,7 +749,7 @@ function startTicker() {
     const workout = currentWorkout(); if (!workout || workout.pausedAt) return;
     const timer = $('#workout-timer'); if (timer) timer.textContent = formatDuration(workoutElapsed(workout));
     const dockTime = $('.dock-time'); if (dockTime) dockTime.textContent = formatDuration(workoutElapsed(workout));
-    const dockTitle = $('.dock-info strong'); if (dockTitle) dockTitle.textContent = `WORKOUT ACTIVE · ${formatDuration(workoutElapsed(workout))}`;
+    const dockTitle = $('.dock-info strong'); if (dockTitle) dockTitle.textContent = `WORKOUT · ${workout.name || 'Workout'}`;
   }, 1000);
 }
 function stopTicker() { clearInterval(state.timerHandle); state.timerHandle = null; }
