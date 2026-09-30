@@ -68,6 +68,7 @@ const Store = {
 Store.data = Store.read();
 
 const state = { view: 'home', query: '', equipmentFilter: 'All equipment', partFilter: 'All body parts', categoryFilter: 'All categories', favoritesOnly: false, timerHandle: null, quickDraft: null, builderDraft: null, modalMode: null, modalReturn: null, cloudStatus: 'Checking Firebase connection…', accountInfo: null, onboardingStep: 0 };
+let stopBuilderDrag;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const exerciseById = id => EXERCISES.find(exercise => exercise.id === id);
@@ -264,7 +265,7 @@ function addWorkoutCardControls(root) {
     });
     const remove = document.createElement('button');
     remove.className = 'delete-template'; remove.dataset.action = 'delete-template'; remove.dataset.id = template.id;
-    remove.setAttribute('aria-label', `Delete ${template.name}`); remove.title = 'Delete workout'; remove.textContent = '×';
+    remove.setAttribute('aria-label', `Delete ${template.name}`); remove.title = 'Delete workout'; remove.textContent = 'DELETE';
     actions.append(remove);
   });
 }
@@ -332,16 +333,21 @@ function renderOnboardingStep(step) {
   root.innerHTML = `<div class="onboarding-overlay"><section class="onboarding-panel"><div class="onboard-top"><div><div class="eyebrow">SETLIST · GETTING STARTED</div><h2>${title}</h2></div>${skipButton}</div><p class="onboard-copy">${subtitle}</p>${body}${progress}</section></div>`;
 }
 function openModal(html, mode = null) {
+  stopBuilderDrag?.(); stopBuilderDrag = null;
   state.modalMode = mode; document.body.classList.add('modal-open'); $('#modal-root').innerHTML = `<div class="modal-backdrop"><section class="modal-panel">${html}</section></div>`;
+  if (mode) $('.modal-panel').dataset.modalMode = mode;
   if (mode === 'builder') {
     renderBuilderSelection();
     const library = $('.builder-exercises'), headings = document.createElement('div');
+    const focusGroup = $('[data-builder-part]', $('.modal-panel'))?.closest('.field-group');
+    if (focusGroup) $('#builder-selection')?.after(focusGroup);
     headings.className = 'builder-column-headings';
     headings.innerHTML = '<span></span><span>EXERCISE</span><span>SETS</span><span>REPS</span>';
     library?.prepend(headings);
     $('.modal-actions.spread .template-meta', $('.modal-panel'))?.remove();
     linkExerciseLabels(library, $$('[data-builder-select]', library).map(input => ({ exerciseId: input.dataset.builderSelect })), '.builder-exercise', 'span');
     linkExerciseLabels($('#builder-selection'), state.builderDraft.items, '.builder-selected-row');
+    stopBuilderDrag = initializeBuilderDrag($('#builder-selection'));
   }
   if (mode === 'quick-add' || mode === 'add-exercise') {
     const action = mode === 'quick-add' ? 'add-to-quick' : 'add-active-item';
@@ -507,7 +513,7 @@ function migrateUntouchedStarterWorkouts() {
 }
 function showQuickPreview(draft) {
   state.quickDraft = draft;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${draft.items.map((item, index) => `<div class="quick-summary-row"><span class="quick-star">${Store.data.user.favorites.includes(item.exerciseId) ? '★' : '↗'}</span><strong>${safeText(itemExercise(item)?.name)}</strong><span>${itemSets(item)} × ${itemReps(item)}</span><button class="button-plain" data-action="remove-quick-item" data-index="${index}">REMOVE</button></div>`).join('')}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button></div></div>`, 'quick-preview');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${draft.items.map((item, index) => `<div class="quick-summary-row"><span class="quick-star">${Store.data.user.favorites.includes(item.exerciseId) ? '★' : '↗'}</span><strong>${safeText(itemExercise(item)?.name)}</strong><span>${itemSets(item)} × ${itemReps(item)}</span><button type="button" class="button-plain quick-remove-button" data-action="remove-quick-item" data-index="${index}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}" title="Remove exercise">×</button></div>`).join('')}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button></div></div>`, 'quick-preview');
   const heading = $('.modal-heading', $('#modal-root'));
   const close = $('.modal-close', heading);
   const headingActions = document.createElement('div');
@@ -541,9 +547,13 @@ function updateBuilderFromModal() {
   if (!state.builderDraft) return;
   const draft = state.builderDraft, name = $('#builder-name')?.value || '';
   draft.name = name;
-  draft.items = $$('[data-builder-select]').filter(input => input.checked).map(input => {
-    const id = input.dataset.builderSelect;
-    return { exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || 10, weight: exerciseById(id)?.weight || 0, completedSets: [] };
+  const selectedInputs = $$('[data-builder-select]').filter(input => input.checked);
+  const selectedIds = new Set(selectedInputs.map(input => input.dataset.builderSelect));
+  const existingItems = new Map(draft.items.map(item => [item.exerciseId, item]));
+  const orderedIds = [...draft.items.map(item => item.exerciseId).filter(id => selectedIds.has(id)), ...selectedInputs.map(input => input.dataset.builderSelect).filter(id => !existingItems.has(id))];
+  draft.items = orderedIds.map(id => {
+    const existing = existingItems.get(id), exercise = exerciseById(id);
+    return { ...existing, exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || existing?.sets || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || existing?.reps || 10, weight: existing?.weight ?? exercise?.weight ?? 0, completedSets: [] };
   });
   const count = $('#builder-count'), estimate = $('#builder-estimate');
   if (count) count.textContent = draft.items.length;
@@ -558,9 +568,51 @@ function renderBuilderSelection() {
     panel = document.createElement('section'); panel.id = 'builder-selection'; panel.className = 'builder-selection';
     library.before(panel);
   }
-  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map((item, index) => `<div class="builder-selected-row"><span class="set-index">${String(index + 1).padStart(2, '0')}</span><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span class="builder-selected-count">${itemSets(item)} × ${itemReps(item)}</span><div class="builder-row-controls"><button data-action="builder-move" data-index="${index}" data-delta="-1" aria-label="Move up" ${index === 0 ? 'disabled' : ''}>↑</button><button data-action="builder-move" data-index="${index}" data-delta="1" aria-label="Move down" ${index === draft.items.length - 1 ? 'disabled' : ''}>↓</button><button data-action="builder-remove" data-index="${index}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}">×</button></div></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
+  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map((item, index) => `<div class="builder-selected-row" data-builder-selected-id="${safeText(item.exerciseId)}"><span class="set-index">${String(index + 1).padStart(2, '0')}</span><button type="button" class="builder-drag-handle" aria-label="Drag ${safeText(itemExercise(item)?.name || 'exercise')} to reorder">⠿</button><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span class="builder-selected-count">${itemSets(item)} × ${itemReps(item)}</span></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
   $$('.builder-selected-row', panel).forEach((row, index) => { $('.builder-selected-count', row).textContent = `${itemSets(draft.items[index])} × ${itemMetric(draft.items[index])}`; });
   linkExerciseLabels(panel, draft.items, '.builder-selected-row');
+}
+function initializeBuilderDrag(panel) {
+  if (!panel) return;
+  let draggedRow = null;
+  let draggedPointerId = null;
+  const onPointerDown = event => {
+    const handle = event.target instanceof Element ? event.target.closest('.builder-drag-handle') : null;
+    if (!handle || !panel.contains(handle)) return;
+    draggedRow = handle.closest('.builder-selected-row');
+    if (!draggedRow) return;
+    event.preventDefault();
+    draggedPointerId = event.pointerId;
+    draggedRow.classList.add('dragging');
+  };
+  const onPointerMove = event => {
+    if (!draggedRow || event.pointerId !== draggedPointerId) return;
+    const targetRow = document.elementFromPoint(event.clientX, event.clientY)?.closest('.builder-selected-row');
+    if (!targetRow || targetRow === draggedRow || !panel.contains(targetRow)) return;
+    const bounds = targetRow.getBoundingClientRect();
+    panel.insertBefore(draggedRow, event.clientY < bounds.top + bounds.height / 2 ? targetRow : targetRow.nextSibling);
+  };
+  const finishDrag = () => {
+    if (!draggedRow) return;
+    draggedRow.classList.remove('dragging');
+    const itemsById = new Map(state.builderDraft.items.map(item => [item.exerciseId, item]));
+    const selectedRows = $$('.builder-selected-row', panel);
+    state.builderDraft.items = selectedRows.map(row => itemsById.get(row.dataset.builderSelectedId)).filter(Boolean);
+    selectedRows.forEach((row, index) => { $('.set-index', row).textContent = String(index + 1).padStart(2, '0'); });
+    draggedRow = null; draggedPointerId = null;
+  };
+  const onPointerUp = event => { if (event.pointerId === draggedPointerId) finishDrag(); };
+  const onPointerCancel = event => { if (event.pointerId === draggedPointerId) finishDrag(); };
+  document.addEventListener('pointerdown', onPointerDown);
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('pointercancel', onPointerCancel);
+  return () => {
+    document.removeEventListener('pointerdown', onPointerDown);
+    document.removeEventListener('pointermove', onPointerMove);
+    document.removeEventListener('pointerup', onPointerUp);
+    document.removeEventListener('pointercancel', onPointerCancel);
+  };
 }
 function showExerciseDetail(id) {
   const exercise = exerciseById(id), history = Store.data.history.flatMap(workout => (workout.items || []).filter(item => item.exerciseId === id).map(item => ({ ...item, date: workout.endedAt }))).sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -798,13 +850,6 @@ function handleAction(action, target) {
     case 'add-exercise-active': renderAddExerciseModal(); break;
     case 'add-active-item': addItemToActive(id); break;
     case 'remove-active-item': removeActiveItem(Number(target.dataset.index)); break;
-    case 'builder-move': {
-      updateBuilderFromModal();
-      const index = Number(target.dataset.index), nextIndex = index + Number(target.dataset.delta);
-      if (nextIndex >= 0 && nextIndex < state.builderDraft.items.length) [state.builderDraft.items[index], state.builderDraft.items[nextIndex]] = [state.builderDraft.items[nextIndex], state.builderDraft.items[index]];
-      showBuilder(); break;
-    }
-    case 'builder-remove': updateBuilderFromModal(); state.builderDraft.items.splice(Number(target.dataset.index), 1); showBuilder(); break;
     case 'pause-workout': pauseWorkout(); break;
     case 'resume-workout': resumeWorkout(); break;
     case 'finish-workout': finishWorkout(); break;

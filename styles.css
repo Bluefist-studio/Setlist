@@ -168,7 +168,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .template-actions { display: flex; gap: 6px; }
 .template-actions button { padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px; background: #fff; cursor: pointer; font-size: 9px; font-weight: 800; }
 .template-actions .start-template { border-color: var(--green); background: var(--green); color: #fff; }
-.template-actions .delete-template { width: 27px; padding: 0; color: #a54632; font-size: 15px; }
+.template-actions .delete-template { color: #a54632; }
 .stats-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 20px 0 27px; }
 .stat-block { min-height: 112px; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: rgba(255,255,255,.64); }
 .stat-block span { display: block; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; }
@@ -243,11 +243,13 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
 .builder-column-headings span:nth-child(n + 3) { text-align: center; }
 .builder-selection { margin: 0 0 15px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .builder-selection-heading { display: flex; justify-content: space-between; padding: 10px 0; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; }
-.builder-selected-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; min-height: 40px; border-top: 1px solid #eff0ec; font-size: 10px; }
+.builder-selected-row { display: grid; grid-template-columns: 24px 32px minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 40px; border-top: 1px solid #eff0ec; font-size: 10px; }
 .builder-selected-row > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .builder-selected-count { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; }
 .builder-selection-empty { margin: 0 0 11px; color: var(--muted); font-size: 10px; }
-.builder-row-controls button:disabled { opacity: .35; cursor: default; }
+.builder-drag-handle { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--muted); cursor: grab; font-size: 17px; touch-action: none; }
+.builder-drag-handle:active { cursor: grabbing; }
+.builder-selected-row.dragging { opacity: .45; }
 .quick-back-button { margin: -12px 0 5px; }
 .completion-secondary { margin-top: 8px; }
 .modal-panel .exercise-choice-list, .modal-panel .builder-exercises { overscroll-behavior: contain; }
@@ -312,6 +314,10 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
 .quick-summary-row strong { flex: 1; }
 .quick-summary-row span { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; }
 .quick-star { color: #d77a52; }
+.quick-remove-button { flex: 0 0 32px; width: 32px; height: 32px; padding: 0; font-size: 20px; }
+.modal-panel[data-modal-mode="template-detail"] .modal-actions,
+.modal-panel[data-modal-mode="quick-config"] .modal-actions { justify-content: center; }
+.modal-panel[data-modal-mode="quick-preview"] .quick-summary-row .exercise-name-button { font-size: 12px; }
 .quick-workout-actions { display: grid; justify-items: center; gap: 8px; margin-top: 20px; }
 .quick-workout-actions .button { width: min(100%, 320px); }
 .set-unit { margin-left: 4px; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; }
@@ -356,6 +362,10 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .home-intro { align-items: flex-start; }
   .home-intro h1 { font-size: 25px; }
   .streak-chip { padding: 9px; font-size: 11px; }
+  .workout-row { min-height: 82px; gap: 12px; padding-block: 13px; }
+  .workout-stamp { flex-basis: 44px; height: 44px; font-size: 14px; }
+  .workout-row-main strong { font-size: 16px; }
+  .workout-row-main small { font-size: 13px; line-height: 1.45; }
   .hero-grid { grid-template-columns: 1fr; }
   .quick-card { min-height: 225px; padding: 22px; }
   .quick-card h2 { margin-top: 24px; font-size: 24px; }
@@ -371,6 +381,16 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .filter-select { flex: 1; min-width: 0; }
   .exercise-choice-list { grid-template-columns: 1fr; }
   .template-grid { grid-template-columns: 1fr; }
+  .template-card { padding: 20px; }
+  .template-card h3 { font-size: 18px; line-height: 1.35; }
+  .template-card p { font-size: 13px; line-height: 1.5; }
+  .template-count { font-size: 13px; }
+  .template-exercises { gap: 7px; margin: 16px 0; }
+  .template-exercises .exercise-tag { padding: 7px 9px; font-size: 12px; }
+  .template-footer { flex-wrap: wrap; gap: 10px; }
+  .template-meta { font-size: 11px; }
+  .template-actions { display: grid; width: 100%; justify-items: center; gap: 8px; }
+  .template-actions button { width: min(100%, 320px); min-width: 64px; min-height: 48px; padding: 8px 12px; font-size: 13px; }
   .stats-summary { gap: 7px; }
   .stat-block { min-height: 96px; padding: 12px; }
   .stat-block strong { margin-top: 11px; font-size: 21px; }
@@ -378,6 +398,43 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .page-heading { align-items: flex-start; flex-direction: column; }
   .page-heading > .button { width: 100%; }
   .onboarding-panel, .modal-panel { padding: 21px 17px; }
+  .modal-panel .modal-heading { align-items: center; }
+  .modal-panel .modal-close { flex: 0 0 44px; width: 44px; height: 44px; font-size: 22px; }
+  .modal-panel .modal-actions { flex-wrap: wrap; gap: 10px; }
+  .modal-panel .button { min-height: 52px; padding-inline: 15px; font-size: 14px; }
+  .modal-panel .button-small { min-height: 48px; padding-inline: 14px; font-size: 13px; }
+  .modal-panel .button-plain { min-height: 46px; font-size: 14px; }
+  .modal-panel .option-chip { min-height: 48px; padding: 10px 13px; font-size: 13px; }
+  .modal-panel .quick-summary-row { min-height: 58px; gap: 12px; padding: 12px 0; font-size: 15px; }
+  .modal-panel .quick-summary-row .exercise-name-button,
+  .modal-panel .quick-summary-row > strong { font-size: 15px; line-height: 1.4; }
+  .modal-panel .quick-summary-row span:not(.quick-star) { flex: 0 0 auto; font-size: 12px; }
+  .modal-panel .quick-summary-row .quick-star { font-size: 17px; }
+  .modal-panel .quick-remove-button { flex-basis: 44px; width: 44px; height: 44px; font-size: 24px; }
+  .modal-panel .form-row .field-group:last-child > div { padding-top: 6px !important; font-size: 14px !important; line-height: 1.5; }
+  .modal-panel #builder-count, .modal-panel #builder-estimate { font-size: 17px; }
+  .modal-panel .form-row .field-label { font-size: 12px; }
+  .builder-exercise input[type=number] { text-align: center; }
+  .modal-panel[data-modal-mode="builder"] .modal-actions.spread,
+  .modal-panel[data-modal-mode="template-detail"] .modal-actions,
+  .modal-panel[data-modal-mode="quick-config"] .modal-actions,
+  .modal-panel .quick-workout-actions { display: grid; justify-items: center; gap: 10px; }
+  .modal-panel[data-modal-mode="builder"] .modal-actions.spread { grid-template-columns: minmax(0, 1fr); }
+  .modal-panel[data-modal-mode="builder"] .modal-actions.spread > div { display: grid; justify-items: center; width: 100%; gap: 10px; }
+  .modal-panel[data-modal-mode="builder"] .modal-actions.spread .button,
+  .modal-panel[data-modal-mode="template-detail"] .modal-actions .button,
+  .modal-panel[data-modal-mode="quick-config"] .modal-actions .button,
+  .modal-panel .quick-workout-actions .button { width: min(100%, 320px); }
+  .builder-exercises { max-height: 40vh; }
+  .builder-column-headings { grid-template-columns: 28px minmax(0, 1fr) 60px 60px; min-height: 40px; font-size: 10px; }
+  .builder-exercise { grid-template-columns: 28px minmax(0, 1fr) 60px 60px; min-height: 56px; gap: 6px; font-size: 12px; }
+  .builder-exercise input[type=checkbox] { width: 20px; height: 20px; }
+  .builder-exercise input[type=number] { min-height: 42px; padding: 4px; font-size: 16px; }
+  .builder-exercise small { font-size: 10px; }
+  .builder-selection-heading { padding: 12px 0; font-size: 11px; }
+  .builder-selected-row { grid-template-columns: 28px 44px minmax(0, 1fr) auto; min-height: 56px; gap: 7px; font-size: 13px; }
+  .builder-selected-count { font-size: 11px; }
+  .builder-drag-handle { width: 44px; height: 44px; font-size: 20px; }
   .view-container { font-size: 15px; }
   .page-heading h1 { font-size: 30px; }
   .page-heading p { font-size: 14px; line-height: 1.55; }
