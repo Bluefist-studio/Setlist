@@ -1,0 +1,1742 @@
+[
+  {
+    "id": "push-up",
+    "name": "Push-Up",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A bodyweight pressing exercise targeting the chest, shoulders, and triceps.",
+    "howTo": "Start in a plank position with hands slightly wider than your shoulders. Lower your chest toward the floor, then push back up."
+  },
+  {
+    "id": "incline-push-up",
+    "name": "Incline Push-Up",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An easier push-up variation performed with your hands elevated.",
+    "howTo": "Place your hands on a stable elevated surface and keep your body straight. Lower your chest toward the surface and push back up."
+  },
+  {
+    "id": "decline-push-up",
+    "name": "Decline Push-Up",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A push-up variation with your feet elevated, increasing the challenge for your upper body.",
+    "howTo": "Place your feet on a stable elevated surface and hands on the floor. Lower your chest toward the floor and press back up."
+  },
+  {
+    "id": "bench-press",
+    "name": "Bench Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A barbell pressing exercise primarily targeting the chest.",
+    "howTo": "Lie on the bench and lower the bar toward your chest. Press the bar upward until your arms are extended."
+  },
+  {
+    "id": "incline-bench-press",
+    "name": "Incline Bench Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A bench press performed on an incline to emphasize the upper chest.",
+    "howTo": "Lie on an inclined bench and lower the bar toward your upper chest. Press the bar upward until your arms are extended."
+  },
+  {
+    "id": "db-bench",
+    "name": "Dumbbell Bench Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 25,
+    "defaultRestSeconds": 90,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A chest press using two dumbbells instead of a barbell.",
+    "howTo": "Lie on a bench with a dumbbell in each hand. Lower the dumbbells toward your chest and press them back up."
+  },
+  {
+    "id": "incline-dumbbell-press",
+    "name": "Incline Dumbbell Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A dumbbell press performed on an incline to emphasize the upper chest.",
+    "howTo": "Lie on an inclined bench with a dumbbell in each hand. Lower them toward your upper chest and press them upward."
+  },
+  {
+    "id": "chest-fly",
+    "name": "Dumbbell Fly",
+    "bodyParts": [
+      "Chest"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "An isolation exercise that works the chest through a wide arm movement.",
+    "howTo": "Lie on a bench with dumbbells above your chest. Slowly lower your arms out to the sides, then bring them back together."
+  },
+  {
+    "id": "band-chest-press",
+    "name": "Band Chest Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A chest pressing movement using resistance bands.",
+    "howTo": "Anchor the band behind you and press your hands forward until your arms are extended. Return under control."
+  },
+  {
+    "id": "band-chest-fly",
+    "name": "Band Chest Fly",
+    "bodyParts": [
+      "Chest"
+    ],
+    "equipment": [
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A chest isolation exercise using resistance bands.",
+    "howTo": "With the bands anchored behind you, bring your hands together in front of your chest. Slowly return to the starting position."
+  },
+  {
+    "id": "machine-chest-press",
+    "name": "Chest Press",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A machine-based pressing exercise targeting the chest and triceps.",
+    "howTo": "Sit with your back against the pad and press the handles forward. Return the handles slowly."
+  },
+  {
+    "id": "dips",
+    "name": "Dips",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A bodyweight pushing exercise targeting the chest and triceps.",
+    "howTo": "Support yourself on parallel bars and lower your body by bending your elbows. Press yourself back up."
+  },
+  {
+    "id": "pull-up",
+    "name": "Pull-Up",
+    "bodyParts": [
+      "Back",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 6,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A bodyweight pulling exercise that primarily targets the upper back and lats.",
+    "howTo": "Hang from the bar with your palms facing away. Pull your chest toward the bar, then lower yourself with control."
+  },
+  {
+    "id": "chin-up",
+    "name": "Chin-Up",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 6,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A pulling exercise using an underhand grip with strong involvement from the biceps.",
+    "howTo": "Grip the bar with your palms facing toward you. Pull your chin over the bar, then lower yourself under control."
+  },
+  {
+    "id": "inverted-row",
+    "name": "Inverted Row",
+    "bodyParts": [
+      "Back",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A horizontal bodyweight pulling exercise for the back and arms.",
+    "howTo": "Position yourself under a secure horizontal bar and pull your chest toward it while keeping your body straight."
+  },
+  {
+    "id": "lat-pulldown",
+    "name": "Lat Pulldown",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 60,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A machine exercise that primarily targets the lat muscles of the back.",
+    "howTo": "Pull the bar down toward your upper chest while keeping your torso relatively upright. Slowly return the bar upward."
+  },
+  {
+    "id": "barbell-row",
+    "name": "Barbell Row",
+    "bodyParts": [
+      "Back",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A compound pulling exercise targeting the back and arms.",
+    "howTo": "Hinge forward while keeping your back stable. Pull the bar toward your lower ribs, then lower it under control."
+  },
+  {
+    "id": "db-row",
+    "name": "Dumbbell Row",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 30,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-arm pulling exercise targeting the back and arms.",
+    "howTo": "Support yourself with one hand and pull the dumbbell toward your hip. Lower it slowly and repeat."
+  },
+  {
+    "id": "kb-row",
+    "name": "Kettlebell Row",
+    "bodyParts": [
+      "Back",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 35,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A pulling exercise that targets the upper back and lats.",
+    "howTo": "Hinge forward with a stable back and pull the kettlebell toward your hip. Lower it under control."
+  },
+  {
+    "id": "cable-row",
+    "name": "Seated Cable Row",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A seated pulling exercise targeting the middle and upper back.",
+    "howTo": "Pull the handle toward your torso while keeping your back controlled. Slowly extend your arms again."
+  },
+  {
+    "id": "machine-row",
+    "name": "Seated Row Machine",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A machine-based horizontal pulling exercise for the back.",
+    "howTo": "Sit against the pad and pull the handles toward your torso. Return them slowly to the starting position."
+  },
+  {
+    "id": "face-pull",
+    "name": "Face Pull",
+    "bodyParts": [
+      "Back",
+      "Shoulders"
+    ],
+    "equipment": [
+      "Resistance bands",
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A pulling exercise targeting the upper back and rear shoulders.",
+    "howTo": "Pull the band or cable toward your face while driving your elbows outward. Slowly return to the starting position."
+  },
+  {
+    "id": "band-row",
+    "name": "Resistance Band Row",
+    "bodyParts": [
+      "Back",
+      "Arms"
+    ],
+    "equipment": [
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A rowing movement using resistance bands to train the back.",
+    "howTo": "Anchor the band in front of you and pull your hands toward your torso. Return slowly."
+  },
+  {
+    "id": "straight-arm-pulldown",
+    "name": "Straight-Arm Pulldown",
+    "bodyParts": [
+      "Back"
+    ],
+    "equipment": [
+      "Resistance bands",
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A back isolation exercise emphasizing the lats.",
+    "howTo": "Keep your arms mostly straight and pull the band or cable down toward your thighs. Return slowly."
+  },
+  {
+    "id": "overhead-squat",
+    "name": "Overhead Press",
+    "bodyParts": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 35,
+    "defaultRestSeconds": 90,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A compound pressing exercise primarily targeting the shoulders.",
+    "howTo": "Start with the bar at shoulder height and press it overhead until your arms are extended. Lower it under control."
+  },
+  {
+    "id": "dumbbell-shoulder-press",
+    "name": "Dumbbell Shoulder Press",
+    "bodyParts": [
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A shoulder pressing exercise performed with dumbbells.",
+    "howTo": "Hold the dumbbells at shoulder height and press them overhead. Lower them back to shoulder level."
+  },
+  {
+    "id": "kb-press",
+    "name": "Kettlebell Press",
+    "bodyParts": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 20,
+    "defaultRestSeconds": 90,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-arm overhead press using a kettlebell.",
+    "howTo": "Hold the kettlebell at shoulder height and press it overhead. Lower it slowly back to the starting position."
+  },
+  {
+    "id": "arnold-press",
+    "name": "Arnold Press",
+    "bodyParts": [
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A dumbbell shoulder press that combines rotation with the pressing movement.",
+    "howTo": "Start with palms facing you at shoulder height. Rotate your palms outward as you press the dumbbells overhead."
+  },
+  {
+    "id": "lateral-raise",
+    "name": "Lateral Raise",
+    "bodyParts": [
+      "Shoulders"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the side of the shoulders.",
+    "howTo": "Raise your arms out to the sides until roughly shoulder height. Lower them slowly."
+  },
+  {
+    "id": "front-raise",
+    "name": "Front Raise",
+    "bodyParts": [
+      "Shoulders"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the front of the shoulders.",
+    "howTo": "Raise your arms in front of you to about shoulder height. Lower them slowly."
+  },
+  {
+    "id": "rear-delt-fly",
+    "name": "Rear Delt Fly",
+    "bodyParts": [
+      "Shoulders",
+      "Back"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An exercise targeting the rear shoulders and upper back.",
+    "howTo": "Hinge forward and raise your arms out to the sides. Lower them slowly while keeping your torso stable."
+  },
+  {
+    "id": "band-pull-apart",
+    "name": "Band Pull-Apart",
+    "bodyParts": [
+      "Shoulders",
+      "Back"
+    ],
+    "equipment": [
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength",
+      "Mobility"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A light resistance exercise for the rear shoulders and upper back.",
+    "howTo": "Hold the band in front of you and pull your hands apart until the band reaches your chest. Return slowly."
+  },
+  {
+    "id": "bicep-curl",
+    "name": "Bicep Curl",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Barbell",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the biceps.",
+    "howTo": "Keep your elbows close to your sides and curl the weight toward your shoulders. Lower it slowly."
+  },
+  {
+    "id": "hammer-curl",
+    "name": "Hammer Curl",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A biceps and forearm exercise using a neutral hand position.",
+    "howTo": "Keep your palms facing each other and curl the weights toward your shoulders. Lower them slowly."
+  },
+  {
+    "id": "barbell-curl",
+    "name": "Barbell Curl",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A barbell isolation exercise for the biceps.",
+    "howTo": "Hold the bar with an underhand grip and curl it toward your shoulders. Lower it under control."
+  },
+  {
+    "id": "concentration-curl",
+    "name": "Concentration Curl",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A seated single-arm curl that focuses on the biceps.",
+    "howTo": "Rest your upper arm against your inner thigh and curl the dumbbell toward your shoulder. Lower it slowly."
+  },
+  {
+    "id": "tricep-pushdown",
+    "name": "Triceps Pushdown",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Machines",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the triceps.",
+    "howTo": "Keep your elbows close to your sides and push the handle or band downward. Return under control."
+  },
+  {
+    "id": "overhead-tricep-extension",
+    "name": "Overhead Triceps Extension",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Kettlebell",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise that targets the triceps from an overhead position.",
+    "howTo": "Hold the weight overhead and bend your elbows to lower it behind your head. Extend your arms to return."
+  },
+  {
+    "id": "skull-crusher",
+    "name": "Skull Crusher",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A lying triceps exercise performed with a barbell.",
+    "howTo": "Lie on a bench and hold the bar above your chest. Bend your elbows to lower the bar toward your forehead, then extend your arms."
+  },
+  {
+    "id": "close-grip-push-up",
+    "name": "Close-Grip Push-Up",
+    "bodyParts": [
+      "Arms",
+      "Chest"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A push-up variation that places more emphasis on the triceps.",
+    "howTo": "Place your hands closer together than a standard push-up. Lower your chest and press back up."
+  },
+  {
+    "id": "bodyweight-squat",
+    "name": "Bodyweight Squat",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A basic lower-body movement using only bodyweight.",
+    "howTo": "Sit your hips back and bend your knees to lower your body. Drive through your feet to stand back up."
+  },
+  {
+    "id": "goblet-squat",
+    "name": "Goblet Squat",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Kettlebell",
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 30,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A squat variation performed while holding a weight in front of your chest.",
+    "howTo": "Hold the weight close to your chest and squat down while keeping your torso upright. Stand back up."
+  },
+  {
+    "id": "back-squat",
+    "name": "Back Squat",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A barbell squat with the bar positioned across your upper back.",
+    "howTo": "Place the bar across your upper back and squat down by bending your hips and knees. Drive through your feet to stand."
+  },
+  {
+    "id": "front-squat",
+    "name": "Front Squat",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A barbell squat with the weight held in front of the body.",
+    "howTo": "Hold the bar across the front of your shoulders and squat down. Keep your torso upright as you stand back up."
+  },
+  {
+    "id": "romanian-deadlift",
+    "name": "Romanian Deadlift",
+    "bodyParts": [
+      "Legs",
+      "Back"
+    ],
+    "equipment": [
+      "Barbell",
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 55,
+    "defaultRestSeconds": 90,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A hip-hinge exercise emphasizing the hamstrings and glutes.",
+    "howTo": "Keep the weight close to your body and push your hips backward while keeping your back stable. Drive your hips forward to stand."
+  },
+  {
+    "id": "deadlift",
+    "name": "Deadlift",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Core"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 5,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 8,
+    "unit": "reps",
+    "description": "A compound lift involving the legs, hips, back, and core.",
+    "howTo": "Start with the bar near your shins and lift by driving through your feet while extending your hips. Lower the bar under control."
+  },
+  {
+    "id": "reverse-lunge",
+    "name": "Reverse Lunge",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-leg exercise that works the legs and challenges balance.",
+    "howTo": "Step one foot backward and lower your body toward the floor. Push through the front foot to return to standing."
+  },
+  {
+    "id": "walking-lunge",
+    "name": "Walking Lunge",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A moving lunge exercise that trains the legs and balance.",
+    "howTo": "Step forward into a lunge, then bring the rear leg forward into the next lunge. Continue alternating legs."
+  },
+  {
+    "id": "bulgarian-split-squat",
+    "name": "Bulgarian Split Squat",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A single-leg squat variation with the rear foot elevated.",
+    "howTo": "Place one foot behind you on an elevated surface and lower your body toward the floor. Push through the front foot to rise."
+  },
+  {
+    "id": "step-up",
+    "name": "Step-Up",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-leg exercise performed by stepping onto an elevated surface.",
+    "howTo": "Place one foot on the platform and drive through that leg to step up. Step back down under control."
+  },
+  {
+    "id": "leg-press",
+    "name": "Leg Press",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A machine-based exercise targeting the major muscles of the legs.",
+    "howTo": "Place your feet on the platform and bend your knees to lower the weight. Press through your feet to extend your legs."
+  },
+  {
+    "id": "leg-extension",
+    "name": "Leg Extension",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A machine isolation exercise targeting the quadriceps.",
+    "howTo": "Sit against the pad and extend your knees to raise the weight. Lower it slowly."
+  },
+  {
+    "id": "leg-curl",
+    "name": "Leg Curl",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A machine isolation exercise targeting the hamstrings.",
+    "howTo": "Bend your knees to pull the machine pad toward your body. Slowly return to the starting position."
+  },
+  {
+    "id": "calf-raise",
+    "name": "Calf Raise",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Dumbbells",
+      "Kettlebell",
+      "Machines"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An exercise that targets the calf muscles.",
+    "howTo": "Rise onto the balls of your feet, lifting your heels as high as comfortable. Lower your heels slowly."
+  },
+  {
+    "id": "plank",
+    "name": "Plank",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 30,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 4,
+    "unit": "seconds",
+    "description": "A static core exercise that trains the muscles responsible for keeping your torso stable.",
+    "howTo": "Support your body on your forearms and toes while keeping your body in a straight line. Hold the position."
+  },
+  {
+    "id": "side-plank",
+    "name": "Side Plank",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 30,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 40,
+    "estimatedTime": 4,
+    "unit": "seconds",
+    "description": "A static exercise that emphasizes the sides of the core.",
+    "howTo": "Support yourself on one forearm and the side of your foot. Keep your body straight and hold the position."
+  },
+  {
+    "id": "dead-bug",
+    "name": "Dead Bug",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "A core stability exercise that trains control while moving the arms and legs.",
+    "howTo": "Lie on your back with arms and legs raised. Slowly extend the opposite arm and leg while keeping your lower back controlled."
+  },
+  {
+    "id": "bird-dog",
+    "name": "Bird Dog",
+    "bodyParts": [
+      "Core",
+      "Back"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 40,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "A core stability exercise performed from a hands-and-knees position.",
+    "howTo": "Extend one arm and the opposite leg while keeping your torso stable. Return to the starting position and switch sides."
+  },
+  {
+    "id": "crunch",
+    "name": "Crunch",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "A basic abdominal exercise using a short curling motion.",
+    "howTo": "Lie on your back with knees bent. Lift your shoulders toward your knees, then lower back down."
+  },
+  {
+    "id": "bicycle-crunch",
+    "name": "Bicycle Crunch",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "An abdominal exercise combining trunk rotation with alternating leg movement.",
+    "howTo": "Lie on your back and alternate bringing each elbow toward the opposite knee while extending the other leg."
+  },
+  {
+    "id": "hanging-knee-raise",
+    "name": "Hanging Knee Raise",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A hanging core exercise performed by raising the knees toward the torso.",
+    "howTo": "Hang from a bar and raise your knees toward your chest. Lower your legs slowly."
+  },
+  {
+    "id": "leg-raise",
+    "name": "Leg Raise",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A core exercise performed by raising the legs while lying down.",
+    "howTo": "Lie on your back and raise your legs upward. Lower them slowly without losing control of your lower back."
+  },
+  {
+    "id": "pallof-press",
+    "name": "Pallof Press",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Resistance bands",
+      "Machines"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A core stability exercise that challenges you to resist rotation.",
+    "howTo": "Stand sideways to the anchor and hold the band at your chest. Press your hands straight forward while resisting the pull."
+  },
+  {
+    "id": "russian-twist",
+    "name": "Russian Twist",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight",
+      "Kettlebell",
+      "Dumbbells"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A seated core exercise involving controlled rotation of the torso.",
+    "howTo": "Sit with your knees bent and rotate your torso from side to side. Hold a weight if desired."
+  },
+  {
+    "id": "weighted-sit-up",
+    "name": "Weighted Sit-Up",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A sit-up performed while holding additional weight.",
+    "howTo": "Lie on your back holding the weight near your chest. Sit up by curling your torso forward, then lower back down."
+  },
+  {
+    "id": "kb-swing",
+    "name": "Kettlebell Swing",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Core",
+      "Shoulders"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength",
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 25,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A dynamic hip-hinge exercise that trains the hips, legs, back, and core.",
+    "howTo": "Swing the kettlebell between your legs and drive your hips forward to bring it up to about chest height."
+  },
+  {
+    "id": "turkish-get-up",
+    "name": "Turkish Get-Up",
+    "bodyParts": [
+      "Full Body",
+      "Core",
+      "Shoulders",
+      "Legs"
+    ],
+    "equipment": [
+      "Kettlebell",
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Mobility"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 3,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 7,
+    "unit": "reps",
+    "description": "A full-body movement that combines strength, stability, and controlled transitions from the floor to standing.",
+    "howTo": "Start lying down while holding the weight overhead and move through a series of controlled positions until standing. Reverse the movement to return to the floor."
+  },
+  {
+    "id": "kettlebell-clean",
+    "name": "Kettlebell Clean",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength",
+      "Power"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A dynamic movement that brings a kettlebell from the floor or between the legs to the shoulder.",
+    "howTo": "Drive through your hips to swing the kettlebell upward and guide it into the rack position at your shoulder."
+  },
+  {
+    "id": "kettlebell-snatch",
+    "name": "Kettlebell Snatch",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength",
+      "Power",
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A dynamic full-body movement that drives a kettlebell from the swing position overhead.",
+    "howTo": "Use your hips to drive the kettlebell upward and guide it smoothly overhead. Lower it under control."
+  },
+  {
+    "id": "burpee",
+    "name": "Burpee",
+    "bodyParts": [
+      "Full Body"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A full-body conditioning exercise combining a squat, plank position, and jump.",
+    "howTo": "Squat down, place your hands on the floor, move your feet back, then return to standing and jump."
+  },
+  {
+    "id": "mountain-climber",
+    "name": "Mountain Climber",
+    "bodyParts": [
+      "Core",
+      "Shoulders",
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 20,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "A dynamic bodyweight exercise that challenges the core and raises your heart rate.",
+    "howTo": "Start in a plank position and alternate driving your knees toward your chest."
+  },
+  {
+    "id": "farmer-carry",
+    "name": "Farmer Carry",
+    "bodyParts": [
+      "Full Body",
+      "Core",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength",
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 30,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "seconds",
+    "description": "A loaded carry that trains grip, core stability, and full-body strength.",
+    "howTo": "Hold a weight in each hand and walk while keeping your torso upright and controlled."
+  },
+  {
+    "id": "kettlebell-clean-press",
+    "name": "Kettlebell Clean & Press",
+    "bodyParts": [
+      "Full Body",
+      "Shoulders",
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Kettlebell"
+    ],
+    "categories": [
+      "Strength",
+      "Power"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 6,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A full-body movement combining a kettlebell clean with an overhead press.",
+    "howTo": "Clean the kettlebell into the rack position, then press it overhead. Lower it and repeat."
+  },
+  {
+    "id": "thruster",
+    "name": "Thruster",
+    "bodyParts": [
+      "Legs",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Kettlebell",
+      "Barbell"
+    ],
+    "categories": [
+      "Strength",
+      "Conditioning"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A full-body exercise combining a squat with an overhead press.",
+    "howTo": "Squat while holding the weight at your shoulders, then drive upward and press the weight overhead."
+  },
+  {
+    "id": "cat-cow",
+    "name": "Cat-Cow",
+    "bodyParts": [
+      "Back"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Mobility"
+    ],
+    "defaultSets": 2,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 30,
+    "estimatedTime": 3,
+    "unit": "reps",
+    "description": "A gentle spinal mobility movement that alternates between arching and rounding the back.",
+    "howTo": "Start on hands and knees. Gently arch your back and lift your chest, then round your spine and tuck your chin. Move slowly between positions."
+  },
+  {
+    "id": "glute-bridge",
+    "name": "Glute Bridge",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A bodyweight hip-extension exercise targeting the glutes and hamstrings.",
+    "howTo": "Lie on your back with knees bent and feet flat. Brace your core, press through your feet, and lift your hips. Lower them under control."
+  },
+  {
+    "id": "tricep-extension",
+    "name": "Tricep Extension",
+    "bodyParts": [
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An arm exercise that targets the triceps using a dumbbell or resistance band.",
+    "howTo": "Hold the weight overhead or anchor a band securely. Bend your elbows to lower your hands, then extend your arms without flaring your elbows."
+  }
+]

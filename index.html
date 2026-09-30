@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f4ef">
+  <meta name="description" content="A simple, flexible workout organizer and tracker.">
+  <title>Setlist — Train your way</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#home" data-view="home" aria-label="Setlist home"><span class="brand-mark">S</span><span>setlist<span class="brand-period"></span></span></a>
+      <div class="side-label">YOUR SPACE</div>
+      <nav class="side-nav">
+        <button class="nav-link active" data-view="home"><span class="nav-icon">⌂</span>Home</button>
+        <button class="nav-link" data-view="exercises"><span class="nav-icon">◉</span>Exercises</button>
+        <button class="nav-link" data-view="workouts"><span class="nav-icon">▤</span>Workouts</button>
+        <button class="nav-link" data-view="stats"><span class="nav-icon">↗</span>Stats</button>
+      </nav>
+      <div class="sidebar-bottom"><span class="avatar" id="user-avatar">G</span><div><strong id="sidebar-name">Your space</strong><small id="sidebar-level">Level 1 · 0 XP</small></div><button class="icon-button settings-button" data-action="settings" title="Preferences" aria-label="Preferences">⚙</button></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><a class="mobile-brand" href="#home" data-view="home" aria-label="Setlist home"><span class="brand-mark">S</span><strong>setlist<span class="brand-period"></span></strong></a><div class="topbar-context" id="topbar-context">YOUR TRAINING, YOUR CALL</div><button class="top-avatar" id="top-avatar" data-action="settings" title="Preferences" aria-label="Preferences">G</button></header>
+      <div class="view-container" id="view-container" tabindex="-1"></div>
+    </main>
+  </div>
+  <div id="active-dock"></div>
+  <nav class="mobile-nav" aria-label="Main navigation">
+    <button class="mobile-nav-link active" data-view="home"><span>⌂</span><small>Home</small></button>
+    <button class="mobile-nav-link" data-view="exercises"><span>◉</span><small>Exercises</small></button>
+    <button class="mobile-nav-link" data-view="workouts"><span>▤</span><small>Workouts</small></button>
+    <button class="mobile-nav-link" data-view="stats"><span>↗</span><small>Stats</small></button>
+  </nav>
+  <div id="modal-root"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

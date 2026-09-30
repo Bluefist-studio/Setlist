@@ -1,0 +1,11 @@
+Setlist Firebase setup
+
+1. Enable Anonymous sign-in in Firebase Authentication.
+2. Create a Cloud Firestore database.
+3. Run `npx firebase-tools login` from this folder.
+4. Publish the user-scoped rules with `npx firebase-tools deploy --only firestore:rules`.
+
+The app initializes Firebase from firebase-sync.js. Local browser storage remains
+the immediate source of truth; changes sync to the signed-in anonymous user's
+Firestore document when a connection is available. Cloud sync stays paused until
+the app verifies the private Firestore rules are deployed.

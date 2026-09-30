@@ -1,0 +1,1076 @@
+# SETLIST — FITNESS APP
+
+Build a mobile-first fitness tracking web app called **Setlist**.
+
+Use **HTML, CSS, and vanilla JavaScript**. Avoid frameworks unless there is a compelling reason to use one.
+
+The app should initially work entirely in the browser using localStorage. Structure the code so a backend such as Firebase could be added later.
+
+The priority is a polished, functional UI and a simple, intuitive workout experience.
+
+---
+
+# 1. APP CONCEPT
+
+Setlist is a simple fitness workout organizer and tracker.
+
+The user chooses what they want to train. Setlist helps them:
+
+* Build workouts
+* Start workouts quickly
+* Remember previous workouts
+* Suggest weights, reps, and sets based on history
+* Track weight, reps, and sets
+* Estimate workout duration
+* Track actual workout time
+* Track average rest time
+* Track progression
+* Build a workout bank
+* Track consistency
+* Earn XP and levels
+
+The app should NOT feel like a personal trainer or forced training program.
+
+The user remains in control.
+
+Avoid:
+
+* Subscription/paywall features
+* Social feeds
+* Calorie tracking
+* Nutrition tracking
+* Forced programs
+* AI coaching
+* Excessive gamification
+
+---
+
+# 2. CORE PRINCIPLE
+
+The app has three ways to start training:
+
+### QUICK START
+
+"You decide what I'm doing."
+
+The user provides constraints and Setlist builds the workout.
+
+### CREATE WORKOUT
+
+"I'll decide what I'm doing."
+
+The user builds the workout manually.
+
+### REPEAT WORKOUT
+
+"Use something I've already built."
+
+The user selects a workout from their workout bank and modifies it if desired.
+
+---
+
+# 3. MAIN NAVIGATION
+
+Four primary sections:
+
+* Home
+* Exercises
+* Workouts
+* Stats
+
+Use a bottom navigation bar for these sections.
+
+The user should be able to navigate between these sections at any time.
+
+---
+
+# 4. ACTIVE WORKOUT STATE
+
+An active workout is a persistent application state, NOT simply a page.
+
+Once a workout starts:
+
+* The workout timer continues running
+* Workout progress is preserved
+* Completed sets are preserved
+* Entered weight/reps are preserved
+* The user can navigate anywhere in the app
+* The user can return to the active workout at any time
+
+Navigating away must NOT cancel or pause the workout.
+
+Only an explicit pause, finish, or discard action should change the workout state.
+
+---
+
+# 5. PERSISTENT ACTIVE WORKOUT BAR
+
+When a workout is active, display a persistent bottom bar above the normal navigation.
+
+Example:
+
+────────────────────────────
+● WORKOUT ACTIVE     21:14
+KB Press · Set 2/3
+[ RETURN ]
+────────────────────────────
+
+The bar should:
+
+* Show that a workout is active
+* Show elapsed workout time
+* Show the current exercise
+* Show current set/progress
+* Provide a Return button
+* Remain visible while navigating Home, Exercises, Workouts, or Stats
+
+The timer must continue running regardless of which section the user is viewing.
+
+If the user navigates to Exercises, for example:
+
+EXERCISES
+
+Search exercises...
+
+...
+
+────────────────────────────
+● WORKOUT ACTIVE     21:14
+KB Press · Set 2/3
+[ RETURN ]
+────────────────────────────
+
+This is a critical feature.
+
+---
+
+# 6. ONBOARDING
+
+Show a short onboarding process when the app is first opened.
+
+## Equipment
+
+Allow the user to select available equipment:
+
+* Bodyweight
+* Kettlebell
+* Dumbbells
+* Resistance bands
+* Barbell
+* Machines
+* Other
+
+## Preferred exercises
+
+Allow the user to select favorite/preferred exercises from the exercise database.
+
+Encourage at least approximately 8 exercises because Quick Start needs enough options.
+
+Allow the user to skip and configure this later.
+
+## Preferred workout duration
+
+Ask:
+
+"How long do you usually want to work out?"
+
+Options:
+
+* 15 minutes
+* 20 minutes
+* 30 minutes
+* 45 minutes
+* 60 minutes
+* Custom
+
+This becomes the default Quick Start duration.
+
+Do NOT require default sets, reps, or rest during onboarding.
+
+---
+
+# 7. HOME SCREEN
+
+Use this layout as the starting design:
+
+FITNESS
+
+Level 7       🔥 3 days
+
+┌─────────────────────────┐
+│ ⚡ QUICK START           │
+│                         │
+│ Upper Body + Core       │
+│ 30 min · Gym            │
+│                         │
+│       [ START ]         │
+└─────────────────────────┘
+
+YOUR WORKOUTS
+
+Upper Body + Core    >
+Full Body            >
+Rugby Maintenance    >
+
+[ + CREATE WORKOUT ]
+
+────────────────────
+
+12 Workouts    18,450 lb
+7h 24m         72% XP
+
+HOME   EXERCISES   WORKOUTS   STATS
+
+The sample values are placeholders.
+
+The Home screen should immediately allow:
+
+* Quick Start
+* Repeat an existing workout
+* Create a workout
+* View exercises
+* View stats
+
+---
+
+# 8. EXERCISE LIBRARY
+
+Create a database of exercises.
+
+Each exercise should contain:
+
+* ID
+* Name
+* Equipment
+* Body parts/categories
+* Favorite status
+* Default sets
+* Default reps
+* Suggested/default weight where appropriate
+* Estimated work time
+* Default rest
+
+Support:
+
+* Search
+* Favorites
+* Equipment filters
+* Body-part filters
+* Category filters
+
+Example categories:
+
+* Strength
+* Core
+* Mobility
+* Kettlebell
+* Dumbbell
+* Bodyweight
+
+---
+
+# 9. EXERCISE HISTORY
+
+Setlist should remember exercise performance.
+
+Example:
+
+KB ROW
+
+Last:
+40 lb × 10 × 3
+
+Best:
+45 lb × 10 × 3
+
+Suggested:
+40 lb × 10 × 3
+
+The app should use recent performance to generate reasonable suggestions.
+
+Suggestions are never mandatory.
+
+---
+
+# 10. WORKOUT BANK
+
+The Workouts section stores reusable workout templates.
+
+A workout contains:
+
+* ID
+* Name
+* Exercises
+* Exercise order
+* Suggested sets
+* Suggested reps
+* Suggested weight
+* Estimated duration
+* Times used
+* Last used
+
+Example:
+
+UPPER BODY + CORE
+
+8 workouts
+Last used Sept 25
+
+KB Row
+KB Press
+Face Pull
+Push-up
+Dead Bug
+KB Swing
+
+[ START ]
+[ EDIT ]
+
+A workout template is NOT the same thing as a completed workout.
+
+The template describes the workout structure.
+
+The completed workout stores what the user actually performed.
+
+---
+
+# 11. CREATE WORKOUT
+
+Flow:
+
+1. Choose body parts
+2. Choose desired workout duration
+3. Select exercises
+4. Reorder exercises
+5. Set sets
+6. Set reps
+7. Set suggested weight
+8. Name workout
+9. Review estimated duration
+10. Save
+
+Body part options:
+
+* Chest
+* Back
+* Shoulders
+* Arms
+* Legs
+* Core
+* Full Body
+
+The app can suggest a workout name.
+
+Example:
+
+"Upper Body + Core"
+
+The user can rename it.
+
+---
+
+# 12. QUICK START
+
+Quick Start should allow the user to select:
+
+### Body part
+
+* Full Body
+* Upper Body
+* Lower Body
+* Core
+* Custom
+
+### Duration
+
+Use the onboarding preference by default.
+
+Allow the user to change it.
+
+### Equipment
+
+* Gym/available equipment
+* Bodyweight only
+
+Bodyweight-only mode is important.
+
+The generator should consider:
+
+* Favorite exercises
+* Available equipment
+* Recent exercise history
+* Exercises not used recently
+* Selected body parts
+* Desired workout duration
+* Sets/reps
+* Estimated exercise duration
+* Rest periods
+
+The generator should prioritize favorites while introducing some variety.
+
+Do NOT simply choose the same favorite exercises every time.
+
+Example:
+
+QUICK WORKOUT
+
+Upper Body + Core
+~29 min
+
+⭐ KB Row
+3 × 10
+
+⭐ KB Press
+3 × 8
+
+⭐ Face Pull
+3 × 12
+
+🆕 Dead Bug
+3 × 10
+
+⭐ Push-up
+3 × 12
+
+[ START ]
+[ MODIFY ]
+[ REGENERATE ]
+
+The requested duration does not need to be exact.
+
+A 30-minute request could reasonably produce a 28–32 minute workout.
+
+---
+
+# 13. QUICK START INTELLIGENCE
+
+The generator should use a simple scoring system rather than random selection.
+
+Consider:
+
+* Favorite status
+* How recently the exercise was used
+* How frequently the exercise has been used
+* Whether the exercise matches selected body parts
+* Whether the exercise matches available equipment
+* Whether adding it keeps the workout near the desired duration
+* Variety between exercises
+
+Favorites should have a strong preference.
+
+Recently used exercises should receive a lower priority.
+
+Exercises not used recently should receive a higher priority.
+
+The goal is:
+
+"Mostly exercises I like, with enough variety that every Quick Start isn't identical."
+
+---
+
+# 14. STARTING A WORKOUT
+
+Before starting, show:
+
+WORKOUT NAME
+
+Estimated duration
+
+Exercise list
+
+Example:
+
+UPPER BODY + CORE
+
+Estimated: 32 min
+
+1. KB Row — 3 × 10
+2. KB Press — 3 × 8
+3. Face Pull — 3 × 12
+4. Push-up — 3 × 12
+5. Dead Bug — 3 × 10
+
+[ START WORKOUT ]
+
+Starting the workout starts the workout timer.
+
+---
+
+# 15. WORKOUT SCREEN
+
+The workout screen should be extremely simple.
+
+Example:
+
+KB ROW
+
+Suggested
+
+35 lb × 10 × 3
+
+SET | WEIGHT | REPS
+
+1 | 35 lb | 10 | ✓
+2 | 35 lb | 10 | ✓
+3 | 35 lb | 10
+
+[ COMPLETE SET ]
+
+The user can modify:
+
+* Weight
+* Reps
+* Sets
+
+These are the fundamental workout metrics.
+
+---
+
+# 16. SET COMPLETION
+
+When a set is completed:
+
+* Save the set
+* Record the completion timestamp
+* Update workout progress
+* Move to the next set
+
+The app should quietly record elapsed time between completed sets.
+
+The user does NOT need to manually operate a rest timer.
+
+Do not force the user to wait a specific amount of time.
+
+---
+
+# 17. REST TIMER
+
+A rest timer may exist as an optional convenience feature, but it should NOT be required for logging a workout.
+
+The app should always record actual time between completed sets automatically.
+
+The user should be free to rest for as long or as little as they want.
+
+---
+
+# 18. EXERCISE COMPLETION
+
+After completing the final set:
+
+KB ROW ✓
+
+35 lb × 10 × 3
+
+The user should be able to choose what exercise they want to do next.
+
+Do NOT force the next exercise from the original workout order.
+
+Example:
+
+WHAT'S NEXT?
+
+[ KB PRESS ]
+[ FACE PULL ]
+[ + CHOOSE EXERCISE ]
+
+The original workout order should remain available as a suggestion, but the user controls the execution order.
+
+---
+
+# 19. ADDING / CHANGING EXERCISES DURING A WORKOUT
+
+While a workout is active, the user can:
+
+* Choose another exercise
+* Add an exercise
+* Skip an exercise
+* Change exercise order
+* Browse the Exercise Library
+* Add an exercise from the library to the current workout
+
+The user should be able to select:
+
+"Do next"
+
+without permanently changing the saved workout template unless they explicitly choose to edit/save the template.
+
+This is important:
+
+### Workout template
+
+What the workout normally contains.
+
+### Active workout
+
+What the user actually decides to do today.
+
+Do not automatically overwrite the template when the active workout changes.
+
+---
+
+# 20. WORKOUT NAVIGATION
+
+The user must be able to navigate the entire app during an active workout.
+
+They can visit:
+
+* Home
+* Exercises
+* Workouts
+* Stats
+
+The workout continues in the background.
+
+The persistent workout bar remains visible.
+
+Returning to the workout restores the exact active state.
+
+Example:
+
+User is doing:
+
+KB Press — Set 2/3
+
+They navigate to Exercises.
+
+They search for Face Pull.
+
+They add Face Pull as the next exercise.
+
+They return to the workout.
+
+Nothing has been lost.
+
+---
+
+# 21. ACTIVE WORKOUT STATES
+
+Implement explicit states:
+
+### Not started
+
+Workout template exists but hasn't begun.
+
+### Active
+
+Workout is currently being performed.
+
+### Paused
+
+Only if the user explicitly chooses to pause.
+
+### Completed
+
+Workout has been finalized.
+
+### Discarded
+
+Workout has been intentionally abandoned.
+
+Navigating away does NOT change the state from Active.
+
+---
+
+# 22. WORKOUT PROGRESS
+
+Show a subtle progress indicator.
+
+Example:
+
+Upper Body + Core
+2 / 6 exercises
+
+━━━━━━━━━━░░░░
+
+The exact UI is flexible.
+
+Keep it unobtrusive.
+
+---
+
+# 23. ACTUAL WORKOUT TIME
+
+Start the workout timer when the user presses:
+
+[ START WORKOUT ]
+
+Stop it when the workout is completed.
+
+Store:
+
+* Start timestamp
+* End timestamp
+* Total workout duration
+
+The timer continues regardless of navigation.
+
+---
+
+# 24. REST TRACKING
+
+Automatically capture the time between completed sets.
+
+Do not require the user to start or stop a rest timer.
+
+At the end of the workout calculate:
+
+Average Rest
+
+Example:
+
+1:42
+
+This should be based on actual time between sets.
+
+---
+
+# 25. WORKOUT COMPLETION
+
+After the final exercise:
+
+WORKOUT COMPLETE ✓
+
+Upper Body + Core
+
+34:27
+Actual workout time
+
+Estimated:
+32:00
+
+WORKOUT STATS
+
+6 Exercises
+18 Sets
+4,820 lb Volume
+
+Average Rest
+1:42
+
+Then show performance:
+
+KB Row
+40 lb × 10 × 3
++5 lb from previous
+
+KB Press
+20 lb × 8 × 3
+Same
+
+Face Pull
+15 lb × 12 × 3
++2 reps
+
+Then:
+
++145 XP
+
+Level 7
+████████░░ 82%
+
+Allow the user to save/finish.
+
+---
+
+# 26. PROGRESSION
+
+Compare completed exercise performance against previous history.
+
+Possible improvements:
+
+* More weight
+* More reps
+* More sets
+* More total volume
+* Personal best
+* Improved consistency
+
+Do not automatically prescribe progression.
+
+The app suggests but the user decides.
+
+---
+
+# 27. STATS
+
+Create a simple Stats page.
+
+Possible metrics:
+
+* Total workouts
+* Workouts this month
+* Total sets
+* Total training time
+* Total weighted volume
+* Exercise progression
+* Personal bests
+* Current streak
+* Average workout duration
+* Average rest
+
+Example:
+
+THIS MONTH
+
+12 Workouts
+7h 24m Training
+184 Sets
+32,450 lb Volume
+
+Average Rest
+1:46
+
+Workout Frequency
+3.0 / week
+
+Use charts where they actually improve understanding, but do not turn the page into an overly complicated analytics dashboard.
+
+---
+
+# 28. XP AND LEVELS
+
+Use XP as a light motivational feature.
+
+Award XP for things such as:
+
+* Completing workouts
+* Completing sets
+* Trying new exercises
+* Progressing exercises
+* Maintaining consistency
+
+Do not make heavier weights the primary way to gain XP.
+
+XP should reward showing up and training consistently.
+
+---
+
+# 29. USER PREFERENCES
+
+Initial onboarding preferences:
+
+* Available equipment
+* Favorite exercises
+* Preferred workout duration
+
+Additional settings can later include:
+
+* Default sets
+* Default reps
+* Default rest
+* Exercise preferences
+* Workout preferences
+
+Do not overwhelm the onboarding experience with these settings.
+
+---
+
+# 30. DATA STRUCTURE
+
+Design the data model around these entities.
+
+## User
+
+* ID
+* Name
+* Equipment
+* Favorite exercises
+* Preferred workout duration
+* XP
+* Level
+* Streak
+
+## Exercise
+
+* ID
+* Name
+* Equipment
+* Body parts
+* Categories
+* Favorite
+* Default sets
+* Default reps
+* Suggested weight
+* Estimated work time
+* Default rest
+
+## Exercise History
+
+* Date
+* Exercise ID
+* Weight
+* Reps
+* Sets
+* Exercise duration
+* Set completion timestamps
+
+## Workout Template
+
+* ID
+* Name
+* Exercises
+* Exercise order
+* Suggested sets
+* Suggested reps
+* Suggested weight
+* Estimated duration
+* Times used
+* Last used
+
+## Active Workout
+
+* Template ID if applicable
+* Workout name
+* Start timestamp
+* Current exercise
+* Exercise order
+* Completed exercises
+* Completed sets
+* Actual weight
+* Actual reps
+* Set timestamps
+* Current state
+
+## Completed Workout
+
+* Date
+* Workout name
+* Exercises performed
+* Actual sets
+* Actual reps
+* Actual weight
+* Total duration
+* Average rest
+* Volume
+* XP earned
+
+---
+
+# 31. LOCAL STORAGE
+
+Use localStorage for the initial version.
+
+Create a clean data-access layer so storage can later be replaced by Firebase or another backend.
+
+The UI should not directly manipulate raw localStorage throughout the application.
+
+---
+
+# 32. UI DESIGN
+
+Mobile-first.
+
+Clean, modern, simple.
+
+Large touch targets.
+
+Clear typography.
+
+Minimal clutter.
+
+The workout screen should be especially easy to use while exercising.
+
+Avoid:
+
+* Excessive animations
+* Excessive gradients
+* Tiny buttons
+* Overly complicated menus
+* Excessive cards
+* Fake motivational language
+* Subscription prompts
+
+The app should feel like a polished utility.
+
+---
+
+# 33. IMPORTANT UX PRINCIPLE
+
+The user should never feel trapped inside a workout.
+
+They can navigate anywhere.
+
+They can change what exercise comes next.
+
+They can add exercises.
+
+They can skip exercises.
+
+They can modify weight/reps/sets.
+
+The app remembers everything.
+
+The persistent workout bar always makes it obvious that a workout is active and provides a fast way back.
+
+---
+
+# 34. DEVELOPMENT PRIORITY
+
+Build in this order:
+
+### Phase 1 — UI and navigation
+
+* Onboarding
+* Home
+* Exercises
+* Workouts
+* Stats
+* Navigation
+
+### Phase 2 — Exercise and workout data
+
+* Exercise database
+* Favorites
+* Exercise history
+* Workout templates
+
+### Phase 3 — Workout creation
+
+* Create workout
+* Name workout
+* Select body parts
+* Select exercises
+* Sets/reps/weight
+* Estimated duration
+
+### Phase 4 — Quick Start
+
+* Duration selection
+* Body-part selection
+* Equipment selection
+* Exercise selection algorithm
+* Variety logic
+* Bodyweight-only mode
+
+### Phase 5 — Active workout
+
+* Workout timer
+* Set logging
+* Exercise progression
+* Free navigation
+* Persistent active-workout bar
+* Change next exercise
+* Add exercises during workout
+
+### Phase 6 — Completion and stats
+
+* Workout summary
+* Actual time
+* Average rest
+* Volume
+* Performance comparison
+* XP
+* History
+* Stats
+
+---
+
+# FINAL DESIGN PRINCIPLE
+
+Setlist should feel like:
+
+**"I know how I want to train. Setlist makes it easy to organize, remember, and track it."**
+
+It should never feel like:
+
+**"The app is telling me how I have to train."**
