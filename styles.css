@@ -339,23 +339,23 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
 @media (max-width: 680px) {
   .sidebar { display: none; }
   .main-area { margin-left: 0; }
-  .topbar { height: 57px; padding: 0 18px; }
-  .mobile-brand { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 15px; text-decoration: none; }
-  .mobile-brand .brand-mark { width: 25px; height: 25px; border-radius: 7px; font-size: 14px; }
-  .topbar-context { font-size: 8px; }
-  .top-avatar { display: grid; place-items: center; width: 29px; height: 29px; border: 0; border-radius: 50%; background: var(--lime); color: var(--green); font-weight: 800; }
+  .topbar { height: 61px; padding: 0 18px; }
+  .mobile-brand { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 16px; text-decoration: none; }
+  .mobile-brand .brand-mark { width: 28px; height: 28px; border-radius: 7px; font-size: 15px; }
+  .topbar-context { font-size: 9px; }
+  .top-avatar { display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--lime); color: var(--green); font-size: 15px; font-weight: 800; }
   .view-container { padding: 27px 18px 135px; }
-  .mobile-nav { position: fixed; z-index: 10; inset: auto 0 0; display: grid; grid-template-columns: repeat(4, 1fr); height: 65px; padding: 5px 8px max(5px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(250,250,247,.96); backdrop-filter: blur(12px); }
+  .mobile-nav { position: fixed; z-index: 10; inset: auto 0 0; display: grid; grid-template-columns: repeat(4, 1fr); height: 72px; padding: 5px 8px max(5px, env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: rgba(250,250,247,.96); backdrop-filter: blur(12px); }
   .mobile-nav-link { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border: 0; background: transparent; color: #858b82; cursor: pointer; }
-  .mobile-nav-link span { font-size: 17px; }
-  .mobile-nav-link small { font-size: 9px; font-weight: 700; }
+  .mobile-nav-link span { font-size: 20px; }
+  .mobile-nav-link small { font-size: 11px; font-weight: 700; }
   .mobile-nav-link.active { color: var(--green); }
   .active-dock { right: 10px; bottom: 73px; left: 10px; min-height: 61px; padding: 8px 10px; gap: 9px; }
   .dock-return { padding: 0 9px; font-size: 9px; }
   .dock-time { font-size: 10px; }
   .home-intro { align-items: flex-start; }
   .home-intro h1 { font-size: 25px; }
-  .streak-chip { padding: 8px; font-size: 9px; }
+  .streak-chip { padding: 9px; font-size: 11px; }
   .hero-grid { grid-template-columns: 1fr; }
   .quick-card { min-height: 225px; padding: 22px; }
   .quick-card h2 { margin-top: 24px; font-size: 24px; }
@@ -365,7 +365,7 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .home-bottom { grid-template-columns: 1fr 1fr 1fr; }
   .metric-mini { padding-top: 14px; }
   .metric-mini strong { font-size: 16px; }
-  .metric-mini span { font-size: 8px; }
+  .metric-mini span { font-size: 9px; }
   .tool-row { flex-wrap: wrap; }
   .tool-row .search-wrap { flex-basis: 100%; }
   .filter-select { flex: 1; min-width: 0; }
@@ -378,6 +378,31 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .page-heading { align-items: flex-start; flex-direction: column; }
   .page-heading > .button { width: 100%; }
   .onboarding-panel, .modal-panel { padding: 21px 17px; }
+  .view-container { font-size: 15px; }
+  .page-heading h1 { font-size: 30px; }
+  .page-heading p { font-size: 14px; line-height: 1.55; }
+  .section-head h2 { font-size: 20px; }
+  .button { min-height: 46px; font-size: 13px; }
+  .button-small { min-height: 42px; padding-inline: 13px; font-size: 12px; }
+  .button-plain { min-height: 42px; padding: 8px; font-size: 14px; }
+  .input, .select, .search-input { min-height: 46px; font-size: 16px; }
+  .filter-pill { min-height: 42px; padding: 8px 12px; font-size: 12px; }
+  .library-count { font-size: 11px; }
+  .exercise-row { min-height: 78px; gap: 8px; }
+  .exercise-open { gap: 10px; }
+  .exercise-glyph { flex-basis: 44px; height: 44px; }
+  .exercise-details strong { font-size: 15px; }
+  .exercise-details small { font-size: 12px; line-height: 1.4; }
+  .favorite-button, .exercise-more { width: 46px; height: 46px; font-size: 23px; }
+  .exercise-detail-favorite { width: 50px; height: 50px; }
+  .exercise-instructions p { font-size: 14px; }
+  .exercise-instructions h3, .field-label { font-size: 11px; }
+  .modal-copy { font-size: 14px; line-height: 1.6; }
+  .simple-metric { font-size: 13px; }
+  .choice-card { min-height: 52px; font-size: 13px; }
+  .onboard-exercise-card { min-height: 48px; font-size: 12px; }
+  .onboard-favorite-toggle { min-height: 48px; }
+  .mobile-nav-link { min-height: 56px; }
   .active-header h1 { font-size: 23px; }
   .timer-display { font-size: 16px; }
   .active-exercise-card { padding: 15px 11px; }

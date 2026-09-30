@@ -566,7 +566,8 @@ function showExerciseDetail(id) {
   const exercise = exerciseById(id), history = Store.data.history.flatMap(workout => (workout.items || []).filter(item => item.exerciseId === id).map(item => ({ ...item, date: workout.endedAt }))).sort((a, b) => new Date(b.date) - new Date(a.date));
   const latest = history[0], best = history.reduce((winner, item) => !winner || volumeItem(item) > volumeItem(winner) ? item : winner, null);
   const returnModal = state.modalMode === 'exercise-detail' ? state.modalReturn : state.modalMode ? { html: $('#modal-root').innerHTML, mode: state.modalMode } : null;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">${safeText(exercise.parts.join(' · '))}</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(exercise.equipment.join(' · '))} · Suggested ${exercise.weight ? `${exercise.weight} lb × ` : ''}${exercise.reps} × ${exercise.sets}</p><div class="simple-metric"><span>Last</span><strong>${latest ? `${latest.weight || 0} lb × ${latest.reps} × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet'}</strong></div><div class="simple-metric"><span>Best logged volume</span><strong>${best ? `${formatNumber(volumeItem(best))} lb · ${dateLabel(best.date)}` : '—'}</strong></div><div class="modal-actions"><button class="button button-secondary" data-action="favorite" data-id="${id}">${Store.data.user.favorites.includes(id) ? '★ FAVORITE' : '☆ ADD FAVORITE'}</button>${currentWorkout() ? `<button class="button button-primary" data-action="add-active-item" data-id="${id}">ADD TO WORKOUT</button>` : '<button class="button button-primary" data-action="close-modal">DONE</button>'}</div>`, 'exercise-detail');
+  const isFavorite = Store.data.user.favorites.includes(id);
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">${safeText(exercise.parts.join(' · '))}</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(exercise.equipment.join(' · '))} · Suggested ${exercise.weight ? `${exercise.weight} lb × ` : ''}${exercise.reps} × ${exercise.sets}</p><div class="simple-metric"><span>Last</span><strong>${latest ? `${latest.weight || 0} lb × ${latest.reps} × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet'}</strong></div><div class="simple-metric"><span>Best logged volume</span><strong>${best ? `${formatNumber(volumeItem(best))} lb · ${dateLabel(best.date)}` : '—'}</strong></div><div class="modal-actions"><button type="button" class="favorite-button exercise-detail-favorite ${isFavorite ? 'is-favorite' : ''}" data-action="favorite" data-id="${id}" aria-label="${isFavorite ? 'Remove favorite' : 'Add favorite'}" aria-pressed="${isFavorite}">${isFavorite ? '★' : '☆'}</button>${currentWorkout() ? `<button class="button button-primary" data-action="add-active-item" data-id="${id}">ADD TO WORKOUT</button>` : '<button class="button button-primary" data-action="close-modal">DONE</button>'}</div>`, 'exercise-detail');
   if (returnModal) {
     state.modalReturn = returnModal;
     $$('[data-action="close-modal"]', $('#modal-root')).forEach(button => {
@@ -728,7 +729,18 @@ function handleAction(action, target) {
     case 'toggle-favorites': state.favoritesOnly = !state.favoritesOnly; render(); break;
     case 'favorite': {
       const favorites = Store.data.user.favorites; Store.data.user.favorites = favorites.includes(id) ? favorites.filter(item => item !== id) : [...favorites, id];
-      Store.save(); if (state.modalMode === 'exercise-detail') showExerciseDetail(id); else render(); break;
+      Store.save();
+      render();
+      if (state.modalMode === 'exercise-detail') {
+        const isFavorite = Store.data.user.favorites.includes(id), button = $('.exercise-detail-favorite', $('#modal-root'));
+        if (button) {
+          button.textContent = isFavorite ? '★' : '☆';
+          button.classList.toggle('is-favorite', isFavorite);
+          button.setAttribute('aria-label', isFavorite ? 'Remove favorite' : 'Add favorite');
+          button.setAttribute('aria-pressed', String(isFavorite));
+        }
+      }
+      break;
     }
     case 'exercise-detail': showExerciseDetail(id); break;
     case 'start-template': case 'open-template': {
