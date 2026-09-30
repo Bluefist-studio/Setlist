@@ -398,6 +398,23 @@ function openAccountModal(mode = 'create', error = '', email = '') {
       ? '<button class="button-plain" data-action="account-mode-forgot">FORGOT PASSWORD?</button><button class="button-plain" data-action="account-mode-create">CREATE AN ACCOUNT</button>'
       : '<button class="button-plain" data-action="account-mode-login">← BACK TO LOG IN</button>';
   openModal(`<div class="modal-heading"><div><div class="eyebrow">SETLIST ACCOUNT</div><h2>${titles[mode]}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${descriptions[mode]}</p><div class="field-group"><label class="field-label" for="account-email">EMAIL ADDRESS</label><input class="input" id="account-email" type="email" autocomplete="email" placeholder="you@example.com" value="${safeText(email)}" required></div>${passwordField}<p class="account-link-message" id="account-link-message" role="status">${safeText(error)}</p><div class="account-modal-links">${alternate}</div><div class="modal-actions"><button class="button button-primary" data-action="${submitAction}">${submitLabel}</button></div>`, `account-${mode}`);
+  const panel = $('.modal-panel', $('#modal-root'));
+  const form = document.createElement('form');
+  form.id = 'account-form';
+  form.innerHTML = panel.innerHTML;
+  panel.replaceChildren(form);
+  const submitButton = $('.modal-actions button', form);
+  $$('button', form).forEach(button => { button.type = button === submitButton ? 'submit' : 'button'; });
+  submitButton.removeAttribute('data-action');
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    submitAccountForm(mode);
+  });
+  form.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' || !event.target.matches('input[type="email"], input[type="password"]')) return;
+    event.preventDefault();
+    form.requestSubmit();
+  });
   if (state.modalReturn) {
     const back = $('.modal-close', $('#modal-root'));
     back.className = 'button button-secondary button-small'; back.dataset.action = 'back-to-previous-modal'; back.textContent = '← BACK'; back.setAttribute('aria-label', previousModal?.kind === 'onboarding' ? 'Back to onboarding' : 'Back to Preferences');
@@ -909,7 +926,13 @@ async function submitAccountForm(mode) {
       closeModal(); toast('Account created. Your workouts are linked.');
     } else if (mode === 'login') {
       await firebaseSync.signIn(email, password);
-      closeModal(); toast('Logged in. Your account data is ready.');
+      if (!Store.data.user.onboarded) {
+        Store.data.user.onboarded = true;
+        seedStarterWorkouts();
+        Store.save();
+      }
+      state.view = 'home'; state.modalReturn = null;
+      closeModal(); render(); toast('Logged in. Your account data is ready.');
     } else {
       await firebaseSync.sendPasswordReset(email);
       if (message) message.textContent = 'If an account exists for this email, a password reset email is on its way.';
@@ -923,7 +946,10 @@ async function submitAccountForm(mode) {
       'auth/invalid-credential': 'Email and password were not recognized.',
       'auth/user-not-found': 'Email and password were not recognized.',
       'auth/wrong-password': 'Email and password were not recognized.',
-      'auth/operation-not-allowed': 'Enable Email/Password sign-in in Firebase Authentication.'
+      'auth/operation-not-allowed': 'Enable Email/Password sign-in in Firebase Authentication.',
+      'auth/unauthorized-domain': 'This site address is not authorized for Firebase sign-in. Add it under Firebase Authentication > Settings > Authorized domains.',
+      'auth/network-request-failed': 'Could not reach Firebase. Check your internet connection and try again.',
+      'auth/too-many-requests': 'Too many sign-in attempts. Wait a while before trying again.'
     };
     if (message) message.textContent = messages[error.code] || error.message || 'Account request failed. Try again.';
   }

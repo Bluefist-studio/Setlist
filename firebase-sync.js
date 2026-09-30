@@ -29,7 +29,7 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
   let rulesVerified = false;
   let activeUserId = null;
   let preferRemoteNextBootstrap = false;
-  let connecting = false;
+  let connectionPromise;
   let writing = false;
   let writeQueued = false;
   let writeTimer;
@@ -37,13 +37,30 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
 
   const setStatus = message => onStatus(message);
 
-  async function ensureConnection() {
+  async function ensureConnection(requiredUserId = null) {
     if (!navigator.onLine) {
       setStatus('Offline · saved on this device');
       return false;
     }
-    if (connecting) return false;
-    connecting = true;
+    if (connectionPromise) {
+      const pendingConnection = connectionPromise;
+      const connected = await pendingConnection;
+      if (requiredUserId && auth?.currentUser?.uid === requiredUserId && activeUserId !== requiredUserId) {
+        if (connectionPromise === pendingConnection) connectionPromise = null;
+        return ensureConnection(requiredUserId);
+      }
+      return connected;
+    }
+    const pendingConnection = connect();
+    connectionPromise = pendingConnection;
+    try {
+      return await pendingConnection;
+    } finally {
+      if (connectionPromise === pendingConnection) connectionPromise = null;
+    }
+  }
+
+  async function connect() {
     setStatus('Connecting to Firebase…');
     try {
       const [appSdk, authSdk, firestoreSdk] = await loadFirebaseSdk();
@@ -79,6 +96,7 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
         const local = getLocalData();
         if (remoteSnapshot.exists()) {
           const remote = remoteSnapshot.data();
+          if (!isValidState(remote.state)) throw new Error('Saved account data has an unexpected format.');
           if (preferRemoteNextBootstrap || !hasLocalData() || Number(remote.localUpdatedAt) > Number(local._updatedAt || 0)) {
             onRemoteData(remote.state);
             setStatus('Synced · account');
@@ -97,6 +115,10 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
         stopListening = firestoreSdk.onSnapshot(stateRef, snapshot => {
           if (!snapshot.exists()) return;
           const remote = snapshot.data();
+          if (!isValidState(remote.state)) {
+            setStatus('Saved account data could not be read · check Firebase data format');
+            return;
+          }
           const latestLocal = getLocalData();
           if (Number(remote.localUpdatedAt) > Number(latestLocal._updatedAt || 0)) {
             onRemoteData(remote.state);
@@ -113,11 +135,14 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       return true;
     } catch (error) {
       console.warn('Firebase unavailable; Setlist will continue using local data.', error);
-      setStatus(navigator.onLine ? 'Local data ready · Firebase unavailable' : 'Offline · saved on this device');
+      setStatus(navigator.onLine ? `Account data unavailable · ${error.message || 'Firebase error'}` : 'Offline · saved on this device');
       return false;
-    } finally {
-      connecting = false;
     }
+  }
+
+  function isValidState(value) {
+    return value && typeof value === 'object' && value.user && typeof value.user === 'object'
+      && Array.isArray(value.workouts) && Array.isArray(value.history);
   }
 
   async function writeSnapshot(stateRef, firestoreSdk, data) {
@@ -175,7 +200,10 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       throw new Error('Log out before creating a different account.');
     }
     onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous });
-    await ensureConnection();
+    const connected = await ensureConnection(result.user.uid);
+    if (!connected || !bootstrapped || activeUserId !== result.user.uid) {
+      throw new Error('Your account was created, but its workout data could not be saved to Firestore. Check that Firestore is enabled and its rules are deployed, then log in to sync.');
+    }
     return result.user;
   }
 
@@ -190,7 +218,10 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       writeQueued = false; preferRemoteNextBootstrap = true;
     }
     onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous });
-    await ensureConnection();
+    const connected = await ensureConnection(result.user.uid);
+    if (!connected || !bootstrapped || activeUserId !== result.user.uid) {
+      throw new Error('Your account was verified, but its saved data could not be loaded. Check your connection and Firestore rules, then try again.');
+    }
     return result.user;
   }
 
