@@ -1,11 +1,14 @@
 Setlist Firebase setup
 
-1. Enable Anonymous sign-in in Firebase Authentication.
+1. Enable Email/Password sign-in in Firebase Authentication. Anonymous sign-in is optional; Setlist can create email/password accounts directly.
 2. Create a Cloud Firestore database.
-3. Run `npx firebase-tools login` from this folder.
-4. Publish the user-scoped rules with `npx firebase-tools deploy --only firestore:rules`.
+3. Add the local/deployed Setlist domains under Authentication > Settings > Authorized domains.
+4. Run `npx firebase-tools login` from this folder.
+5. Publish the user-scoped rules with `npx firebase-tools deploy --only firestore:rules`.
 
-The app initializes Firebase from firebase-sync.js. Local browser storage remains
-the immediate source of truth; changes sync to the signed-in anonymous user's
-Firestore document when a connection is available. Cloud sync stays paused until
-the app verifies the private Firestore rules are deployed.
+Create Account links email/password credentials to an existing anonymous user
+when present, preserving its UID; otherwise it creates an email/password user
+and syncs the current local data. Log In loads that account on another device.
+Forgot Password uses Firebase's password-reset email. Local browser storage
+remains the immediate source of truth, and changes sync when connected. Cloud
+sync stays paused until the app verifies the private Firestore rules are deployed.

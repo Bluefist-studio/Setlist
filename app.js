@@ -1,4 +1,5 @@
 import { createFirebaseSync } from './firebase-sync.js';
+import { calculateXpMultiplier, XP_AWARDS, xpLevelFromTotal as xpLevel, xpNeededForNextLevel, xpProgressInLevel as xpProgress } from './xp-system.js';
 import exerciseDatabase from './exercises.json' with { type: 'json' };
 
 const normalizeLabel = value => String(value).replaceAll('_', ' ').replace(/\b\w/g, letter => letter.toUpperCase());
@@ -66,7 +67,7 @@ const Store = {
 };
 Store.data = Store.read();
 
-const state = { view: 'home', query: '', equipmentFilter: 'All equipment', partFilter: 'All body parts', categoryFilter: 'All categories', favoritesOnly: false, timerHandle: null, quickDraft: null, builderDraft: null, modalMode: null, modalReturn: null, cloudStatus: 'Checking Firebase connection…' };
+const state = { view: 'home', query: '', equipmentFilter: 'All equipment', partFilter: 'All body parts', categoryFilter: 'All categories', favoritesOnly: false, timerHandle: null, quickDraft: null, builderDraft: null, modalMode: null, modalReturn: null, cloudStatus: 'Checking Firebase connection…', accountInfo: null, onboardingStep: 0 };
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const exerciseById = id => EXERCISES.find(exercise => exercise.id === id);
@@ -92,8 +93,6 @@ const completedSets = workout => (workout?.items || []).reduce((sum, item) => su
 const itemDone = item => item.skipped || item.completedSets?.length >= itemSets(item);
 const workoutDoneItems = workout => (workout?.items || []).filter(itemDone).length;
 const activeItem = workout => workout?.items?.[workout.currentIndex];
-const xpLevel = xp => Math.floor(Math.max(0, xp) / 500) + 1;
-const xpProgress = xp => Math.max(0, xp) % 500;
 const volumeFor = workout => (workout.items || []).reduce((total, item) => total + (item.completedSets || []).reduce((sum, set) => sum + (Number(set.weight) || 0) * (Number(set.reps) || 0), 0), 0);
 
 function toast(message) {
@@ -126,6 +125,12 @@ function render() {
   if (state.view === 'stats') addHistoryControls(view);
   if (state.view === 'active' && currentWorkout()?.completed) {
     const saveButton = $('[data-action="save-completed"]', view);
+    const xpSummary = $('.completion-xp', view);
+    if (xpSummary && currentWorkout().xpMultiplier < 1) {
+      const adjustmentNote = document.createElement('small');
+      adjustmentNote.className = 'xp-adjustment-note'; adjustmentNote.textContent = 'XP adjusted for workout duration';
+      xpSummary.after(adjustmentNote);
+    }
     if (saveButton) {
       const discardButton = document.createElement('button');
       discardButton.className = 'button button-secondary button-full completion-secondary';
@@ -154,10 +159,10 @@ function renderHome() {
   const savedCount = Store.data.history.length;
   const minutes = Store.data.history.reduce((sum, item) => sum + (item.duration || 0), 0);
   const volume = Store.data.history.reduce((sum, item) => sum + (item.volume || 0), 0);
-  const xp = Store.data.user.xp, percentage = Math.round(xpProgress(xp) / 5);
+  const xp = Store.data.user.xp, levelProgress = xpProgress(xp), nextLevelXp = xpNeededForNextLevel(xp), percentage = Math.round(levelProgress / nextLevelXp * 100);
   return `<section class="home-intro"><div><div class="eyebrow">A LITTLE MOVEMENT ADDS UP</div><h1>Make today<br>your own.</h1></div><div class="streak-chip"><span class="streak-flame">✳</span>${currentStreak()} day${currentStreak() === 1 ? '' : 's'} active</div></section>
     <section class="hero-grid"><article class="quick-card"><div class="quick-kicker"><span>✳</span> QUICK START</div><h2>Pick a focus.<br>We’ll shape the session.</h2><p>${Store.data.user.duration} min · Based on your gear &amp; favorites</p><div class="quick-actions"><button class="button button-primary" data-action="quick-start">QUICK WORKOUT <span>↗</span></button><span class="quick-action-note">No plan required</span></div></article>
-    <article class="level-card"><div><div class="level-top"><span class="eyebrow">YOUR PACE</span><span class="streak-flame">✳</span></div><div class="level-number">${xpLevel(xp)}<small>LEVEL</small></div></div><div><div class="xp-label"><span>${xpProgress(xp)} / 500 XP</span><span>${percentage}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${percentage}%"></div></div><p class="level-caption">Consistency counts. Every session.</p></div></article></section>
+    <article class="level-card"><div><div class="level-top"><span class="eyebrow">YOUR PACE</span><span class="streak-flame">✳</span></div><div class="level-number">${xpLevel(xp)}<small>LEVEL</small></div></div><div><div class="xp-label"><span>${levelProgress} / ${nextLevelXp} XP</span><span>${percentage}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${percentage}%"></div></div><p class="level-caption">Consistency counts. Every session.</p></div></article></section>
     <section class="section-head"><h2>Your workouts</h2><button class="text-button" data-view="workouts">VIEW ALL &nbsp;→</button></section>
     ${workouts.length ? `<div class="workout-list">${workouts.map((workout, index) => `<div class="workout-row" data-action="open-template" data-id="${workout.id}"><div class="workout-stamp">${String(index + 1).padStart(2, '0')}</div><div class="workout-row-main"><strong>${safeText(workout.name)}</strong><small>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min${workout.lastUsed ? ` · last ${dateLabel(workout.lastUsed)}` : ''}</small></div><span class="row-arrow">→</span></div>`).join('')}</div>` : `<div class="empty-state">Your workout bank is ready when you are.</div>`}
     <div class="create-strip"><div><strong>Have a session in mind?</strong><small>Build it your way, then save it for later.</small></div><button class="button button-secondary button-small" data-action="create-workout">＋ CREATE WORKOUT</button></div>
@@ -306,19 +311,25 @@ function renderCompletion(workout) {
 }
 function renderOnboarding() {
   if ($('#onboarding-root')) return;
-  const root = document.createElement('div'); root.id = 'onboarding-root'; document.body.append(root); renderOnboardingStep(0);
+  const root = document.createElement('div'); root.id = 'onboarding-root'; document.body.append(root); renderOnboardingStep(-1);
 }
 function renderOnboardingStep(step) {
   const root = $('#onboarding-root'); if (!root) return;
+  root.hidden = false;
+  state.onboardingStep = step;
   const user = Store.data.user;
-  const title = ['What do you have to train with?', 'What do you like doing?', 'How long do you usually want to work out?'][step];
-  const subtitle = ['Choose everything you have access to. You can change this any time.', 'Pick at least 8 favorites to give Quick Start enough variety. It’ll mix these with other movements, too.', 'This becomes your default Quick Start duration.'][step];
+  const isEntry = step === -1;
+  const title = isEntry ? 'Are you new or returning?' : ['What do you have to train with?', 'What do you like doing?', 'How long do you usually want to work out?'][step];
+  const subtitle = isEntry ? 'Choose how you’d like to get started.' : ['Choose everything you have access to. You can change this any time.', 'Pick at least 8 favorites to give Quick Start enough variety. It’ll mix these with other movements, too.', 'This becomes your default Quick Start duration.'][step];
   const onboardingCategories = ['All', ...new Set(EXERCISES.flatMap(item => item.categories))];
   let body = '';
+  if (isEntry) body = `<div class="onboarding-entry-options"><button class="onboarding-entry-option" data-action="onboard-new"><span class="eyebrow">NEW TO SETLIST</span><strong>Set up your training space</strong><span>Choose your equipment and preferences.</span></button><button class="onboarding-entry-option" data-action="onboard-returning"><span class="eyebrow">ALREADY HAVE AN ACCOUNT</span><strong>I’m returning</strong><span>Log in to load your workouts and history.</span></button></div>`;
   if (step === 0) body = `<div class="choice-grid">${EQUIPMENT.map(item => `<label class="choice-card"><input type="checkbox" name="onboard-equipment" value="${item}" ${user.equipment.includes(item) ? 'checked' : ''}>${item}</label>`).join('')}</div>`;
   if (step === 1) body = `<div class="filter-pills onboarding-category-filters">${onboardingCategories.map((category, index) => `<button type="button" class="filter-pill ${index === 0 ? 'selected' : ''}" data-onboarding-category="${safeText(category)}" aria-pressed="${index === 0}">${safeText(category)}</button>`).join('')}</div><div class="exercise-choice-list">${EXERCISES.map(item => { const detailId = `onboard-exercise-description-${item.id}`; return `<div class="onboard-exercise-option" data-categories="${safeText(item.categories.join('|'))}"><button type="button" class="onboard-exercise-card" data-action="toggle-onboard-description" data-detail-id="${detailId}" aria-controls="${detailId}" aria-expanded="false"><span>${safeText(item.name)}</span><span class="onboard-exercise-indicator" aria-hidden="true">＋</span></button><label class="onboard-favorite-toggle" title="Favorite ${safeText(item.name)}"><input type="checkbox" name="onboard-favorite" value="${item.id}" aria-label="Favorite ${safeText(item.name)}" ${user.favorites.includes(item.id) ? 'checked' : ''}></label><div class="onboard-exercise-copy" id="${detailId}" hidden><p>${safeText(item.description)}</p><strong>HOW TO</strong><p>${safeText(item.howTo)}</p></div></div>`; }).join('')}</div>`;
-  if (step === 2) body = `<div class="duration-grid">${DURATIONS.map(duration => `<button class="duration-option ${user.duration === duration ? 'selected' : ''}" data-duration="${duration}">${duration} min</button>`).join('')}<button class="duration-option ${!DURATIONS.includes(user.duration) ? 'selected' : ''}" data-duration="custom">Custom</button></div><div id="custom-duration-wrap" style="margin-top:12px;${DURATIONS.includes(user.duration) ? 'display:none' : ''}"><label class="field-label" for="custom-duration">Minutes</label><input class="input" id="custom-duration" type="number" min="10" max="120" value="${user.duration}"></div><div class="field-group" style="margin-top:16px"><label class="field-label" for="user-name">What should we call you? <span style="text-transform:none">(optional)</span></label><input class="input" id="user-name" maxlength="28" placeholder="Your name" value="${safeText(user.name)}"></div>`;
-  root.innerHTML = `<div class="onboarding-overlay"><section class="onboarding-panel"><div class="onboard-top"><div><div class="eyebrow">SETLIST · GETTING STARTED</div><h2>${title}</h2></div><button class="button-plain" data-action="skip-onboarding">Skip for now</button></div><p class="onboard-copy">${subtitle}</p>${body}<div class="step-dots">${[0, 1, 2].map(index => `<span class="${index === step ? 'active' : ''}"></span>`).join('')}</div><div class="onboard-footer">${step > 0 ? '<button class="button-plain" data-action="onboard-back">← BACK</button>' : '<span></span>'}<button class="button button-primary" data-action="onboard-next" data-step="${step}">${step === 2 ? 'LET’S GO' : 'CONTINUE'} <span>→</span></button></div></section></div>`;
+  if (step === 2) body = `<div class="duration-grid">${DURATIONS.map(duration => `<button class="duration-option ${user.duration === duration ? 'selected' : ''}" data-duration="${duration}">${duration} min</button>`).join('')}<button class="duration-option ${!DURATIONS.includes(user.duration) ? 'selected' : ''}" data-duration="custom">Custom</button></div><div id="custom-duration-wrap" style="margin-top:12px;${DURATIONS.includes(user.duration) ? 'display:none' : ''}"><label class="field-label" for="custom-duration">Minutes</label><input class="input" id="custom-duration" type="number" min="10" max="120" value="${user.duration}"></div><div class="field-group" style="margin-top:16px"><label class="field-label" for="user-name">What should we call you? <span style="text-transform:none">(optional)</span></label><input class="input" id="user-name" maxlength="28" placeholder="Your name" value="${safeText(user.name)}"></div><div class="field-group onboarding-account-group"><span class="field-label">ACCOUNT (OPTIONAL)</span><p>Create an account to use your workouts on other devices. You can also do this later in Preferences.</p><button class="button button-secondary button-small" data-action="onboard-account">CREATE ACCOUNT OR LOG IN</button></div>`;
+  const skipButton = isEntry ? '' : '<button class="button-plain" data-action="skip-onboarding">Skip for now</button>';
+  const progress = isEntry ? '' : `<div class="step-dots">${[0, 1, 2].map(index => `<span class="${index === step ? 'active' : ''}"></span>`).join('')}</div><div class="onboard-footer">${step > 0 ? '<button class="button-plain" data-action="onboard-back">← BACK</button>' : '<span></span>'}<button class="button button-primary" data-action="onboard-next" data-step="${step}">${step === 2 ? 'LET’S GO' : 'CONTINUE'} <span>→</span></button></div>`;
+  root.innerHTML = `<div class="onboarding-overlay"><section class="onboarding-panel"><div class="onboard-top"><div><div class="eyebrow">SETLIST · GETTING STARTED</div><h2>${title}</h2></div>${skipButton}</div><p class="onboard-copy">${subtitle}</p>${body}${progress}</section></div>`;
 }
 function openModal(html, mode = null) {
   state.modalMode = mode; document.body.classList.add('modal-open'); $('#modal-root').innerHTML = `<div class="modal-backdrop"><section class="modal-panel">${html}</section></div>`;
@@ -342,6 +353,11 @@ function openModal(html, mode = null) {
     $('.preferences-note')?.remove();
     const panel = $('.modal-panel'), actions = $('.modal-actions', panel);
     if (actions) actions.className = 'preferences-actions';
+    const accountPanel = document.createElement('section');
+    accountPanel.className = 'account-panel';
+    accountPanel.innerHTML = '<span class="field-label">ACCOUNT</span><p id="account-summary"></p><div id="account-controls"></div>';
+    if (actions) actions.before(accountPanel); else panel.append(accountPanel);
+    renderAccountControls();
     const resetButton = document.createElement('button');
     resetButton.className = 'button button-danger button-full preferences-reset';
     resetButton.dataset.action = 'reset-data';
@@ -349,7 +365,44 @@ function openModal(html, mode = null) {
     (actions || panel).append(resetButton);
   }
 }
-function closeModal() { $('#modal-root').innerHTML = ''; state.modalMode = null; state.modalReturn = null; document.body.classList.remove('modal-open'); }
+function closeModal() {
+  const previous = state.modalReturn;
+  $('#modal-root').innerHTML = ''; state.modalMode = null; state.modalReturn = null; document.body.classList.remove('modal-open');
+  if (previous?.kind === 'onboarding') renderOnboardingStep(previous.step);
+}
+function renderAccountControls() {
+  const summary = $('#account-summary'), controls = $('#account-controls');
+  if (!summary || !controls) return;
+  const email = state.accountInfo?.email;
+  summary.textContent = email ? `Signed in as ${email}.` : 'Create an account to use your workouts on other devices.';
+  controls.innerHTML = email
+    ? '<button class="button button-secondary button-small" data-action="account-switch">SWITCH ACCOUNT</button><button class="button button-secondary button-small" data-action="account-sign-out">LOG OUT</button>'
+    : '<button class="button button-secondary button-small" data-action="account-create">CREATE ACCOUNT</button><button class="button button-secondary button-small" data-action="account-login">LOG IN</button>';
+}
+function openAccountModal(mode = 'create', error = '', email = '') {
+  const previousModal = state.modalMode?.startsWith('account-') ? state.modalReturn : state.modalMode === 'settings' ? { kind: 'modal', html: $('#modal-root').innerHTML, mode: 'settings' } : $('#onboarding-root') ? { kind: 'onboarding', step: state.onboardingStep } : null;
+  state.modalReturn = previousModal;
+  if (previousModal?.kind === 'onboarding') $('#onboarding-root').hidden = true;
+  const titles = { create: 'Create an account.', login: 'Log in.', forgot: 'Reset your password.' };
+  const descriptions = {
+    create: 'Your account syncs this browser’s workouts to your email account for access on your other devices.',
+    login: 'Log in to load the workouts and history saved to your account.',
+    forgot: 'We’ll send a password reset link if an account exists for this email.'
+  };
+  const passwordField = mode === 'forgot' ? '' : `<div class="field-group"><label class="field-label" for="account-password">PASSWORD</label><input class="input" id="account-password" type="password" autocomplete="${mode === 'create' ? 'new-password' : 'current-password'}" minlength="6" required></div>`;
+  const submitAction = { create: 'submit-account-create', login: 'submit-account-login', forgot: 'submit-password-reset' }[mode];
+  const submitLabel = { create: 'CREATE ACCOUNT', login: 'LOG IN', forgot: 'SEND RESET LINK' }[mode];
+  const alternate = mode === 'create'
+    ? '<button class="button-plain" data-action="account-mode-login">Already have an account? Log in</button>'
+    : mode === 'login'
+      ? '<button class="button-plain" data-action="account-mode-forgot">FORGOT PASSWORD?</button><button class="button-plain" data-action="account-mode-create">CREATE AN ACCOUNT</button>'
+      : '<button class="button-plain" data-action="account-mode-login">← BACK TO LOG IN</button>';
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">SETLIST ACCOUNT</div><h2>${titles[mode]}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${descriptions[mode]}</p><div class="field-group"><label class="field-label" for="account-email">EMAIL ADDRESS</label><input class="input" id="account-email" type="email" autocomplete="email" placeholder="you@example.com" value="${safeText(email)}" required></div>${passwordField}<p class="account-link-message" id="account-link-message" role="status">${safeText(error)}</p><div class="account-modal-links">${alternate}</div><div class="modal-actions"><button class="button button-primary" data-action="${submitAction}">${submitLabel}</button></div>`, `account-${mode}`);
+  if (state.modalReturn) {
+    const back = $('.modal-close', $('#modal-root'));
+    back.className = 'button button-secondary button-small'; back.dataset.action = 'back-to-previous-modal'; back.textContent = '← BACK'; back.setAttribute('aria-label', previousModal?.kind === 'onboarding' ? 'Back to onboarding' : 'Back to Preferences');
+  }
+}
 function linkExerciseLabels(root, items, rowSelector, labelSelector = 'strong') {
   $$(rowSelector, root).forEach((row, index) => {
     const label = $(labelSelector, row), item = items?.[index];
@@ -361,8 +414,14 @@ function linkExerciseLabels(root, items, rowSelector, labelSelector = 'strong') 
     label.replaceWith(button);
   });
 }
-function quickModal() {
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Core', 'Custom'].map((part, index) => `<button class="option-chip ${index === 0 ? 'selected' : ''}" data-quick-part="${part}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${[15,20,30,45,60].map(item => `<option value="${item}" ${item === Store.data.user.duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom">Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${Store.data.user.duration}" style="display:none;margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available">My available equipment</option><option value="bodyweight">Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
+function quickModal(restore = false) {
+  const durations = [15, 20, 30, 45, 60];
+  const focus = restore ? state.quickFocus : 'Full Body';
+  const duration = restore ? state.quickDuration : Store.data.user.duration;
+  const equipment = restore ? state.quickEquipment : 'available';
+  const standardDuration = durations.includes(duration);
+  state.quickFocus = focus; state.quickDuration = duration; state.quickEquipment = equipment;
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Core', 'Custom'].map(part => `<button class="option-chip ${part === focus ? 'selected' : ''}" data-quick-part="${part}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${durations.map(item => `<option value="${item}" ${item === duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom" ${standardDuration ? '' : 'selected'}>Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${duration}" style="display:${standardDuration ? 'none' : 'block'};margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available" ${equipment === 'available' ? 'selected' : ''}>My available equipment</option><option value="bodyweight" ${equipment === 'bodyweight' ? 'selected' : ''}>Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
 }
 function availableForEquipment(exercise, mode) {
   if (mode === 'bodyweight') return exercise.equipment.includes('Bodyweight');
@@ -432,6 +491,14 @@ function migrateUntouchedStarterWorkouts() {
 function showQuickPreview(draft) {
   state.quickDraft = draft;
   openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${draft.items.map((item, index) => `<div class="quick-summary-row"><span class="quick-star">${Store.data.user.favorites.includes(item.exerciseId) ? '★' : '↗'}</span><strong>${safeText(itemExercise(item)?.name)}</strong><span>${itemSets(item)} × ${itemReps(item)}</span><button class="button-plain" data-action="remove-quick-item" data-index="${index}">REMOVE</button></div>`).join('')}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button></div></div>`, 'quick-preview');
+  const heading = $('.modal-heading', $('#modal-root'));
+  const close = $('.modal-close', heading);
+  const headingActions = document.createElement('div');
+  const back = document.createElement('button');
+  headingActions.className = 'quick-preview-heading-actions';
+  back.className = 'button button-secondary button-small'; back.dataset.action = 'back-quick-config'; back.textContent = '← BACK';
+  back.setAttribute('aria-label', 'Back to Quick Workout setup');
+  close.replaceWith(headingActions); headingActions.append(back, close);
   $$('.quick-summary-row', $('#modal-root')).forEach((row, index) => { if (row.children[2]) row.children[2].textContent = `${itemSets(draft.items[index])} × ${itemMetric(draft.items[index])}`; });
   const actions = $('.modal-actions.spread');
   if (actions) {
@@ -512,10 +579,53 @@ function startWorkout(source) {
   if (template) template.lastUsed = new Date().toISOString();
   Store.save(); state.view = 'active'; closeModal(); render(); toast('Workout started. Your progress is saved as you go.');
 }
+function exercisePerformance(item) {
+  const sets = item.completedSets || [];
+  return {
+    volume: sets.reduce((total, set) => total + (Number(set.weight) || 0) * (Number(set.reps) || 0), 0),
+    reps: sets.reduce((total, set) => total + (Number(set.reps) || 0), 0),
+    maxWeight: Math.max(0, ...sets.map(set => Number(set.weight) || 0))
+  };
+}
+function isPerformanceImprovement(current, previous) {
+  return current.volume > previous.volume || current.reps > previous.reps || current.maxWeight > previous.maxWeight;
+}
+function streakXpForNextSavedWorkout() {
+  const today = new Date().toDateString();
+  if (Store.data.history.some(session => new Date(session.endedAt).toDateString() === today)) return 0;
+  const streak = currentStreak() + 1;
+  return ({ 3: XP_AWARDS.streak3, 7: XP_AWARDS.streak7, 14: XP_AWARDS.streak14, 30: XP_AWARDS.streak30 })[streak] || 0;
+}
+function calculateWorkoutXp(workout) {
+  const completedExercises = workout.items.filter(item => !item.skipped && (item.completedSets?.length || 0) >= itemSets(item));
+  let newExerciseXp = 0, progressionXp = 0, personalBestXp = 0;
+  for (const item of completedExercises) {
+    const previous = Store.data.history.flatMap(session => (session.items || []).filter(entry => entry.exerciseId === item.exerciseId).map(entry => ({ endedAt: session.endedAt, metrics: exercisePerformance(entry) }))).sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt));
+    if (!previous.length) { newExerciseXp += XP_AWARDS.newExercise; continue; }
+    const current = exercisePerformance(item), latest = previous[0].metrics;
+    const best = previous.reduce((result, entry) => ({ volume: Math.max(result.volume, entry.metrics.volume), reps: Math.max(result.reps, entry.metrics.reps), maxWeight: Math.max(result.maxWeight, entry.metrics.maxWeight) }), { volume: 0, reps: 0, maxWeight: 0 });
+    if (isPerformanceImprovement(current, latest)) progressionXp += XP_AWARDS.beatPrevious;
+    if (isPerformanceImprovement(current, best)) personalBestXp += XP_AWARDS.personalBest;
+  }
+  const streakBonus = streakXpForNextSavedWorkout();
+  const savedTemplateBonus = Store.data.workouts.some(template => template.id === workout.id) ? XP_AWARDS.savedWorkout : 0;
+  const workoutXp = XP_AWARDS.startWorkout + XP_AWARDS.completeWorkout +
+    completedSets(workout) * XP_AWARDS.completeSet +
+    completedExercises.length * XP_AWARDS.completeExercise + newExerciseXp + savedTemplateBonus + streakBonus;
+  const estimatedSeconds = estimateWorkout(workout.items) * 60;
+  const multiplier = calculateXpMultiplier(workout.elapsedSeconds, estimatedSeconds);
+  const adjustedWorkoutXp = Math.round(workoutXp * multiplier);
+  const performanceXp = progressionXp + personalBestXp;
+  return {
+    xpEarned: adjustedWorkoutXp + performanceXp,
+    xpMultiplier: multiplier,
+    xpBreakdown: { workoutXp, adjustedWorkoutXp, performanceXp, progressionXp, personalBestXp, streakBonus, estimatedSeconds }
+  };
+}
 function completeWorkoutState(workout) {
   if (!workout || workout.completed) return;
   workout.elapsedSeconds = workoutElapsed(workout); workout.completed = true; workout.state = 'completed'; workout.endedAt = Date.now();
-  workout.xpEarned = Math.max(20, completedSets(workout) * 5 + workoutDoneItems(workout) * 10 + (workout.quick ? 5 : 0));
+  Object.assign(workout, calculateWorkoutXp(workout));
 }
 function finishWorkout() {
   const workout = currentWorkout(); if (!workout) return;
@@ -529,6 +639,7 @@ function saveCompletedWorkout() {
   const savedSession = Store.data.history.at(-1);
   savedSession.templateId = !workout.quick && Store.data.workouts.some(template => template.id === workout.id) ? workout.id : null;
   savedSession.quick = Boolean(workout.quick);
+  savedSession.xpBreakdown = workout.xpBreakdown || null;
   Store.data.user.xp += workout.xpEarned || 0; Store.data.active = null; state.view = 'home'; saveAndRender(); toast(`Session saved · +${workout.xpEarned} XP`);
 }
 function addItemToActive(id) {
@@ -585,6 +696,7 @@ function handleAction(action, target) {
     case 'back-to-previous-modal': {
       const previous = state.modalReturn;
       if (!previous) { closeModal(); break; }
+      if (previous.kind === 'onboarding') { closeModal(); break; }
       $('#modal-root').innerHTML = previous.html; state.modalMode = previous.mode; state.modalReturn = null;
       document.body.classList.add('modal-open'); break;
     }
@@ -625,6 +737,7 @@ function handleAction(action, target) {
       if (!generated.items.length) { toast('No matching movements found. Check your equipment preferences.'); break; }
       state.quickFocus = focus; state.quickDuration = duration; state.quickEquipment = $('#quick-equipment').value; showQuickPreview(generated); break;
     }
+    case 'back-quick-config': quickModal(true); break;
     case 'regenerate-quick': showQuickPreview(generateQuickWorkout(state.quickFocus, state.quickDuration, state.quickEquipment)); break;
     case 'remove-quick-item': state.quickDraft.items.splice(Number(target.dataset.index), 1); showQuickPreview(state.quickDraft); break;
     case 'add-quick-exercise': renderQuickAdd(); break;
@@ -671,6 +784,9 @@ function handleAction(action, target) {
     case 'save-completed': saveCompletedWorkout(); break;
     case 'finish-without-saving': Store.data.active = null; state.view = 'home'; saveAndRender(); toast('Workout finished without saving.'); break;
     case 'skip-onboarding': Store.data.user.onboarded = true; seedStarterWorkouts(); saveAndRender(); break;
+    case 'onboard-new': renderOnboardingStep(0); break;
+    case 'onboard-returning': openAccountModal('login'); break;
+    case 'onboard-account': Store.data.user.name = $('#user-name')?.value.trim() || ''; Store.save(); openAccountModal('create'); break;
     case 'onboard-next': {
       const step = Number(target.dataset.step);
       if (step === 0) { Store.data.user.equipment = $$('[name="onboard-equipment"]:checked').map(input => input.value); renderOnboardingStep(1); }
@@ -683,6 +799,16 @@ function handleAction(action, target) {
     }
     case 'onboard-back': { const step = Number(target.dataset.step) || 1; renderOnboardingStep(Math.max(0, step - 1)); break; }
     case 'save-settings': Store.data.user.name = $('#settings-name').value.trim(); Store.data.user.equipment = $$('[name="settings-equipment"]:checked').map(input => input.value); Store.data.user.duration = Number($('#settings-duration').value); closeModal(); saveAndRender(); toast('Preferences updated.'); break;
+    case 'account-create': openAccountModal('create'); break;
+    case 'account-login': openAccountModal('login'); break;
+    case 'account-switch': openAccountModal('login', '', state.accountInfo?.email || ''); break;
+    case 'account-mode-create': openAccountModal('create', '', $('#account-email')?.value || ''); break;
+    case 'account-mode-login': openAccountModal('login', '', $('#account-email')?.value || ''); break;
+    case 'account-mode-forgot': openAccountModal('forgot', '', $('#account-email')?.value || ''); break;
+    case 'submit-account-create': submitAccountForm('create'); break;
+    case 'submit-account-login': submitAccountForm('login'); break;
+    case 'submit-password-reset': submitAccountForm('forgot'); break;
+    case 'account-sign-out': signOutAccount(); break;
     case 'remove-history': {
       const session = Store.data.history.find(item => item.id === id);
       if (!session) break;
@@ -690,8 +816,12 @@ function handleAction(action, target) {
       break;
     }
     case 'confirm-remove-history':
+      {
+      const removedSession = Store.data.history.find(item => item.id === id);
+      Store.data.user.xp = Math.max(0, (Number(Store.data.user.xp) || 0) - (Number(removedSession?.xp) || 0));
       Store.data.history = Store.data.history.filter(item => item.id !== id);
       closeModal(); state.view = 'stats'; saveAndRender(); toast('Session removed from history.'); break;
+      }
     case 'reset-data': openModal(`<div class="modal-heading"><div><div class="eyebrow">RESET SETLIST</div><h2>Start over?</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">This deletes your active workout, templates, workout history, XP, and preferences on this device and replaces your synced Setlist data when connected. You’ll return to onboarding. This can’t be undone.</p><div class="modal-actions"><button class="button button-secondary" data-action="close-modal">CANCEL</button><button class="button button-danger" data-action="confirm-reset-data">RESET DATA</button></div>`, 'reset-confirmation'); break;
     case 'confirm-reset-data':
       Store.data = Store.createInitialData(); Store.save();
@@ -765,21 +895,67 @@ document.addEventListener('change', event => {
   if (event.target.id === 'quick-duration') $('#quick-custom-duration').style.display = event.target.value === 'custom' ? '' : 'none';
 });
 window.addEventListener('beforeunload', () => { if (Store.data.active) Store.save(); });
+async function submitAccountForm(mode) {
+  const email = $('#account-email')?.value.trim().toLowerCase() || '';
+  const password = $('#account-password')?.value || '';
+  const message = $('#account-link-message');
+  if (!email) { if (message) message.textContent = 'Enter your email address.'; return; }
+  if (mode !== 'forgot' && !password) { if (message) message.textContent = 'Enter your password.'; return; }
+  if (mode === 'create' && password.length < 6) { if (message) message.textContent = 'Use a password with at least 6 characters.'; return; }
+  if (!firebaseSync) { if (message) message.textContent = 'Account services are unavailable right now.'; return; }
+  try {
+    if (mode === 'create') {
+      await firebaseSync.createAccount(email, password);
+      closeModal(); toast('Account created. Your workouts are linked.');
+    } else if (mode === 'login') {
+      await firebaseSync.signIn(email, password);
+      closeModal(); toast('Logged in. Your account data is ready.');
+    } else {
+      await firebaseSync.sendPasswordReset(email);
+      if (message) message.textContent = 'If an account exists for this email, a password reset email is on its way.';
+    }
+  } catch (error) {
+    const messages = {
+      'auth/email-already-in-use': 'An account already uses this email. Choose Log In instead.',
+      'auth/credential-already-in-use': 'An account already uses this email. Choose Log In instead.',
+      'auth/weak-password': 'Use a password with at least 6 characters.',
+      'auth/invalid-email': 'Enter a valid email address.',
+      'auth/invalid-credential': 'Email and password were not recognized.',
+      'auth/user-not-found': 'Email and password were not recognized.',
+      'auth/wrong-password': 'Email and password were not recognized.',
+      'auth/operation-not-allowed': 'Enable Email/Password sign-in in Firebase Authentication.'
+    };
+    if (message) message.textContent = messages[error.code] || error.message || 'Account request failed. Try again.';
+  }
+}
+async function signOutAccount() {
+  if (!firebaseSync) return;
+  try {
+    await firebaseSync.signOut();
+    Store.data = Store.createInitialData(); state.view = 'home'; state.accountInfo = null;
+    Store.save(); closeModal(); render(); toast('Logged out on this device.');
+  } catch (error) {
+    toast(error.message || 'Could not log out. Try again when online.');
+  }
+}
+
 function initializeCloudSync() {
   firebaseSync = createFirebaseSync({
     getLocalData: () => Store.data,
+    getEmptyData: () => Store.createInitialData(),
     hasLocalData: () => Store.hasLocalData,
     onRemoteData: data => {
       if (!data || !data.user || !Array.isArray(data.workouts) || !Array.isArray(data.history)) return;
       Store.data = data; Store.persistLocal();
-      state.cloudStatus = 'Synced · anonymous account';
+      state.cloudStatus = 'Synced · account';
       render();
     },
     onStatus: message => {
       state.cloudStatus = message;
       const status = $('#cloud-status');
       if (status) status.textContent = message;
-    }
+    },
+    onAccount: account => { state.accountInfo = account; renderAccountControls(); }
   });
   firebaseSync.start();
 }
