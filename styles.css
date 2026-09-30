@@ -315,7 +315,7 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
 .quick-summary-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 11px; }
 .quick-summary-row strong { flex: 1; }
 .quick-summary-row span { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; }
-.quick-star { color: #d77a52; }
+.quick-shuffle-button { flex: 0 0 32px; width: 32px; height: 32px; padding: 0; font-size: 17px; }
 .quick-remove-button { flex: 0 0 32px; width: 32px; height: 32px; padding: 0; font-size: 20px; }
 .modal-panel[data-modal-mode="template-detail"] .modal-actions,
 .modal-panel[data-modal-mode="quick-config"] .modal-actions { justify-content: center; }
@@ -433,8 +433,8 @@ body.modal-open { overflow: hidden; overscroll-behavior: none; }
   .modal-panel .quick-summary-row { min-height: 58px; gap: 12px; padding: 12px 0; font-size: 15px; }
   .modal-panel .quick-summary-row .exercise-name-button,
   .modal-panel .quick-summary-row > strong { font-size: 15px; line-height: 1.4; }
-  .modal-panel .quick-summary-row span:not(.quick-star) { flex: 0 0 auto; font-size: 12px; }
-  .modal-panel .quick-summary-row .quick-star { font-size: 17px; }
+  .modal-panel .quick-summary-row span { flex: 0 0 auto; font-size: 12px; }
+  .modal-panel .quick-shuffle-button { flex-basis: 44px; width: 44px; height: 44px; font-size: 20px; }
   .modal-panel .quick-remove-button { flex-basis: 44px; width: 44px; height: 44px; font-size: 24px; }
   .modal-panel .form-row .field-group:last-child > div { padding-top: 6px !important; font-size: 14px !important; line-height: 1.5; }
   .modal-panel #builder-count, .modal-panel #builder-estimate { font-size: 17px; }

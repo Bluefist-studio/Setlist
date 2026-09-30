@@ -522,7 +522,7 @@ function migrateUntouchedStarterWorkouts() {
 }
 function showQuickPreview(draft) {
   state.quickDraft = draft;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${draft.items.map((item, index) => `<div class="quick-summary-row"><span class="quick-star">${Store.data.user.favorites.includes(item.exerciseId) ? '★' : '↗'}</span><strong>${safeText(itemExercise(item)?.name)}</strong><span>${itemSets(item)} × ${itemReps(item)}</span><button type="button" class="button-plain quick-remove-button" data-action="remove-quick-item" data-index="${index}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}" title="Remove exercise">×</button></div>`).join('')}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button></div></div>`, 'quick-preview');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${quickSummaryRowsHtml(draft)}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button><button class="button button-secondary" data-action="save-quick-template">SAVE TO WORKOUTS</button></div></div>`, 'quick-preview');
   const heading = $('.modal-heading', $('#modal-root'));
   const close = $('.modal-close', heading);
   const headingActions = document.createElement('div');
@@ -531,14 +531,37 @@ function showQuickPreview(draft) {
   back.className = 'button button-secondary button-small'; back.dataset.action = 'back-quick-config'; back.textContent = '← BACK';
   back.setAttribute('aria-label', 'Back to Quick Workout setup');
   close.replaceWith(headingActions); headingActions.append(back, close);
-  $$('.quick-summary-row', $('#modal-root')).forEach((row, index) => { if (row.children[2]) row.children[2].textContent = `${itemSets(draft.items[index])} × ${itemMetric(draft.items[index])}`; });
   const actions = $('.modal-actions.spread');
   if (actions) {
-    const start = $('[data-action="start-quick"]', actions), regenerate = $('[data-action="regenerate-quick"]', actions), add = $('[data-action="add-quick-exercise"]', actions);
-    actions.className = 'quick-workout-actions'; actions.replaceChildren(start, regenerate, add);
+    const start = $('[data-action="start-quick"]', actions), regenerate = $('[data-action="regenerate-quick"]', actions), add = $('[data-action="add-quick-exercise"]', actions), save = $('[data-action="save-quick-template"]', actions);
+    actions.className = 'quick-workout-actions'; actions.replaceChildren(add, regenerate, save, start);
     start.className = 'button button-primary button-full'; regenerate.className = 'button button-secondary'; add.className = 'button button-secondary'; add.textContent = '＋ ADD EXERCISE';
   }
   linkExerciseLabels($('#modal-root'), draft.items, '.quick-summary-row');
+}
+function quickSummaryRowsHtml(draft) {
+  return draft.items.map(item => `<div class="quick-summary-row" data-quick-exercise-id="${safeText(item.exerciseId)}"><strong>${safeText(itemExercise(item)?.name)}</strong><button type="button" class="button-plain quick-shuffle-button" data-action="shuffle-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Shuffle ${safeText(itemExercise(item)?.name || 'exercise')} for another match" title="Shuffle to a different matching exercise">⟲</button><button type="button" class="button-plain quick-remove-button" data-action="remove-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}" title="Remove exercise">×</button></div>`).join('');
+}
+function updateQuickPreviewList() {
+  const draft = state.quickDraft, list = $('.quick-summary-list', $('#modal-root'));
+  if (!list) { showQuickPreview(draft); return; }
+  list.innerHTML = quickSummaryRowsHtml(draft);
+  const copy = $('.modal-copy', $('#modal-root'));
+  if (copy) copy.textContent = `About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.`;
+  linkExerciseLabels($('#modal-root'), draft.items, '.quick-summary-row');
+}
+function shuffleQuickItem(exerciseId) {
+  const draft = state.quickDraft;
+  const index = draft.items.findIndex(item => item.exerciseId === exerciseId);
+  if (index < 0) return;
+  const usedIds = new Set(draft.items.map(item => item.exerciseId));
+  const candidates = EXERCISES.filter(exercise => !usedIds.has(exercise.id) && focusMatches(exercise, state.quickFocus) && availableForEquipment(exercise, state.quickEquipment));
+  if (!candidates.length) { toast('No other matching movements available.'); return; }
+  const favorites = candidates.filter(exercise => Store.data.user.favorites.includes(exercise.id));
+  const pool = favorites.length ? favorites : candidates;
+  const exercise = pool[Math.floor(Math.random() * pool.length)];
+  draft.items[index] = { exerciseId: exercise.id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight, completedSets: [] };
+  updateQuickPreviewList();
 }
 function openBuilder(workout = null) {
   state.builderDraft = workout ? JSON.parse(JSON.stringify(workout)) : { id: null, name: '', items: [] };
@@ -830,11 +853,18 @@ function handleAction(action, target) {
     }
     case 'back-quick-config': quickModal(true); break;
     case 'regenerate-quick': showQuickPreview(generateQuickWorkout(state.quickFocus, state.quickDuration, state.quickEquipment)); break;
-    case 'remove-quick-item': state.quickDraft.items.splice(Number(target.dataset.index), 1); showQuickPreview(state.quickDraft); break;
+    case 'shuffle-quick-item': shuffleQuickItem(id); break;
+    case 'remove-quick-item': state.quickDraft.items = state.quickDraft.items.filter(item => item.exerciseId !== id); updateQuickPreviewList(); break;
     case 'add-quick-exercise': renderQuickAdd(); break;
     case 'back-quick-preview': showQuickPreview(state.quickDraft); break;
     case 'add-to-quick': { const exercise = exerciseById(id); state.quickDraft.items.push({ exerciseId: id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight }); showQuickPreview(state.quickDraft); break; }
     case 'start-quick': if (state.quickDraft.items.length) startWorkout(state.quickDraft); else toast('Add at least one movement first.'); break;
+    case 'save-quick-template': {
+      const draft = state.quickDraft;
+      if (!draft?.items.length) { toast('Add at least one movement first.'); break; }
+      Store.data.workouts.push({ id: `workout-${Date.now()}`, name: draft.name || 'Quick Workout', items: draft.items.map(item => ({ ...item, completedSets: [] })), uses: 0, lastUsed: null });
+      Store.save(); toast('Saved to your workouts.'); break;
+    }
     case 'save-template': {
       updateBuilderFromModal(); const draft = state.builderDraft;
       if (!draft.name.trim()) { $('#builder-name').focus(); toast('Give your workout a name first.'); break; }
