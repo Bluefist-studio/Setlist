@@ -101,21 +101,28 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       if (!bootstrapped) {
         const remoteSnapshot = await firestoreSdk.getDoc(stateRef);
         const local = getLocalData();
+        const localBelongsToUser = !local?._accountUid || local._accountUid === userId;
         if (remoteSnapshot.exists()) {
           const remote = remoteSnapshot.data();
           if (!isValidState(remote.state)) throw new Error('Saved account data has an unexpected format.');
-          if (preferRemoteNextBootstrap || !hasLocalData() || Number(remote.localUpdatedAt) > Number(local._updatedAt || 0)) {
+          if (preferRemoteNextBootstrap || !localBelongsToUser || !hasLocalData() || Number(remote.localUpdatedAt) > Number(local._updatedAt || 0)) {
             onRemoteData(remote.state);
             setStatus('Synced · account');
           } else {
+            local._accountUid = userId;
             await writeSnapshot(stateRef, firestoreSdk, local);
           }
-        } else if (preferRemoteNextBootstrap && getEmptyData) {
+        } else if ((preferRemoteNextBootstrap || !localBelongsToUser) && getEmptyData) {
           onRemoteData(getEmptyData());
-          await writeSnapshot(stateRef, firestoreSdk, getLocalData());
+          const empty = getLocalData();
+          empty._accountUid = userId;
+          await writeSnapshot(stateRef, firestoreSdk, empty);
         } else {
+          local._accountUid = userId;
           await writeSnapshot(stateRef, firestoreSdk, local);
         }
+        const currentLocal = getLocalData();
+        if (currentLocal) currentLocal._accountUid = userId;
         preferRemoteNextBootstrap = false;
         bootstrapped = true;
         stopListening?.();
