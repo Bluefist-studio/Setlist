@@ -7,6 +7,26 @@ const normalizeEquipment = value => ({
   bodyweight: 'Bodyweight', barbell: 'Barbell', dumbbells: 'Dumbbells', kettlebell: 'Kettlebell',
   'resistance bands': 'Resistance bands', machine: 'Machines', machines: 'Machines'
 }[String(value).toLowerCase()] || normalizeLabel(value));
+const TECHNICAL_TERMS = {
+  anchor: 'A secure point where a band, cable, or barbell is fixed before you begin the movement.',
+  brace: 'Tighten your core as if preparing for a gentle impact. Keep breathing while maintaining that tension.',
+  clean: 'A lift that brings a weight from the floor or a hanging position to the shoulders in one controlled motion.',
+  hinge: 'Move by bending primarily at the hips while keeping your spine stable, like closing a door with your hips.',
+  landmine: 'A barbell setup with one end fixed in a landmine attachment or a secure corner, allowing the free end to arc.',
+  press: 'Push a weight away from your body, usually by extending your arms from the shoulders or chest.',
+  rack: 'The supported position where a barbell or kettlebell rests near the shoulders before a lift or press.',
+  'rack position': 'The supported stance where a barbell or kettlebell is held close to the shoulders, ready for the next movement.',
+  reps: 'Short for repetitions: the number of times you perform a movement in one set.',
+  row: 'Pull a weight toward your torso while keeping your shoulder blades controlled.',
+  set: 'A group of consecutive repetitions performed before resting.',
+  snatch: 'A lift that moves a weight from the floor or hang position to overhead in one continuous motion.',
+  thrust: 'Drive the hips or limbs forward with force to create movement, usually while keeping control of the weight.',
+  thruster: 'A combined squat and press performed as one continuous movement.'
+};
+const technicalTermPattern = new RegExp(`\\b(${Object.keys(TECHNICAL_TERMS).sort((a, b) => b.length - a.length).join('|')})\\b`, 'gi');
+function renderTechnicalText(text) {
+  return safeText(text).replace(technicalTermPattern, match => `<button type="button" class="technical-term" data-action="technical-term" data-term="${match.toLowerCase()}">${match}</button>`);
+}
 const EXERCISES = exerciseDatabase.map(record => {
   const sets = Number(record.defaultSets) || 3;
   const rest = Number(record.defaultRestSeconds) || 60;
@@ -325,7 +345,7 @@ function renderOnboardingStep(step) {
   const user = Store.data.user;
   const isEntry = step === -1;
   const title = isEntry ? 'Are you new or returning?' : ['What do you have to train with?', 'What do you like doing?', 'How long do you usually want to work out?'][step];
-  const subtitle = isEntry ? 'Choose how you’d like to get started.' : ['Choose everything you have access to. You can change this any time.', 'Pick at least 8 favorites to give Quick Start enough variety. It’ll mix these with other movements, too.', 'This becomes your default Quick Start duration.'][step];
+  const subtitle = isEntry ? 'Choose how you’d like to get started.' : ['Choose everything you have access to. You can change this any time.', 'Pick at least 10 favorites to give Quick Start enough variety. It’ll mix these with other movements, too.', 'This becomes your default Quick Start duration.'][step];
   const onboardingCategories = ['All', ...new Set(EXERCISES.flatMap(item => item.categories))];
   let body = '';
   if (isEntry) body = `<div class="onboarding-entry-options"><button class="onboarding-entry-option" data-action="onboard-new"><span class="eyebrow">NEW TO SETLIST</span><strong>Set up your training space</strong><span>Choose your equipment and preferences.</span></button><button class="onboarding-entry-option" data-action="onboard-returning"><span class="eyebrow">ALREADY HAVE AN ACCOUNT</span><strong>I’m returning</strong><span>Log in to load your workouts and history.</span></button></div>`;
@@ -336,23 +356,35 @@ function renderOnboardingStep(step) {
   const progress = isEntry ? '' : `<div class="step-dots">${[0, 1, 2].map(index => `<span class="${index === step ? 'active' : ''}"></span>`).join('')}</div><div class="onboard-footer">${step > 0 ? '<button class="button-plain" data-action="onboard-back">← BACK</button>' : '<span></span>'}<button class="button button-primary" data-action="onboard-next" data-step="${step}">${step === 2 ? 'LET’S GO' : 'CONTINUE'} <span>→</span></button></div>`;
   root.innerHTML = `<div class="onboarding-overlay"><section class="onboarding-panel"><div class="onboard-top"><div><div class="eyebrow">SETLIST · GETTING STARTED</div><h2>${title}</h2></div>${skipButton}</div><p class="onboard-copy">${subtitle}</p>${body}${progress}</section></div>`;
 }
+function initializeBuilderModal() {
+  renderBuilderSelection();
+  const library = $('.builder-exercises'), headings = document.createElement('div');
+  $('.builder-column-headings', library)?.remove();
+  const focusGroup = $('[data-builder-part]', $('.modal-panel'))?.closest('.field-group');
+  if (focusGroup) $('#builder-selection')?.after(focusGroup);
+  headings.className = 'builder-column-headings';
+  headings.innerHTML = '<span></span><span>EXERCISE</span>';
+  library?.prepend(headings);
+  $('.modal-actions.spread .template-meta', $('.modal-panel'))?.remove();
+  linkExerciseLabels(library, $$('[data-builder-select]', library).map(input => ({ exerciseId: input.dataset.builderSelect })), '.builder-exercise', 'span');
+  linkExerciseLabels($('#builder-selection'), state.builderDraft.items, '.builder-selected-row');
+  stopBuilderDrag = initializeBuilderDrag($('#builder-selection'));
+  updateBuilderFocusVisibility();
+}
+function captureBuilderPosition() {
+  return { modalScrollTop: $('.modal-panel')?.scrollTop || 0, libraryScrollTop: $('.builder-exercises')?.scrollTop || 0 };
+}
+function restoreBuilderPosition(position) {
+  if (!position) return;
+  const panel = $('.modal-panel'), library = $('.builder-exercises');
+  if (panel) panel.scrollTop = position.modalScrollTop;
+  if (library) library.scrollTop = position.libraryScrollTop;
+}
 function openModal(html, mode = null) {
   stopBuilderDrag?.(); stopBuilderDrag = null;
   state.modalMode = mode; document.body.classList.add('modal-open'); $('#modal-root').innerHTML = `<div class="modal-backdrop"><section class="modal-panel">${html}</section></div>`;
   if (mode) $('.modal-panel').dataset.modalMode = mode;
-  if (mode === 'builder') {
-    renderBuilderSelection();
-    const library = $('.builder-exercises'), headings = document.createElement('div');
-    const focusGroup = $('[data-builder-part]', $('.modal-panel'))?.closest('.field-group');
-    if (focusGroup) $('#builder-selection')?.after(focusGroup);
-    headings.className = 'builder-column-headings';
-    headings.innerHTML = '<span></span><span>EXERCISE</span><span>SETS</span><span>REPS</span>';
-    library?.prepend(headings);
-    $('.modal-actions.spread .template-meta', $('.modal-panel'))?.remove();
-    linkExerciseLabels(library, $$('[data-builder-select]', library).map(input => ({ exerciseId: input.dataset.builderSelect })), '.builder-exercise', 'span');
-    linkExerciseLabels($('#builder-selection'), state.builderDraft.items, '.builder-selected-row');
-    stopBuilderDrag = initializeBuilderDrag($('#builder-selection'));
-  }
+  if (mode === 'builder') initializeBuilderModal();
   if (mode === 'quick-add' || mode === 'add-exercise') {
     const action = mode === 'quick-add' ? 'add-to-quick' : 'add-active-item';
     const items = $$(`[data-action="${action}"]`, $('#modal-root')).map(button => ({ exerciseId: button.dataset.id }));
@@ -375,6 +407,23 @@ function openModal(html, mode = null) {
     (actions || panel).append(resetButton);
   }
 }
+function updateBuilderFocusVisibility() {
+  const draft = state.builderDraft, library = $('.builder-exercises');
+  if (!draft || !library) return;
+  const chosenParts = draft.parts || ['Full Body'];
+  const selected = new Set(draft.items.map(item => item.exerciseId));
+  $$('.option-chip[data-builder-part]', $('.modal-panel')).forEach(button => button.classList.toggle('selected', chosenParts.includes(button.dataset.builderPart)));
+  $$('.builder-exercise', library).forEach(row => {
+    const exercise = exerciseById(row.dataset.builderRow);
+    const isSelected = selected.has(row.dataset.builderRow), checkbox = $('[data-builder-select]', row);
+    if (checkbox) checkbox.checked = isSelected;
+    $$('[data-builder-sets], [data-builder-reps]', row).forEach(input => { input.disabled = !isSelected; });
+    row.classList.toggle('selected', isSelected);
+    const hidden = !isSelected && !chosenParts.some(part => focusMatches(exercise, part));
+    row.hidden = hidden;
+    row.classList.toggle('is-hidden', hidden);
+  });
+}
 function closeModal() {
   const previous = state.modalReturn;
   $('#modal-root').innerHTML = ''; state.modalMode = null; state.modalReturn = null; document.body.classList.remove('modal-open');
@@ -384,9 +433,12 @@ function renderAccountControls() {
   const summary = $('#account-summary'), controls = $('#account-controls');
   if (!summary || !controls) return;
   const email = state.accountInfo?.email;
-  summary.textContent = email ? `Signed in as ${email}.` : 'Create an account to use your workouts on other devices.';
+  const emailVerified = state.accountInfo?.emailVerified !== false;
+  summary.textContent = email ? emailVerified ? `Signed in as ${email}.` : `Signed in as ${email}, but email verification is still pending.` : 'Create an account to use your workouts on other devices.';
   controls.innerHTML = email
-    ? '<button class="button button-secondary button-small" data-action="account-switch">SWITCH ACCOUNT</button><button class="button button-secondary button-small" data-action="account-sign-out">LOG OUT</button>'
+    ? emailVerified
+      ? '<button class="button button-secondary button-small" data-action="account-switch">SWITCH ACCOUNT</button><button class="button button-secondary button-small" data-action="account-sign-out">LOG OUT</button>'
+      : '<p class="account-verification-note">Your workouts remain saved on this device until you verify your email.</p><button class="button button-secondary button-small" data-action="account-resend-verification">RESEND VERIFICATION</button><button class="button button-secondary button-small" data-action="account-refresh-verification">I VERIFIED MY EMAIL</button><button class="button button-secondary button-small" data-action="account-sign-out">LOG OUT</button>'
     : '<button class="button button-secondary button-small" data-action="account-create">CREATE ACCOUNT</button><button class="button button-secondary button-small" data-action="account-login">LOG IN</button>';
 }
 function openAccountModal(mode = 'create', error = '', email = '') {
@@ -448,7 +500,7 @@ function quickModal(restore = false) {
   const equipment = restore ? state.quickEquipment : 'available';
   const standardDuration = durations.includes(duration);
   state.quickFocus = focus; state.quickDuration = duration; state.quickEquipment = equipment;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Core', 'Custom'].map(part => `<button class="option-chip ${focus.includes(part) ? 'selected' : ''}" data-quick-part="${part}" aria-pressed="${focus.includes(part)}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${durations.map(item => `<option value="${item}" ${item === duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom" ${standardDuration ? '' : 'selected'}>Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${duration}" style="display:${standardDuration ? 'none' : 'block'};margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available" ${equipment === 'available' ? 'selected' : ''}>My available equipment</option><option value="bodyweight" ${equipment === 'bodyweight' ? 'selected' : ''}>Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK START</div><h2>Shape today’s session.</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">A starting point, not a prescription. Change anything before you begin.</p><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${['Full Body', 'Upper Body', 'Lower Body', 'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core', 'Custom'].map(part => `<button class="option-chip ${focus.includes(part) ? 'selected' : ''}" data-quick-part="${part}" aria-pressed="${focus.includes(part)}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="quick-duration">DURATION</label><select class="select" id="quick-duration">${durations.map(item => `<option value="${item}" ${item === duration ? 'selected' : ''}>${item} minutes</option>`).join('')}<option value="custom" ${standardDuration ? '' : 'selected'}>Custom</option></select><input class="input" id="quick-custom-duration" type="number" min="10" max="120" value="${duration}" style="display:${standardDuration ? 'none' : 'block'};margin-top:7px"></div><div class="field-group"><label class="field-label" for="quick-equipment">EQUIPMENT</label><select class="select" id="quick-equipment"><option value="available" ${equipment === 'available' ? 'selected' : ''}>My available equipment</option><option value="bodyweight" ${equipment === 'bodyweight' ? 'selected' : ''}>Bodyweight only</option></select></div></div><div class="modal-actions"><button class="button button-primary" data-action="generate-quick">BUILD MY WORKOUT →</button></div>`, 'quick-config');
 }
 function availableForEquipment(exercise, mode) {
   if (mode === 'bodyweight') return exercise.equipment.includes('Bodyweight');
@@ -570,10 +622,10 @@ function openBuilder(workout = null) {
 }
 function showBuilder() {
   const draft = state.builderDraft, selected = new Set(draft.items.map(item => item.exerciseId));
-  const parts = ['Full Body', 'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'];
+  const parts = ['Full Body', 'Upper Body', 'Lower Body', 'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'];
   const chosenParts = draft.parts || ['Full Body'];
-  const exercises = [...draft.items.map(item => exerciseById(item.exerciseId)).filter(Boolean), ...EXERCISES.filter(exercise => !selected.has(exercise.id) && (chosenParts.includes('Full Body') || chosenParts.some(part => exercise.parts.includes(part))) )];
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT BUILDER</div><h2>${draft.id ? 'Edit workout' : 'Make it yours.'}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">Pick your focus, then build the lineup. You can fine-tune the details later.</p><div class="field-group"><label class="field-label" for="builder-name">WORKOUT NAME</label><input class="input" id="builder-name" placeholder="e.g. Upper Body + Core" maxlength="45" value="${safeText(draft.name)}"></div><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${parts.map(part => `<button class="option-chip ${chosenParts.includes(part) ? 'selected' : ''}" data-builder-part="${part}">${part}</button>`).join('')}</div></div><div class="form-row"><div class="field-group"><label class="field-label" for="builder-duration">TARGET DURATION</label><select class="select" id="builder-duration">${[15,20,30,45,60].map(duration => `<option value="${duration}" ${duration === (draft.duration || Store.data.user.duration) ? 'selected' : ''}>${duration} min</option>`).join('')}</select></div><div class="field-group"><label class="field-label">LINEUP</label><div style="padding-top:11px;color:var(--muted);font-size:10px"><strong id="builder-count">${draft.items.length}</strong> selected · ~<span id="builder-estimate">${estimateWorkout(draft.items)}</span> min</div></div></div><div class="builder-exercises">${exercises.map(exercise => { const item = draft.items.find(entry => entry.exerciseId === exercise.id) || { exerciseId: exercise.id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight }; return `<div class="builder-exercise ${selected.has(exercise.id) ? 'selected' : ''}" data-builder-row="${exercise.id}"><input type="checkbox" data-builder-select="${exercise.id}" ${selected.has(exercise.id) ? 'checked' : ''}><span>${safeText(exercise.name)}</span><input aria-label="Sets for ${safeText(exercise.name)}" data-builder-sets="${exercise.id}" type="number" min="1" max="10" value="${itemSets(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}><input aria-label="Reps for ${safeText(exercise.name)}" data-builder-reps="${exercise.id}" type="number" min="1" max="100" value="${itemReps(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}></div>`; }).join('')}</div><div class="modal-actions spread"><span class="template-meta">SETS &nbsp;&nbsp;&nbsp; REPS</span><div><button class="button button-secondary" data-action="close-modal">CANCEL</button><button class="button button-primary" data-action="save-template">SAVE WORKOUT</button></div></div>`, 'builder');
+  const exercises = [...draft.items.map(item => exerciseById(item.exerciseId)).filter(Boolean), ...EXERCISES.filter(exercise => !selected.has(exercise.id))];
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT BUILDER</div><h2>${draft.id ? 'Edit workout' : 'Make it yours.'}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">Pick your focus, then build the lineup. You can fine-tune the details later.</p><div class="field-group"><label class="field-label" for="builder-name">WORKOUT NAME</label><input class="input" id="builder-name" placeholder="e.g. Upper Body + Core" maxlength="45" value="${safeText(draft.name)}"></div><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${parts.map(part => `<button class="option-chip ${chosenParts.includes(part) ? 'selected' : ''}" data-builder-part="${part}">${part}</button>`).join('')}</div></div><div class="field-group"><label class="field-label">LINEUP</label><div style="padding-top:11px;color:var(--muted);font-size:10px"><strong id="builder-count">${draft.items.length}</strong> selected · ~<span id="builder-estimate">${estimateWorkout(draft.items)}</span> min</div></div><div class="builder-exercises">${exercises.map(exercise => { const item = draft.items.find(entry => entry.exerciseId === exercise.id) || { exerciseId: exercise.id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight }; return `<div class="builder-exercise ${selected.has(exercise.id) ? 'selected' : ''}" data-builder-row="${exercise.id}"><input type="checkbox" data-builder-select="${exercise.id}" ${selected.has(exercise.id) ? 'checked' : ''}><span>${safeText(exercise.name)}</span><input aria-label="Sets for ${safeText(exercise.name)}" data-builder-sets="${exercise.id}" type="number" min="1" max="10" value="${itemSets(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}><input aria-label="Reps for ${safeText(exercise.name)}" data-builder-reps="${exercise.id}" type="number" min="1" max="100" value="${itemReps(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}></div>`; }).join('')}</div><div class="modal-actions spread"><span class="template-meta">SETS &nbsp;&nbsp;&nbsp; REPS</span><div><button class="button button-secondary" data-action="close-modal">CANCEL</button><button class="button button-primary" data-action="save-template">SAVE WORKOUT</button></div></div>`, 'builder');
 }
 function updateBuilderFromModal() {
   if (!state.builderDraft) return;
@@ -600,18 +652,25 @@ function renderBuilderSelection() {
     panel = document.createElement('section'); panel.id = 'builder-selection'; panel.className = 'builder-selection';
     library.before(panel);
   }
-  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map((item, index) => `<div class="builder-selected-row" data-builder-selected-id="${safeText(item.exerciseId)}"><span class="set-index">${String(index + 1).padStart(2, '0')}</span><button type="button" class="builder-drag-handle" aria-label="Drag ${safeText(itemExercise(item)?.name || 'exercise')} to reorder">⠿</button><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span class="builder-selected-count">${itemSets(item)} × ${itemReps(item)}</span></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
-  $$('.builder-selected-row', panel).forEach((row, index) => { $('.builder-selected-count', row).textContent = `${itemSets(draft.items[index])} × ${itemMetric(draft.items[index])}`; });
+  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map(item => `<div class="builder-selected-row" data-builder-selected-id="${safeText(item.exerciseId)}"><button type="button" class="builder-remove-exercise" data-action="remove-builder-exercise" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')} from workout">×</button><div class="builder-selected-main"><div class="builder-selected-name-line"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong></div><div class="builder-selected-settings-line"><button type="button" class="builder-selected-settings" data-action="builder-exercise-settings" data-id="${safeText(item.exerciseId)}" aria-label="Change weight, sets, and reps for ${safeText(itemExercise(item)?.name || 'exercise')}"><span class="builder-selected-count">${item.weight ? `${item.weight} lb · ` : ''}${itemSets(item)} sets × ${itemReps(item)} reps</span><span aria-hidden="true">↗</span></button></div></div></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
   linkExerciseLabels(panel, draft.items, '.builder-selected-row');
+}
+function openBuilderExerciseSettings(exerciseId) {
+  updateBuilderFromModal();
+  const item = state.builderDraft?.items.find(entry => entry.exerciseId === exerciseId), exercise = exerciseById(exerciseId);
+  if (!item || !exercise) return;
+  state.modalReturn = { mode: 'builder', html: $('#modal-root').innerHTML, position: captureBuilderPosition() };
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">SELECTED EXERCISE</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="back-to-previous-modal" aria-label="Back to workout builder">×</button></div><p class="modal-copy">Adjust the suggested weight, sets, and reps for this movement.</p><div class="form-row"><div class="field-group"><label class="field-label" for="builder-item-weight">WEIGHT</label><input class="input" id="builder-item-weight" type="number" min="0" step="2.5" value="${item.weight || 0}"></div><div class="field-group"><label class="field-label" for="builder-item-sets">SETS</label><input class="input" id="builder-item-sets" type="number" min="1" max="10" value="${itemSets(item)}"></div></div><div class="field-group"><label class="field-label" for="builder-item-reps">REPS</label><input class="input" id="builder-item-reps" type="number" min="1" max="100" value="${itemReps(item)}"></div><div class="modal-actions"><button class="button button-secondary" data-action="back-to-previous-modal">CANCEL</button><button class="button button-primary" data-action="save-builder-exercise" data-id="${safeText(exerciseId)}">SAVE CHANGES</button></div>`, 'builder-exercise-settings');
 }
 function initializeBuilderDrag(panel) {
   if (!panel) return;
   let draggedRow = null;
   let draggedPointerId = null;
   const onPointerDown = event => {
-    const handle = event.target instanceof Element ? event.target.closest('.builder-drag-handle') : null;
-    if (!handle || !panel.contains(handle)) return;
-    draggedRow = handle.closest('.builder-selected-row');
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target || target.closest('.builder-selected-settings, .builder-remove-exercise, input, select, textarea')) return;
+    draggedRow = target.closest('.builder-selected-row');
+    if (!draggedRow || !panel.contains(draggedRow)) return;
     if (!draggedRow) return;
     event.preventDefault();
     draggedPointerId = event.pointerId;
@@ -630,7 +689,6 @@ function initializeBuilderDrag(panel) {
     const itemsById = new Map(state.builderDraft.items.map(item => [item.exerciseId, item]));
     const selectedRows = $$('.builder-selected-row', panel);
     state.builderDraft.items = selectedRows.map(row => itemsById.get(row.dataset.builderSelectedId)).filter(Boolean);
-    selectedRows.forEach((row, index) => { $('.set-index', row).textContent = String(index + 1).padStart(2, '0'); });
     draggedRow = null; draggedPointerId = null;
   };
   const onPointerUp = event => { if (event.pointerId === draggedPointerId) finishDrag(); };
@@ -649,7 +707,8 @@ function initializeBuilderDrag(panel) {
 function showExerciseDetail(id) {
   const exercise = exerciseById(id), history = Store.data.history.flatMap(workout => (workout.items || []).filter(item => item.exerciseId === id).map(item => ({ ...item, date: workout.endedAt }))).sort((a, b) => new Date(b.date) - new Date(a.date));
   const latest = history[0], best = history.reduce((winner, item) => !winner || volumeItem(item) > volumeItem(winner) ? item : winner, null);
-  const returnModal = state.modalMode === 'exercise-detail' ? state.modalReturn : state.modalMode ? { html: $('#modal-root').innerHTML, mode: state.modalMode } : null;
+  if (state.modalMode === 'builder') updateBuilderFromModal();
+  const returnModal = state.modalMode === 'exercise-detail' ? state.modalReturn : state.modalMode ? { html: $('#modal-root').innerHTML, mode: state.modalMode, position: state.modalMode === 'builder' ? captureBuilderPosition() : null } : null;
   const isFavorite = Store.data.user.favorites.includes(id);
   openModal(`<div class="modal-heading"><div><div class="eyebrow">${safeText(exercise.parts.join(' · '))}</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(exercise.equipment.join(' · '))} · Suggested ${exercise.weight ? `${exercise.weight} lb × ` : ''}${exercise.reps} × ${exercise.sets}</p><div class="simple-metric"><span>Last</span><strong>${latest ? `${latest.weight || 0} lb × ${latest.reps} × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet'}</strong></div><div class="simple-metric"><span>Best logged volume</span><strong>${best ? `${formatNumber(volumeItem(best))} lb · ${dateLabel(best.date)}` : '—'}</strong></div><div class="modal-actions"><button type="button" class="favorite-button exercise-detail-favorite ${isFavorite ? 'is-favorite' : ''}" data-action="favorite" data-id="${id}" aria-label="${isFavorite ? 'Remove favorite' : 'Add favorite'}" aria-pressed="${isFavorite}">${isFavorite ? '★' : '☆'}</button>${currentWorkout() ? `<button class="button button-primary" data-action="add-active-item" data-id="${id}">ADD TO WORKOUT</button>` : '<button class="button button-primary" data-action="close-modal">DONE</button>'}</div>`, 'exercise-detail');
   if (returnModal) {
@@ -661,11 +720,24 @@ function showExerciseDetail(id) {
   if (exercise.unit === 'sec') $('.modal-copy', $('#modal-root')).textContent = `${exercise.equipment.join(' · ')} · Suggested ${exercise.reps} sec hold × ${exercise.sets}`;
   const instructions = document.createElement('section');
   instructions.className = 'exercise-instructions';
-  const description = document.createElement('p'); description.textContent = exercise.description;
+  const description = document.createElement('p'); description.innerHTML = renderTechnicalText(exercise.description);
   const heading = document.createElement('h3'); heading.textContent = 'HOW TO';
-  const howTo = document.createElement('p'); howTo.textContent = exercise.howTo;
+  const howTo = document.createElement('p'); howTo.innerHTML = renderTechnicalText(exercise.howTo);
   instructions.append(description, heading, howTo);
   $('.modal-copy', $('#modal-root')).after(instructions);
+}
+function showTechnicalTerm(term) {
+  const key = String(term || '').toLowerCase();
+  const definition = TECHNICAL_TERMS[key];
+  if (!definition) return;
+  const previous = state.modalMode ? { html: $('#modal-root').innerHTML, mode: state.modalMode, returnModal: state.modalReturn } : null;
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">TECHNICAL TERM</div><h2>${safeText(key)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(definition)}</p><div class="modal-actions"><button class="button button-primary" data-action="close-modal">DONE</button></div>`, 'technical-term');
+  if (previous) {
+    state.modalReturn = previous;
+    $$('[data-action="close-modal"]', $('#modal-root')).forEach(button => {
+      button.className = 'button button-secondary button-small'; button.dataset.action = 'back-to-previous-modal'; button.textContent = '← BACK'; button.setAttribute('aria-label', 'Back to exercise details');
+    });
+  }
 }
 function volumeItem(item) { return (item.completedSets || []).reduce((sum, set) => sum + set.weight * set.reps, 0); }
 function startWorkout(source) {
@@ -799,7 +871,11 @@ function handleAction(action, target) {
       const previous = state.modalReturn;
       if (!previous) { closeModal(); break; }
       if (previous.kind === 'onboarding') { closeModal(); break; }
-      $('#modal-root').innerHTML = previous.html; state.modalMode = previous.mode; state.modalReturn = null;
+      if (previous.mode === 'builder') {
+        $('#modal-root').innerHTML = previous.html; state.modalMode = 'builder'; state.modalReturn = null;
+        document.body.classList.add('modal-open'); initializeBuilderModal(); restoreBuilderPosition(previous.position); break;
+      }
+      $('#modal-root').innerHTML = previous.html; state.modalMode = previous.mode; state.modalReturn = previous.returnModal || null;
       document.body.classList.add('modal-open'); break;
     }
     case 'toggle-onboard-description': {
@@ -827,6 +903,16 @@ function handleAction(action, target) {
       break;
     }
     case 'exercise-detail': showExerciseDetail(id); break;
+    case 'technical-term': showTechnicalTerm(target.dataset.term); break;
+    case 'builder-exercise-settings': openBuilderExerciseSettings(id); break;
+    case 'remove-builder-exercise': {
+      updateBuilderFromModal();
+      state.builderDraft.items = state.builderDraft.items.filter(item => item.exerciseId !== id);
+      const row = $(`[data-builder-row="${id}"]`), checkbox = $(`[data-builder-select="${id}"]`);
+      if (row) { row.classList.remove('selected'); row.hidden = false; row.classList.remove('is-hidden'); }
+      if (checkbox) checkbox.checked = false;
+      renderBuilderSelection(); updateBuilderFocusVisibility(); break;
+    }
     case 'start-template': case 'open-template': {
       const template = Store.data.workouts.find(item => item.id === id); if (!template) break;
       if (action === 'open-template' || target.closest('.template-card')) { openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT TEMPLATE</div><h2>${safeText(template.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${template.items.length} exercises · estimated ${estimateWorkout(template.items)} minutes</p><div class="quick-summary-list">${template.items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} × ${itemReps(item)}</span></div>`).join('')}</div><div class="modal-actions"><button class="button button-secondary" data-action="edit-template" data-id="${id}">EDIT</button><button class="button button-primary" data-action="start-template" data-id="${id}">START WORKOUT →</button></div>`, 'template-detail'); }
@@ -873,6 +959,15 @@ function handleAction(action, target) {
       else Store.data.workouts.push({ id: `workout-${Date.now()}`, name: draft.name.trim(), items: draft.items, uses: 0, lastUsed: null });
       closeModal(); state.view = 'workouts'; saveAndRender(); toast('Workout saved to your bank.'); break;
     }
+    case 'save-builder-exercise': {
+      const item = state.builderDraft?.items.find(entry => entry.exerciseId === id);
+      if (!item) break;
+      item.weight = Math.max(0, Number($('#builder-item-weight')?.value) || 0);
+      item.sets = Math.max(1, Math.min(10, Number($('#builder-item-sets')?.value) || itemSets(item)));
+      item.reps = Math.max(1, Math.min(100, Number($('#builder-item-reps')?.value) || itemReps(item)));
+      const position = state.modalReturn?.position;
+      state.modalReturn = null; showBuilder(); restoreBuilderPosition(position); break;
+    }
     case 'complete-set': {
       if (!workout || workout.pausedAt) break;
       const item = activeItem(workout), weight = Math.max(0, Number($('[data-set-field="weight"]')?.value ?? item.weight) || 0), reps = Math.max(1, Number($('[data-set-field="reps"]')?.value ?? item.reps) || 1), now = Date.now();
@@ -904,8 +999,18 @@ function handleAction(action, target) {
     case 'onboard-account': Store.data.user.name = $('#user-name')?.value.trim() || ''; Store.save(); openAccountModal('create'); break;
     case 'onboard-next': {
       const step = Number(target.dataset.step);
-      if (step === 0) { Store.data.user.equipment = $$('[name="onboard-equipment"]:checked').map(input => input.value); renderOnboardingStep(1); }
-      else if (step === 1) { Store.data.user.favorites = $$('[name="onboard-favorite"]:checked').map(input => input.value); renderOnboardingStep(2); }
+      if (step === 0) {
+        Store.data.user.equipment = $$('[name="onboard-equipment"]:checked').map(input => input.value);
+        const bodyweightIds = EXERCISES.filter(item => item.equipment.includes('Bodyweight')).map(item => item.id);
+        Store.data.user.favorites = bodyweightIds;
+        renderOnboardingStep(1);
+      }
+      else if (step === 1) {
+        const favorites = $$('[name="onboard-favorite"]:checked').map(input => input.value);
+        if (favorites.length < 10) { toast(`Select at least 10 exercises. You have selected ${favorites.length}.`); break; }
+        Store.data.user.favorites = favorites;
+        renderOnboardingStep(2);
+      }
       else {
         if ($('.duration-option.selected')?.dataset.duration === 'custom') Store.data.user.duration = Number($('#custom-duration')?.value) || Store.data.user.duration;
         Store.data.user.name = $('#user-name')?.value.trim() || ''; Store.data.user.onboarded = true; seedStarterWorkouts(); saveAndRender(); toast('You’re all set.');
@@ -923,6 +1028,16 @@ function handleAction(action, target) {
     case 'submit-account-create': submitAccountForm('create'); break;
     case 'submit-account-login': submitAccountForm('login'); break;
     case 'submit-password-reset': submitAccountForm('forgot'); break;
+    case 'account-resend-verification': {
+      if (!firebaseSync) { toast('Account services are unavailable right now.'); break; }
+      firebaseSync.resendVerification().then(() => toast('Verification email sent.')).catch(error => toast(error.message || 'Could not send the verification email.'));
+      break;
+    }
+    case 'account-refresh-verification': {
+      if (!firebaseSync) { toast('Account services are unavailable right now.'); break; }
+      firebaseSync.refreshAccount().then(connected => { renderAccountControls(); toast(connected ? 'Email verified. Your local data is now syncing.' : 'Email is not verified yet.'); }).catch(error => toast(error.message || 'Could not check email verification.'));
+      break;
+    }
     case 'account-sign-out': signOutAccount(); break;
     case 'remove-history': {
       const session = Store.data.history.find(item => item.id === id);
@@ -990,7 +1105,7 @@ document.addEventListener('click', event => {
     draft.parts ||= ['Full Body'];
     if (part === 'Full Body') draft.parts = ['Full Body'];
     else { draft.parts = draft.parts.filter(item => item !== 'Full Body'); draft.parts = draft.parts.includes(part) ? draft.parts.filter(item => item !== part) : [...draft.parts, part]; if (!draft.parts.length) draft.parts = ['Full Body']; }
-    showBuilder(); return;
+    updateBuilderFocusVisibility(); return;
   }
   const duration = event.target.closest('[data-duration]');
   if (duration) {
@@ -1034,16 +1149,16 @@ async function submitAccountForm(mode) {
   try {
     if (mode === 'create') {
       await firebaseSync.createAccount(email, password);
-      closeModal(); toast('Account created. Your workouts are linked.');
+      closeModal(); toast('Verification email sent. Your workouts stay on this device until you verify.');
     } else if (mode === 'login') {
-      await firebaseSync.signIn(email, password);
+      const signedInUser = await firebaseSync.signIn(email, password);
       if (!Store.data.user.onboarded) {
         Store.data.user.onboarded = true;
         seedStarterWorkouts();
         Store.save();
       }
       state.view = 'home'; state.modalReturn = null;
-      closeModal(); render(); toast('Logged in. Your account data is ready.');
+      closeModal(); render(); toast(signedInUser?.emailVerified === false ? 'Check your email to verify. Your data remains local for now.' : 'Logged in. Your account data is ready.');
     } else {
       await firebaseSync.sendPasswordReset(email);
       if (message) message.textContent = 'If an account exists for this email, a password reset email is on its way.';

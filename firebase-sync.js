@@ -67,6 +67,8 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       app = app || (appSdk.getApps().length ? appSdk.getApp() : appSdk.initializeApp(FIREBASE_CONFIG));
       auth = auth || authSdk.getAuth(app);
       database = database || firestoreSdk.getFirestore(app);
+      await authSdk.setPersistence(auth, authSdk.browserLocalPersistence);
+      await auth.authStateReady();
       if (!auth.currentUser) {
         onAccount?.({ uid: null, email: null, isAnonymous: false });
         setStatus('Local data ready · create an account or log in to sync');
@@ -74,7 +76,12 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       }
 
       const userId = auth.currentUser.uid;
-      onAccount?.({ uid: userId, email: auth.currentUser.email || null, isAnonymous: auth.currentUser.isAnonymous });
+      const emailVerified = auth.currentUser.isAnonymous || auth.currentUser.emailVerified;
+      onAccount?.({ uid: userId, email: auth.currentUser.email || null, isAnonymous: auth.currentUser.isAnonymous, emailVerified });
+      if (!emailVerified) {
+        setStatus('Email verification required · saved on this device');
+        return false;
+      }
       if (activeUserId !== userId) {
         stopListening?.(); stopListening = null; bootstrapped = false;
         if (activeUserId !== null) writeQueued = false;
@@ -199,11 +206,9 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
     } else {
       throw new Error('Log out before creating a different account.');
     }
-    onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous });
-    const connected = await ensureConnection(result.user.uid);
-    if (!connected || !bootstrapped || activeUserId !== result.user.uid) {
-      throw new Error('Your account was created, but its workout data could not be saved to Firestore. Check that Firestore is enabled and its rules are deployed, then log in to sync.');
-    }
+    await authSdk.sendEmailVerification(result.user);
+    onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous, emailVerified: false });
+    setStatus('Verification email sent · saved on this device until verified');
     return result.user;
   }
 
@@ -217,7 +222,8 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
       stopListening?.(); stopListening = null; bootstrapped = false; activeUserId = null;
       writeQueued = false; preferRemoteNextBootstrap = true;
     }
-    onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous });
+    onAccount?.({ uid: result.user.uid, email: result.user.email || null, isAnonymous: result.user.isAnonymous, emailVerified: result.user.isAnonymous || result.user.emailVerified });
+    if (!result.user.isAnonymous && !result.user.emailVerified) return result.user;
     const connected = await ensureConnection(result.user.uid);
     if (!connected || !bootstrapped || activeUserId !== result.user.uid) {
       throw new Error('Your account was verified, but its saved data could not be loaded. Check your connection and Firestore rules, then try again.');
@@ -233,11 +239,32 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
     return normalizedEmail;
   }
 
+  async function resendVerification() {
+    const authSdk = await getAuthClient();
+    if (!auth.currentUser || auth.currentUser.isAnonymous || auth.currentUser.emailVerified) return false;
+    await authSdk.sendEmailVerification(auth.currentUser);
+    setStatus('Verification email sent · saved on this device until verified');
+    return true;
+  }
+
+  async function refreshAccount() {
+    const authSdk = await getAuthClient();
+    if (!auth.currentUser) return false;
+    await auth.currentUser.reload();
+    const user = auth.currentUser;
+    const emailVerified = user.isAnonymous || user.emailVerified;
+    onAccount?.({ uid: user.uid, email: user.email || null, isAnonymous: user.isAnonymous, emailVerified });
+    if (!emailVerified) return false;
+    bootstrapped = false;
+    writeQueued = false;
+    return ensureConnection(user.uid);
+  }
+
   async function signOut() {
     const authSdk = await getAuthClient();
     stopListening?.(); stopListening = null; bootstrapped = false; activeUserId = null; writeQueued = false;
     await authSdk.signOut(auth);
-    onAccount?.({ uid: null, email: null, isAnonymous: true });
+    onAccount?.({ uid: null, email: null, isAnonymous: true, emailVerified: false });
   }
 
   async function start() { await ensureConnection(); }
@@ -250,6 +277,8 @@ export function createFirebaseSync({ getLocalData, getEmptyData, hasLocalData, o
     saveLocalSnapshot,
     createAccount,
     signIn,
+    resendVerification,
+    refreshAccount,
     sendPasswordReset,
     signOut,
     stop: () => stopListening?.()
