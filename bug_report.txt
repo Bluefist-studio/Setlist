@@ -1,2 +1,6 @@
 Bug and features:
-change the order of the menus from left to right to Home, Workouts, Exercises, Stats.
+
+
+
+
+Before rebuilding, run npm.cmd ci, then npm.cmd run cap:sync; that reinstalls dependencies and regenerates www.

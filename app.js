@@ -108,7 +108,7 @@ const itemExercise = item => exerciseById(item.exerciseId);
 const itemSets = item => item.sets ?? itemExercise(item)?.sets ?? 3;
 const itemReps = item => item.reps ?? itemExercise(item)?.reps ?? 10;
 const isBodyweight = item => itemExercise(item)?.equipment.includes('Bodyweight') ?? false;
-const itemWeight = item => isBodyweight(item) ? 0 : item.weight ?? itemExercise(item)?.weight ?? 0;
+const itemWeight = item => isBodyweight(item) ? 0 : item.weightCustomized ? item.weight ?? 0 : item.weight || itemExercise(item)?.weight || 0;
 const itemMeasureLabel = item => itemExercise(item)?.unit === 'sec' ? 'seconds' : 'reps';
 const itemMetric = item => itemExercise(item)?.unit === 'sec' ? `${itemReps(item)} sec hold` : `${itemReps(item)} reps`;
 const estimateWorkout = items => Math.round(items.reduce((total, item) => {
@@ -404,7 +404,7 @@ function renderDock() {
   if (!workout || workout.completed || workout.discarded) { dock.className = 'active-dock'; dock.innerHTML = ''; return; }
   const item = activeItem(workout), exercise = itemExercise(item), setNumber = Math.min((item?.completedSets?.length || 0) + 1, itemSets(item));
   dock.className = 'active-dock visible';
-  dock.innerHTML = `<span class="dock-pulse"></span><div class="dock-info"><strong>${workout.pausedAt ? 'WORKOUT PAUSED' : 'WORKOUT'} · ${safeText(workout.name || 'Workout')}</strong><span>${safeText(exercise?.name || workout.name)} · Set ${setNumber}/${itemSets(item)}</span></div><span class="dock-time">${formatDuration(workoutElapsed(workout))}</span><button class="button dock-return" data-action="return-workout">RETURN ↗</button>`;
+  dock.innerHTML = `<span class="dock-pulse"></span><div class="dock-info"><strong>${safeText(workout.name || 'Workout')}</strong><span>${safeText(exercise?.name || workout.name)} · Set ${setNumber}/${itemSets(item)}</span></div><span class="dock-time">${formatDuration(workoutElapsed(workout))}</span><button class="button dock-return" data-action="return-workout">RETURN ↗</button>`;
 }
 function renderActiveWorkout() {
   const workout = currentWorkout();
@@ -746,7 +746,7 @@ function updateBuilderFromModal() {
     const orderedIds = [...draft.items.map(item => item.exerciseId).filter(id => selectedIds.has(id)), ...selectedInputs.map(input => input.dataset.builderSelect).filter(id => !existingItems.has(id))];
     draft.items = orderedIds.map(id => {
       const existing = existingItems.get(id), exercise = exerciseById(id);
-      return { ...existing, exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || existing?.sets || exercise?.sets || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || existing?.reps || exercise?.reps || 10, weight: isBodyweight({ exerciseId: id }) ? 0 : existing?.weight ?? exercise?.weight ?? 0, completedSets: [] };
+      return { ...existing, exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || existing?.sets || exercise?.sets || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || existing?.reps || exercise?.reps || 10, weight: isBodyweight({ exerciseId: id }) ? 0 : existing?.weightCustomized ? existing.weight ?? 0 : existing?.weight || exercise?.weight || 0, completedSets: [] };
     });
   }
   updateBuilderSummary();
@@ -875,7 +875,7 @@ function startWorkout(source) {
   }
   workout.items = workout.items.map(item => {
     const exercise = itemExercise(item), previous = latestExerciseHistory(item.exerciseId);
-    return { ...item, sets: item.sets ?? exercise?.sets ?? 3, reps: item.reps ?? previous?.reps ?? exercise?.reps ?? 10, weight: isBodyweight(item) ? 0 : item.weight ?? previous?.weight ?? exercise?.weight ?? 0, completedSets: [], skipped: false };
+    return { ...item, sets: item.sets ?? exercise?.sets ?? 3, reps: item.reps ?? previous?.reps ?? exercise?.reps ?? 10, weight: isBodyweight(item) ? 0 : item.weightCustomized ? item.weight ?? 0 : item.weight || exercise?.weight || previous?.weight || 0, completedSets: [], skipped: false };
   });
   workout.startedAt = Date.now(); workout.pausedAt = null; workout.pausedSeconds = 0; workout.currentIndex = 0; workout.restIntervals = []; workout.lastSetAt = null; workout.completed = false; workout.state = 'active';
   Store.data.active = workout;
@@ -998,7 +998,7 @@ function startTicker() {
     const workout = currentWorkout(); if (!workout || workout.pausedAt) return;
     const timer = $('#workout-timer'); if (timer) timer.textContent = formatDuration(workoutElapsed(workout));
     const dockTime = $('.dock-time'); if (dockTime) dockTime.textContent = formatDuration(workoutElapsed(workout));
-    const dockTitle = $('.dock-info strong'); if (dockTitle) dockTitle.textContent = `WORKOUT · ${workout.name || 'Workout'}`;
+    const dockTitle = $('.dock-info strong'); if (dockTitle) dockTitle.textContent = workout.name || 'Workout';
   }, 1000);
 }
 function stopTicker() { clearInterval(state.timerHandle); state.timerHandle = null; }
@@ -1106,6 +1106,7 @@ function handleAction(action, target) {
       const item = state.builderDraft?.items.find(entry => entry.exerciseId === id);
       if (!item) break;
       item.weight = isBodyweight(item) ? 0 : Math.max(0, Number($('#builder-item-weight')?.value) || 0);
+      if (!isBodyweight(item)) item.weightCustomized = true;
       item.sets = Math.max(1, Math.min(10, Number($('#builder-item-sets')?.value) || itemSets(item)));
       item.reps = Math.max(1, Math.min(100, Number($('#builder-item-reps')?.value) || itemReps(item)));
       const position = state.modalReturn?.position;
@@ -1114,7 +1115,7 @@ function handleAction(action, target) {
     case 'complete-set': {
       if (!workout || workout.pausedAt) break;
       const item = activeItem(workout), weight = isBodyweight(item) ? 0 : Math.max(0, Number($('[data-set-field="weight"]')?.value ?? item.weight) || 0), reps = Math.max(1, Number($('[data-set-field="reps"]')?.value ?? item.reps) || 1), now = Date.now();
-      item.weight = weight; item.reps = reps; item.completedSets ||= [];
+      item.weight = weight; if (!isBodyweight(item)) item.weightCustomized = true; item.reps = reps; item.completedSets ||= [];
       if (workout.lastSetAt) workout.restIntervals.push(Math.max(0, Math.round((now - workout.lastSetAt) / 1000)));
       item.completedSets.push({ weight, reps, timestamp: now }); workout.lastSetAt = now;
       if (itemDone(item)) {
@@ -1286,7 +1287,7 @@ document.addEventListener('input', event => {
   }
   if (event.target.matches('[data-builder-sets], [data-builder-reps], #builder-name')) updateBuilderFromModal();
   const setField = event.target.closest('[data-set-field]');
-  if (setField && currentWorkout()) { const item = activeItem(currentWorkout()); item[setField.dataset.setField] = Number(setField.value); Store.save(); }
+  if (setField && currentWorkout()) { const item = activeItem(currentWorkout()); item[setField.dataset.setField] = Number(setField.value); if (setField.dataset.setField === 'weight') item.weightCustomized = true; Store.save(); }
 });
 document.addEventListener('change', event => {
   if (event.target.id === 'equipment-filter') { state.equipmentFilter = event.target.value; render(); }
