@@ -1,1 +1,2 @@
 Bug and features:
+change the order of the menus from left to right to Home, Workouts, Exercises, Stats.

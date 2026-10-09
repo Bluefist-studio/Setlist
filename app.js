@@ -50,7 +50,9 @@ const EXERCISES = exerciseDatabase.map(record => {
 });
 const EQUIPMENT = [...new Set([...EXERCISES.flatMap(exercise => exercise.equipment), 'Other'])];
 const BODY_PARTS = [...new Set(['Full Body', 'Upper Body', 'Lower Body', ...EXERCISES.flatMap(exercise => exercise.parts)])];
+const ALPHABETICAL_EXERCISES = [...EXERCISES].sort((left, right) => left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }));
 const DURATIONS = [15, 20, 30, 45, 60];
+const MENU_VIEWS = ['home', 'workouts', 'exercises', 'stats'];
 const STORAGE_KEY = 'setlist.v1';
 let firebaseSync = null;
 
@@ -88,7 +90,6 @@ const Store = {
 Store.data = Store.read();
 
 const state = { view: 'home', query: '', equipmentFilter: 'All equipment', partFilter: 'All body parts', categoryFilter: 'All categories', favoritesOnly: false, timerHandle: null, quickDraft: null, builderDraft: null, modalMode: null, modalReturn: null, cloudStatus: 'Checking Firebase connection…', accountInfo: null, onboardingStep: 0 };
-let stopBuilderDrag;
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const exerciseById = id => EXERCISES.find(exercise => exercise.id === id);
@@ -106,12 +107,25 @@ const workoutElapsed = workout => {
 const itemExercise = item => exerciseById(item.exerciseId);
 const itemSets = item => item.sets ?? itemExercise(item)?.sets ?? 3;
 const itemReps = item => item.reps ?? itemExercise(item)?.reps ?? 10;
-const itemWeight = item => item.weight ?? itemExercise(item)?.weight ?? 0;
-const itemMetric = item => `${itemReps(item)} ${itemExercise(item)?.unit === 'sec' ? 'sec' : 'reps'}`;
-const estimateWorkout = items => Math.round(items.reduce((total, item) => total + ((itemExercise(item)?.work || 40) + (itemExercise(item)?.rest || 60)) * itemSets(item), 0) / 60);
+const isBodyweight = item => itemExercise(item)?.equipment.includes('Bodyweight') ?? false;
+const itemWeight = item => isBodyweight(item) ? 0 : item.weight ?? itemExercise(item)?.weight ?? 0;
+const itemMeasureLabel = item => itemExercise(item)?.unit === 'sec' ? 'seconds' : 'reps';
+const itemMetric = item => itemExercise(item)?.unit === 'sec' ? `${itemReps(item)} sec hold` : `${itemReps(item)} reps`;
+const estimateWorkout = items => Math.round(items.reduce((total, item) => {
+  const exercise = itemExercise(item), work = exercise?.unit === 'sec' ? itemReps(item) : exercise?.work || 40;
+  return total + (work + (exercise?.rest || 60)) * itemSets(item);
+}, 0) / 60);
 const totalSets = workout => (workout?.items || []).reduce((sum, item) => sum + itemSets(item), 0);
 const completedSets = workout => (workout?.items || []).reduce((sum, item) => sum + (item.completedSets?.length || 0), 0);
 const itemDone = item => item.skipped || item.completedSets?.length >= itemSets(item);
+const nextWorkoutItemIndex = (workout, currentIndex) => {
+  const items = workout?.items || [], startIndex = Number.isInteger(currentIndex) && currentIndex >= 0 && currentIndex < items.length ? currentIndex : -1;
+  for (let step = 1; step <= items.length; step++) {
+    const index = startIndex < 0 ? step - 1 : (startIndex + step) % items.length;
+    if (!itemDone(items[index])) return index;
+  }
+  return -1;
+};
 const workoutDoneItems = workout => (workout?.items || []).filter(itemDone).length;
 const activeItem = workout => workout?.items?.[workout.currentIndex];
 const volumeFor = workout => (workout.items || []).reduce((total, item) => total + (item.completedSets || []).reduce((sum, set) => sum + (Number(set.weight) || 0) * (Number(set.reps) || 0), 0), 0);
@@ -121,9 +135,77 @@ function toast(message) {
   clearTimeout(toast.timeout); toast.timeout = setTimeout(() => element.classList.remove('visible'), 2400);
 }
 function saveAndRender() { Store.save(); render(); }
-function setView(view) {
-  state.view = view; closeModal(); render(); window.scrollTo({ top: 0, behavior: 'smooth' });
+function renderPreservingFilterPillPosition() {
+  const scrollLeft = $('.filter-pills', $('#view-container'))?.scrollLeft ?? 0;
+  render();
+  const filterPills = $('.filter-pills', $('#view-container'));
+  if (filterPills) filterPills.scrollLeft = scrollLeft;
 }
+function clearMenuViewMotion(viewContainer) {
+  viewContainer.classList.remove('menu-view-dragging', 'menu-view-snap-back', 'menu-view-slide-forward', 'menu-view-slide-back');
+  viewContainer.style.removeProperty('transform'); viewContainer.style.removeProperty('transition');
+}
+function setView(view, slideDirection = null) {
+  const viewContainer = $('#view-container');
+  clearMenuViewMotion(viewContainer);
+  state.view = view; closeModal(); render(); window.scrollTo(0, 0);
+  if (!slideDirection) return;
+  const direction = slideDirection === 'forward' ? 'forward' : 'back';
+  const className = `menu-view-slide-${direction}`, animationName = `menu-view-slide-${direction}`;
+  viewContainer.classList.add(className);
+  const onAnimationEnd = event => {
+    if (event.target !== viewContainer || event.animationName !== animationName) return;
+    viewContainer.classList.remove(className); viewContainer.removeEventListener('animationend', onAnimationEnd);
+  };
+  viewContainer.addEventListener('animationend', onAnimationEnd);
+}
+function showActiveWorkout() {
+  state.view = 'active'; closeModal(); render(); window.scrollTo(0, 0);
+}
+let menuSwipeStart = null;
+$('#view-container').addEventListener('pointerdown', event => {
+  if (!MENU_VIEWS.includes(state.view) || event.pointerType === 'mouse' || !event.isPrimary || event.button !== 0 || event.target.closest('.filter-pills')) return;
+  clearMenuViewMotion($('#view-container'));
+  menuSwipeStart = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+});
+window.addEventListener('pointermove', event => {
+  const start = menuSwipeStart;
+  if (!start || event.pointerId !== start.pointerId) return;
+  const deltaX = event.clientX - start.x, deltaY = event.clientY - start.y;
+  if (!start.dragging) {
+    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 8) return;
+    if (Math.abs(deltaX) < Math.abs(deltaY) * 1.25) { menuSwipeStart = null; return; }
+    start.dragging = true;
+    $('#view-container').classList.add('menu-view-dragging');
+  }
+  const direction = deltaX < 0 ? 1 : -1;
+  const canNavigate = MENU_VIEWS[MENU_VIEWS.indexOf(state.view) + direction];
+  $('#view-container').style.transform = `translateX(${canNavigate ? deltaX : deltaX * 0.25}px)`;
+});
+function resetMenuSwipeView() {
+  const viewContainer = $('#view-container');
+  viewContainer.classList.remove('menu-view-dragging');
+  viewContainer.classList.add('menu-view-snap-back');
+  viewContainer.style.transform = 'translateX(0)';
+  viewContainer.addEventListener('transitionend', event => {
+    if (event.target !== viewContainer || event.propertyName !== 'transform') return;
+    clearMenuViewMotion(viewContainer);
+  }, { once: true });
+}
+window.addEventListener('pointerup', event => {
+  const start = menuSwipeStart; menuSwipeStart = null;
+  if (!start || event.pointerId !== start.pointerId) return;
+  const deltaX = event.clientX - start.x, deltaY = event.clientY - start.y;
+  if (Math.abs(deltaX) < 64 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) { if (start.dragging) resetMenuSwipeView(); return; }
+  const nextView = MENU_VIEWS[MENU_VIEWS.indexOf(state.view) + (deltaX < 0 ? 1 : -1)];
+  if (nextView) setView(nextView, deltaX < 0 ? 'forward' : 'back');
+  else if (start.dragging) resetMenuSwipeView();
+});
+window.addEventListener('pointercancel', event => {
+  if (event.pointerId !== menuSwipeStart?.pointerId) return;
+  const wasDragging = menuSwipeStart.dragging; menuSwipeStart = null;
+  if (wasDragging) resetMenuSwipeView();
+});
 function updateProfile() {
   const name = Store.data.user.name || 'Your space';
   const initials = name.trim().charAt(0).toUpperCase() || 'S';
@@ -176,7 +258,7 @@ function render() {
   else stopTicker();
 }
 function renderHome() {
-  const workouts = Store.data.workouts.slice(0, 3);
+  const workouts = workoutsByCompletedUses().slice(0, 3);
   const savedCount = Store.data.history.length;
   const minutes = Store.data.history.reduce((sum, item) => sum + (item.duration || 0), 0);
   const volume = Store.data.history.reduce((sum, item) => sum + (item.volume || 0), 0);
@@ -188,6 +270,9 @@ function renderHome() {
     ${workouts.length ? `<div class="workout-list">${workouts.map((workout, index) => { const lastCompleted = latestCompletedTemplateSession(workout); return `<div class="workout-row" data-action="open-template" data-id="${workout.id}"><div class="workout-stamp">${String(index + 1).padStart(2, '0')}</div><div class="workout-row-main"><strong>${safeText(workout.name)}</strong><small>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min${lastCompleted ? ` · last ${dateLabel(lastCompleted.endedAt)}` : ''}</small></div><span class="row-arrow">→</span></div>`; }).join('')}</div>` : `<div class="empty-state">Your workout bank is ready when you are.</div>`}
     <div class="create-strip"><div><strong>Have a session in mind?</strong><small>Build it your way, then save it for later.</small></div><button class="button button-secondary button-small" data-action="create-workout">＋ CREATE WORKOUT</button></div>
     <div class="home-bottom"><div class="metric-mini"><strong>${savedCount}</strong><span>Workouts logged</span></div><div class="metric-mini"><strong>${formatHours(minutes)}</strong><span>Training time</span></div><div class="metric-mini"><strong>${formatNumber(volume)} <small>lb</small></strong><span>Volume moved</span></div></div>`;
+}
+function workoutsByCompletedUses() {
+  return [...Store.data.workouts].sort((left, right) => completedTemplateUses(right) - completedTemplateUses(left));
 }
 function formatHours(minutes) { const hours = Math.floor(minutes / 60), remainder = minutes % 60; return hours ? `${hours}h ${remainder}m` : `${remainder}m`; }
 function formatNumber(value) { return Math.round(value).toLocaleString(); }
@@ -214,7 +299,7 @@ function currentStreak() {
   return streak;
 }
 function renderExercises() {
-  const exercises = EXERCISES.filter(exercise => {
+  const exercises = ALPHABETICAL_EXERCISES.filter(exercise => {
     const query = state.query.toLowerCase();
     return (!query || exercise.name.toLowerCase().includes(query) || exercise.parts.join(' ').toLowerCase().includes(query)) &&
       (state.equipmentFilter === 'All equipment' || exercise.equipment.includes(state.equipmentFilter)) &&
@@ -225,19 +310,19 @@ function renderExercises() {
   const categories = ['All categories', ...new Set(EXERCISES.flatMap(exercise => exercise.categories))];
   return `<div class="page-heading"><div><div class="eyebrow">MOVE LIBRARY</div><h1>Exercises</h1><p>Find a movement, check your history, make it yours.</p></div>${currentWorkout() ? '<button class="button button-primary" data-action="add-exercise-active">＋ ADD TO WORKOUT</button>' : ''}</div>
     <div class="tool-row"><label class="search-wrap"><span>⌕</span><input class="search-input" id="exercise-search" placeholder="Search movements" value="${safeText(state.query)}" autocomplete="off"></label><select class="select filter-select" id="equipment-filter">${['All equipment', ...EQUIPMENT].map(item => `<option ${item === state.equipmentFilter ? 'selected' : ''}>${item}</option>`).join('')}</select><select class="select filter-select" id="part-filter">${['All body parts', ...BODY_PARTS.filter(part => part !== 'Full Body' && part !== 'Upper Body' && part !== 'Lower Body')].map(item => `<option ${item === state.partFilter ? 'selected' : ''}>${item}</option>`).join('')}</select></div>
-    <div class="filter-pills">${categories.map(category => `<button class="filter-pill ${category === state.categoryFilter ? 'selected' : ''}" data-category="${category}">${category}</button>`).join('')}<button class="filter-pill ${state.favoritesOnly ? 'selected' : ''}" data-action="toggle-favorites">♡ Favorites</button></div>
+    <div class="filter-pills">${categories.map(category => `<button class="filter-pill ${category === state.categoryFilter ? 'selected' : ''}" data-category="${category}">${category}</button>`).join('')}<button class="filter-pill ${state.favoritesOnly ? 'selected' : ''}" data-action="toggle-favorites">Favorites</button></div>
     <div class="library-count">${exercises.length} MOVEMENTS</div><div class="exercise-list">${exercises.length ? exercises.map(renderExerciseRow).join('') : '<div class="empty-state">No movements match those filters.</div>'}</div>`;
 }
 function renderExerciseRow(exercise) {
-  const favorite = Store.data.user.favorites.includes(exercise.id), history = latestExerciseHistory(exercise.id);
-  const last = history ? `Last: ${history.weight ? `${history.weight} lb × ` : ''}${history.reps}${exercise.unit === 'sec' ? ' sec' : ''} × ${history.sets}` : `${exercise.equipment.join(' · ')} · ${exercise.parts.join(', ')}`;
+  const favorite = Store.data.user.favorites.includes(exercise.id), history = latestExerciseHistory(exercise.id), showWeight = !isBodyweight({ exerciseId: exercise.id });
+  const last = history ? `Last: ${showWeight && history.weight ? `${history.weight} lb × ` : ''}${exercise.unit === 'sec' ? `${history.reps} sec hold` : `${history.reps} reps`} × ${history.sets}` : `${exercise.equipment.join(' · ')} · ${exercise.parts.join(', ')}`;
   return `<div class="exercise-row"><button type="button" class="exercise-open" data-action="exercise-detail" data-id="${exercise.id}" aria-label="View details for ${safeText(exercise.name)}"><span class="exercise-glyph">${exercise.categories.includes('Core') ? '◌' : exercise.categories.includes('Mobility') ? '⌁' : '↗'}</span><span class="exercise-details"><strong>${safeText(exercise.name)}</strong><small>${safeText(last)}</small></span><span class="exercise-open-arrow" aria-hidden="true">↗</span></button><button class="favorite-button ${favorite ? 'is-favorite' : ''}" data-action="favorite" data-id="${exercise.id}" aria-label="${favorite ? 'Remove favorite' : 'Add favorite'}">${favorite ? '★' : '☆'}</button>${currentWorkout() ? `<button class="exercise-more" data-action="add-active-item" data-id="${exercise.id}" title="Add to active workout">＋</button>` : ''}</div>`;
 }
 function latestExerciseHistory(id) { return Store.data.history.flatMap(workout => (workout.items || []).filter(item => item.exerciseId === id).map(item => ({ item, endedAt: workout.endedAt }))).sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt))[0]?.item; }
 function renderWorkouts() {
-  const workouts = Store.data.workouts;
+  const workouts = workoutsByCompletedUses();
   return `<div class="page-heading"><div><div class="eyebrow">YOUR WORKOUT BANK</div><h1>Workouts</h1><p>Reusable plans, ready when you are.</p></div><button class="button button-primary" data-action="create-workout">＋ CREATE WORKOUT</button></div>
-    ${workouts.length ? `<div class="template-grid">${workouts.map(workout => { const lastCompleted = latestCompletedTemplateSession(workout); return `<article class="template-card"><div class="template-card-top"><div><h3>${safeText(workout.name)}</h3><p>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min</p></div><span class="template-count">${workout.uses || 0}×</span></div><div class="template-exercises">${workout.items.slice(0, 6).map(item => `<span class="exercise-tag">${safeText(itemExercise(item)?.name || 'Exercise')}</span>`).join('')}${workout.items.length > 6 ? `<span class="exercise-tag">+${workout.items.length - 6}</span>` : ''}</div><div class="template-footer"><span class="template-meta">${lastCompleted ? `LAST ${dateLabel(lastCompleted.endedAt).toUpperCase()}` : 'NOT STARTED YET'}</span><div class="template-actions"><button data-action="edit-template" data-id="${workout.id}">EDIT</button><button class="start-template" data-action="start-template" data-id="${workout.id}">START</button></div></div></article>`; }).join('')}</div>` : '<div class="empty-state">No saved workouts yet. Create one to get started.</div>'}
+    ${workouts.length ? `<div class="template-grid">${workouts.map(workout => { const lastCompleted = latestCompletedTemplateSession(workout); return `<article class="template-card" data-template-id="${safeText(workout.id)}"><div class="template-card-top"><div><h3>${safeText(workout.name)}</h3><p>${workout.items.length} exercises · ${estimateWorkout(workout.items)} min</p></div><span class="template-count">${completedTemplateUses(workout)}×</span></div><div class="template-exercises">${workout.items.slice(0, 6).map(item => `<span class="exercise-tag">${safeText(itemExercise(item)?.name || 'Exercise')}</span>`).join('')}${workout.items.length > 6 ? `<span class="exercise-tag">+${workout.items.length - 6}</span>` : ''}</div><div class="template-footer"><span class="template-meta">${lastCompleted ? `LAST ${dateLabel(lastCompleted.endedAt).toUpperCase()}` : 'NOT STARTED YET'}</span><div class="template-actions"><button data-action="edit-template" data-id="${workout.id}">EDIT</button><button class="start-template" data-action="start-template" data-id="${workout.id}">START</button></div></div></article>`; }).join('')}</div>` : '<div class="empty-state">No saved workouts yet. Create one to get started.</div>'}
     <div class="create-strip"><div><strong>Want a different mix today?</strong><small>Quick Start builds a fresh session around your preferences.</small></div><button class="button button-secondary button-small" data-action="quick-start">QUICK START ↗</button></div>`;
 }
 function renderStats() {
@@ -251,16 +336,16 @@ function renderStats() {
   const maxWeekly = Math.max(1, ...weekly);
   const monthlyAverage = thisMonth.length ? (thisMonth.length / Math.max(1, now.getDate()) * 7).toFixed(1) : '0.0';
   const mostRecent = [...history].sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt));
-  return `<div class="page-heading"><div><div class="eyebrow">THE WORK YOU PUT IN</div><h1>Stats</h1><p>A clear look back. No scorecards.</p></div></div>
+  return `<div class="page-heading"><div><div class="eyebrow">THE WORK YOU PUT IN</div><h1>Stats</h1><p>A clear look back.</p></div></div>
     <div class="eyebrow">THIS MONTH</div><div class="stats-summary"><div class="stat-block"><span>Workouts</span><strong>${thisMonth.length}</strong><small>${history.length} all time</small></div><div class="stat-block"><span>Training time</span><strong>${formatHours(monthMinutes)}</strong><small>${formatHours(totalMinutes)} all time</small></div><div class="stat-block"><span>Sets</span><strong>${monthSets}</strong><small>${totalSetsDone} all time</small></div><div class="stat-block"><span>Volume</span><strong>${formatNumber(monthVolume)} <small>lb</small></strong><small>${formatNumber(history.reduce((sum, item) => sum + item.volume, 0))} all time</small></div></div>
     <div class="chart-panel"><div class="chart-title"><h2>Workout frequency</h2><span>LAST 8 WEEKS</span></div><div class="bar-chart">${weekly.map((value, index) => `<div class="chart-column"><div class="chart-bar" style="height:${Math.max(3, value / maxWeekly * 100)}%" title="${value} workouts"></div><small>${index % 2 === 0 ? `${index === 0 ? '8' : 8 - index}w` : ''}</small></div>`).join('')}</div></div>
-    <div class="stats-lower"><section><div class="section-head"><h2>Training rhythm</h2></div><div class="simple-metric"><span>Frequency this month</span><strong>${monthlyAverage} / week</strong></div><div class="simple-metric"><span>Average workout</span><strong>${formatDuration(history.length ? Math.round(totalMinutes * 60 / history.length) : 0)}</strong></div><div class="simple-metric"><span>Average rest</span><strong>${formatDuration(avgRest)}</strong></div><div class="simple-metric"><span>Current streak</span><strong>${currentStreak()} days</strong></div></section><section><div class="section-head"><h2>Recent sessions</h2></div><div class="history-list">${mostRecent.length ? mostRecent.map(workout => `<div class="history-row"><strong>${safeText(workout.name)}</strong><span>${dateLabel(workout.endedAt)} · ${formatDuration(workout.duration * 60)}</span></div>`).join('') : '<div class="empty-state">Completed workouts will show up here.</div>'}</div></section></div>`;
+    <div class="stats-lower"><section><div class="section-head"><h2>Training rhythm</h2></div><div class="simple-metric"><span>Frequency this month</span><strong>${monthlyAverage} / week</strong></div><div class="simple-metric"><span>Average workout</span><strong>${formatDuration(history.length ? Math.round(totalMinutes * 60 / history.length) : 0)}</strong></div><div class="simple-metric"><span>Average rest</span><strong>${formatDuration(avgRest)}</strong></div><div class="simple-metric"><span>Current streak</span><strong>${currentStreak()} days</strong></div></section><section><div class="section-head"><h2>Recent sessions</h2></div><div class="history-list">${mostRecent.length ? mostRecent.map(workout => `<div class="history-row" data-session-id="${safeText(workout.id)}"><button class="history-open" type="button" data-action="open-history-session" data-id="${safeText(workout.id)}"><strong>${safeText(workout.name)}</strong><span>${dateLabel(workout.endedAt)} · ${formatDuration(workout.duration * 60)}</span></button></div>`).join('') : '<div class="empty-state">Completed workouts will show up here.</div>'}</div></section></div>`;
 }
 function averageRest(intervals) { return intervals.length ? Math.round(intervals.reduce((sum, value) => sum + value, 0) / intervals.length) : 0; }
 function addHistoryControls(root) {
   const orderedHistory = [...Store.data.history].sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt));
-  $$('.history-row', root).forEach((row, index) => {
-    const workout = orderedHistory[index];
+  $$('.history-row', root).forEach(row => {
+    const workout = orderedHistory.find(item => item.id === row.dataset.sessionId);
     if (!workout) return;
     const button = document.createElement('button');
     button.className = 'history-delete'; button.dataset.action = 'remove-history'; button.dataset.id = workout.id;
@@ -268,16 +353,37 @@ function addHistoryControls(root) {
     row.append(button);
   });
 }
+function historySessionTemplate(session) {
+  return Store.data.workouts.find(template => template.id === session.templateId) || Store.data.workouts.find(template => !session.templateId && template.name === session.name) || null;
+}
+function showHistorySession(id) {
+  const session = Store.data.history.find(item => item.id === id);
+  if (!session) return;
+  const template = historySessionTemplate(session), sessionItems = session.items || [], templateItems = template?.items || sessionItems;
+  const setCount = sessionItems.reduce((sum, item) => sum + (item.completedSets?.length || item.sets || 0), 0);
+  const itemRows = items => items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} sets · ${itemMetric(item)}${!isBodyweight(item) && itemWeight(item) ? ` · ${itemWeight(item)} lb` : ''}</span></div>`).join('');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">COMPLETED SESSION · ${safeText(dateLabel(session.endedAt).toUpperCase())}</div><h2>${safeText(session.name)}</h2></div><button class="modal-close" data-action="close-modal" aria-label="Close session details">×</button></div><div class="simple-metric"><span>Duration</span><strong>${formatDuration((Number(session.duration) || 0) * 60)}</strong></div><div class="simple-metric"><span>Exercises completed</span><strong>${sessionItems.length}</strong></div><div class="simple-metric"><span>Sets completed</span><strong>${setCount}</strong></div><div class="simple-metric"><span>Volume</span><strong>${formatNumber(Number(session.volume) || 0)} lb</strong></div><div class="simple-metric"><span>Average rest</span><strong>${formatDuration(averageRest(session.restIntervals || []))}</strong></div><div class="section-head"><h3>Workout template</h3><span>${template ? 'SAVED' : 'NOT SAVED'}</span></div><div class="quick-summary-list">${itemRows(templateItems) || '<p class="modal-copy">No completed exercises were recorded for this session.</p>'}</div><div class="modal-actions">${template ? `<button class="button button-secondary" data-action="edit-template" data-id="${safeText(template.id)}">EDIT TEMPLATE</button>` : sessionItems.length ? `<button class="button button-primary" data-action="save-history-workout" data-id="${safeText(session.id)}">SAVE WORKOUT</button>` : ''}<button class="button button-plain" data-action="close-modal">CLOSE</button></div>`, 'history-session');
+}
 function completedTemplateSessions(template) {
-  return Store.data.history.filter(session => !session.quick && (session.templateId === template.id || (!session.templateId && session.name === template.name)));
+  return Store.data.history.filter(session => session.templateId === template.id || (!session.quick && !session.templateId && session.name === template.name));
 }
 function latestCompletedTemplateSession(template) {
   return completedTemplateSessions(template).sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt))[0] || null;
 }
 function completedTemplateUses(template) { return completedTemplateSessions(template).length; }
+function saveHistoryWorkout(id) {
+  const session = Store.data.history.find(item => item.id === id);
+  if (!session) return;
+  if (historySessionTemplate(session)) { showHistorySession(id); toast('This workout is already saved.'); return; }
+  const items = (session.items || []).map(item => ({ exerciseId: item.exerciseId, sets: itemSets(item), reps: itemReps(item), weight: itemWeight(item), completedSets: [] }));
+  if (!items.length) { toast('This session has no recorded exercises to save.'); return; }
+  const template = { id: `workout-${Date.now()}`, name: session.name, items, uses: 0, lastUsed: session.endedAt || null };
+  Store.data.workouts.push(template); session.templateId = template.id;
+  Store.save(); showHistorySession(id); toast('Workout saved to your bank.');
+}
 function addWorkoutCardControls(root) {
-  $$('.template-card', root).forEach((card, index) => {
-    const template = Store.data.workouts[index], actions = $('.template-actions', card);
+  $$('.template-card', root).forEach(card => {
+    const template = Store.data.workouts.find(item => item.id === card.dataset.templateId), actions = $('.template-actions', card);
     if (!template || !actions) return;
     $('.template-count', card).textContent = `${completedTemplateUses(template)}×`;
     $$('.exercise-tag', card).slice(0, Math.min(6, template.items.length)).forEach((tag, exerciseIndex) => {
@@ -303,24 +409,22 @@ function renderDock() {
 function renderActiveWorkout() {
   const workout = currentWorkout();
   if (workout.completed) return renderCompletion(workout);
-  const done = workoutDoneItems(workout), total = workout.items.length, item = activeItem(workout);
-  if (!item || workout.currentIndex >= workout.items.length) {
-    const nextIndex = workout.items.findIndex(entry => !itemDone(entry));
-    if (nextIndex < 0) return renderCompletion(workout);
+  const done = workoutDoneItems(workout), total = workout.items.length;
+  if (!activeItem(workout) || itemDone(activeItem(workout))) {
+    const nextIndex = nextWorkoutItemIndex(workout, workout.currentIndex);
+    if (nextIndex < 0) { completeWorkoutState(workout); Store.save(); return renderCompletion(workout); }
     workout.currentIndex = nextIndex;
   }
-  if (workout.items.every(itemDone)) { completeWorkoutState(workout); Store.save(); return renderCompletion(workout); }
   const active = activeItem(workout), exercise = itemExercise(active), doneSets = active.completedSets?.length || 0;
-  const isExerciseDone = doneSets >= itemSets(active);
+  const showWeight = !isBodyweight(active);
   return `<div class="active-header"><div><div class="eyebrow">${workout.pausedAt ? 'SESSION PAUSED' : 'IN SESSION'}</div><h1>${safeText(workout.name)}</h1></div><div class="timer-display" id="workout-timer">${formatDuration(workoutElapsed(workout))}</div></div>
     <div class="workout-progress"><div class="progress-caption"><span>${done} / ${total} EXERCISES</span><span>${totalSets(workout) ? Math.round(completedSets(workout) / totalSets(workout) * 100) : 0}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${total ? done / total * 100 : 0}%"></div></div></div>
-    <article class="active-exercise-card"><div class="active-exercise-top"><div><div class="eyebrow">${isExerciseDone ? 'EXERCISE COMPLETE' : `EXERCISE ${Math.min(done + 1, total)} OF ${total}`}</div><h2>${safeText(exercise?.name || 'Choose an exercise')}</h2><div class="suggestion">${active.weight > 0 ? `${active.weight} lb × ${active.reps} × ${itemSets(active)}` : `${active.reps}${exercise?.unit === 'sec' ? ' sec' : ''} reps × ${itemSets(active)}`} · Suggested</div></div><button class="button button-secondary button-small" data-action="choose-exercise">CHANGE</button></div>
-      ${isExerciseDone ? `<div class="next-panel"><h3>That’s this one done. What’s next?</h3><div class="next-options">${workout.items.map((entry, index) => ({ entry, index })).filter(({ entry }) => !itemDone(entry)).slice(0, 4).map(({ entry, index }) => `<button class="next-option" data-action="select-next" data-index="${index}">${safeText(itemExercise(entry)?.name || 'Exercise')} →</button>`).join('')}${workout.items.every(itemDone) ? '<button class="next-option" data-action="finish-workout">Finish session ✓</button>' : ''}<button class="next-option" data-action="add-exercise-active">＋ Choose exercise</button></div></div>` : `<table class="set-table"><thead><tr><th>SET</th><th>WEIGHT</th><th>REPS</th><th>DONE</th></tr></thead><tbody>${Array.from({ length: itemSets(active) }, (_, index) => { const logged = active.completedSets?.[index]; const isNext = index === doneSets; return `<tr class="${isNext ? 'current-set' : ''}"><td class="set-index">${index + 1}</td><td>${logged ? `${logged.weight || 0} lb` : isNext ? `<input class="set-input" inputmode="decimal" type="number" min="0" step="2.5" value="${active.weight || 0}" data-set-field="weight">` : `${active.weight || 0} lb`}</td><td>${logged ? logged.reps : isNext ? `<input class="set-input reps-input" inputmode="numeric" type="number" min="1" value="${active.reps}" data-set-field="reps">` : active.reps}</td><td>${logged ? '<span class="set-done">✓</span>' : ''}</td></tr>`; }).join('')}</tbody></table>
+    <article class="active-exercise-card"><div class="active-exercise-top"><div><div class="eyebrow">EXERCISE ${Math.min(done + 1, total)} OF ${total}</div><h2>${safeText(exercise?.name || 'Choose an exercise')}</h2><div class="suggestion">${showWeight && itemWeight(active) > 0 ? `${itemWeight(active)} lb × ` : ''}${itemMetric(active)} × ${itemSets(active)} · Suggested</div></div><button class="button button-secondary button-small" data-action="choose-exercise">CHANGE</button></div>
+      <table class="set-table"><thead><tr><th>SET</th>${showWeight ? '<th>WEIGHT</th>' : ''}<th>${itemMeasureLabel(active).toUpperCase()}</th><th>DONE</th></tr></thead><tbody>${Array.from({ length: itemSets(active) }, (_, index) => { const logged = active.completedSets?.[index]; const isNext = index === doneSets; return `<tr class="${isNext ? 'current-set' : ''}"><td class="set-index">${index + 1}</td>${showWeight ? `<td>${logged ? `${logged.weight || 0} lb` : isNext ? `<input class="set-input" inputmode="decimal" type="number" min="0" step="2.5" value="${itemWeight(active)}" data-set-field="weight">` : `${itemWeight(active)} lb`}</td>` : ''}<td>${logged ? logged.reps : isNext ? `<input class="set-input reps-input" inputmode="numeric" type="number" min="1" value="${active.reps}" data-set-field="reps">` : active.reps}</td><td>${logged ? '<span class="set-done">✓</span>' : ''}</td></tr>`; }).join('')}</tbody></table>
       <div class="sets-adjust"><span>SETS</span><button data-action="change-sets" data-delta="-1" ${itemSets(active) <= doneSets + 1 ? 'disabled' : ''}>−</button><strong>${itemSets(active)}</strong><button data-action="change-sets" data-delta="1">＋</button><span>Adjust today’s plan</span></div>
-      <div class="active-controls"><button class="button button-primary" data-action="complete-set" ${workout.pausedAt ? 'disabled' : ''}>COMPLETE SET <span>✓</span></button><button class="button button-secondary" data-action="skip-exercise">SKIP</button></div>
-      <div class="next-panel"><h3>Choose what’s next</h3><div class="next-options">${workout.items.map((entry, index) => ({ entry, index })).filter(({ entry, index }) => index !== workout.currentIndex && !itemDone(entry)).slice(0, 3).map(({ entry, index }) => `<button class="next-option" data-action="select-next" data-index="${index}">${safeText(itemExercise(entry)?.name || 'Exercise')} →</button>`).join('')}<button class="next-option" data-action="add-exercise-active">＋ Add exercise</button></div></div>`}</article>
+      <div class="active-controls"><button class="button button-primary" data-action="complete-set" ${workout.pausedAt ? 'disabled' : ''}>COMPLETE SET <span>✓</span></button><button class="button button-secondary" data-action="skip-exercise">SKIP</button></div></article>
     <div class="remaining-list"><div class="section-head"><h2>Today’s lineup</h2><button class="text-button" data-action="add-exercise-active">＋ ADD</button></div>${workout.items.map((entry, index) => `<div class="remaining-row"><span>${String(index + 1).padStart(2, '0')}</span><strong>${safeText(itemExercise(entry)?.name || 'Exercise')}</strong><span>${entry.skipped ? 'Skipped' : `${entry.completedSets?.length || 0}/${itemSets(entry)} sets`}</span>${!itemDone(entry) ? `<button data-action="select-next" data-index="${index}">DO NEXT</button>` : ''}</div>`).join('')}</div>
-    <div class="active-controls"><button class="button button-secondary" data-action="${workout.pausedAt ? 'resume-workout' : 'pause-workout'}">${workout.pausedAt ? 'RESUME' : 'PAUSE'}</button><button class="button button-plain" data-action="finish-workout">FINISH WORKOUT</button><button class="button button-plain" data-action="discard-workout">DISCARD</button></div>`;
+    <div class="active-controls"><button class="button button-secondary" data-action="${workout.pausedAt ? 'resume-workout' : 'pause-workout'}">${workout.pausedAt ? 'RESUME' : 'PAUSE'}</button>${canSaveQuickWorkout(workout) ? '<button class="button button-secondary" data-action="save-active-workout">SAVE TO WORKOUTS</button>' : ''}<button class="button button-plain" data-action="finish-workout">FINISH WORKOUT</button><button class="button button-plain" data-action="discard-workout">DISCARD</button></div>`;
 }
 function renderCompletion(workout) {
   const duration = workoutElapsed(workout), rests = workout.restIntervals || [], xp = workout.xpEarned || 0;
@@ -332,7 +436,7 @@ function renderCompletion(workout) {
     const delta = previous ? currentVolume > previousVolume ? 'More volume than last time' : currentVolume === previousVolume ? 'Matched last time' : 'Logged today' : 'First time logged';
     return `<div class="performance-row"><strong>${safeText(itemExercise(entry)?.name || 'Exercise')}</strong><span>${entry.completedSets.length} sets · ${delta}</span></div>`;
   }).join('');
-  return `<div class="eyebrow">NICE WORK</div><div class="completion-panel"><span class="completion-mark">✓</span><h2>Session complete.</h2><p>${safeText(workout.name)}</p><div class="completion-time">${formatDuration(duration)}<small>Actual workout time · estimated ${estimateWorkout(workout.items)} min</small></div><div class="completion-stats"><div><strong>${exercises}</strong><span>Exercises</span></div><div><strong>${sets}</strong><span>Sets</span></div><div><strong>${formatNumber(volumeFor(workout))}</strong><span>lb volume</span></div></div><div class="simple-metric"><span>Average rest between sets</span><strong>${formatDuration(averageRest(rests))}</strong></div><div class="section-head"><h2>Today’s work</h2></div>${comparisons || '<p class="modal-copy">No sets were logged this time.</p>'}<div class="completion-xp"><span>＋${xp} XP earned</span><span>LEVEL ${xpLevel(Store.data.user.xp + xp)}</span></div><button class="button button-primary button-full" data-action="save-completed">SAVE &amp; FINISH</button></div>`;
+  return `<div class="eyebrow">NICE WORK</div><div class="completion-panel"><span class="completion-mark">✓</span><h2>Session complete.</h2><p>${safeText(workout.name)}</p><div class="completion-time">${formatDuration(duration)}<small>Actual workout time · estimated ${estimateWorkout(workout.items)} min</small></div><div class="completion-stats"><div><strong>${exercises}</strong><span>Exercises</span></div><div><strong>${sets}</strong><span>Sets</span></div><div><strong>${formatNumber(volumeFor(workout))}</strong><span>lb volume</span></div></div><div class="simple-metric"><span>Average rest between sets</span><strong>${formatDuration(averageRest(rests))}</strong></div><div class="section-head"><h2>Today’s work</h2></div>${comparisons || '<p class="modal-copy">No sets were logged this time.</p>'}<div class="completion-xp"><span>＋${xp} XP earned</span><span>LEVEL ${xpLevel(Store.data.user.xp + xp)}</span></div>${canSaveQuickWorkout(workout) ? '<button class="button button-secondary button-full completion-secondary" data-action="save-active-workout">SAVE TO WORKOUTS</button>' : ''}<button class="button button-primary button-full" data-action="save-completed">SAVE &amp; FINISH</button></div>`;
 }
 function renderOnboarding() {
   if ($('#onboarding-root')) return;
@@ -350,38 +454,35 @@ function renderOnboardingStep(step) {
   let body = '';
   if (isEntry) body = `<div class="onboarding-entry-options"><button class="onboarding-entry-option" data-action="onboard-new"><span class="eyebrow">NEW TO SETLIST</span><strong>Set up your training space</strong><span>Choose your equipment and preferences.</span></button><button class="onboarding-entry-option" data-action="onboard-returning"><span class="eyebrow">ALREADY HAVE AN ACCOUNT</span><strong>I’m returning</strong><span>Log in to load your workouts and history.</span></button></div>`;
   if (step === 0) body = `<div class="choice-grid">${EQUIPMENT.map(item => `<label class="choice-card"><input type="checkbox" name="onboard-equipment" value="${item}" ${user.equipment.includes(item) ? 'checked' : ''}>${item}</label>`).join('')}</div>`;
-  if (step === 1) body = `<div class="filter-pills onboarding-category-filters">${onboardingCategories.map((category, index) => `<button type="button" class="filter-pill ${index === 0 ? 'selected' : ''}" data-onboarding-category="${safeText(category)}" aria-pressed="${index === 0}">${safeText(category)}</button>`).join('')}</div><div class="exercise-choice-list">${EXERCISES.map(item => { const detailId = `onboard-exercise-description-${item.id}`; return `<div class="onboard-exercise-option" data-categories="${safeText(item.categories.join('|'))}"><button type="button" class="onboard-exercise-card" data-action="toggle-onboard-description" data-detail-id="${detailId}" aria-controls="${detailId}" aria-expanded="false"><span>${safeText(item.name)}</span><span class="onboard-exercise-indicator" aria-hidden="true">＋</span></button><label class="onboard-favorite-toggle" title="Favorite ${safeText(item.name)}"><input type="checkbox" name="onboard-favorite" value="${item.id}" aria-label="Favorite ${safeText(item.name)}" ${user.favorites.includes(item.id) ? 'checked' : ''}></label><div class="onboard-exercise-copy" id="${detailId}" hidden><p>${safeText(item.description)}</p><strong>HOW TO</strong><p>${safeText(item.howTo)}</p></div></div>`; }).join('')}</div>`;
+  if (step === 1) body = `<div class="filter-pills onboarding-category-filters">${onboardingCategories.map((category, index) => `<button type="button" class="filter-pill ${index === 0 ? 'selected' : ''}" data-onboarding-category="${safeText(category)}" aria-pressed="${index === 0}">${safeText(category)}</button>`).join('')}</div><div class="exercise-choice-list">${ALPHABETICAL_EXERCISES.map(item => { const detailId = `onboard-exercise-description-${item.id}`; return `<div class="onboard-exercise-option" data-categories="${safeText(item.categories.join('|'))}"><button type="button" class="onboard-exercise-card" data-action="toggle-onboard-description" data-detail-id="${detailId}" aria-controls="${detailId}" aria-expanded="false"><span>${safeText(item.name)}</span><span class="onboard-exercise-indicator" aria-hidden="true">＋</span></button><label class="onboard-favorite-toggle" title="Favorite ${safeText(item.name)}"><input type="checkbox" name="onboard-favorite" value="${item.id}" aria-label="Favorite ${safeText(item.name)}" ${user.favorites.includes(item.id) ? 'checked' : ''}></label><div class="onboard-exercise-copy" id="${detailId}" hidden><p>${safeText(item.description)}</p><strong>HOW TO</strong><p>${safeText(item.howTo)}</p></div></div>`; }).join('')}</div>`;
   if (step === 2) body = `<div class="duration-grid">${DURATIONS.map(duration => `<button class="duration-option ${user.duration === duration ? 'selected' : ''}" data-duration="${duration}">${duration} min</button>`).join('')}<button class="duration-option ${!DURATIONS.includes(user.duration) ? 'selected' : ''}" data-duration="custom">Custom</button></div><div id="custom-duration-wrap" style="margin-top:12px;${DURATIONS.includes(user.duration) ? 'display:none' : ''}"><label class="field-label" for="custom-duration">Minutes</label><input class="input" id="custom-duration" type="number" min="10" max="120" value="${user.duration}"></div><div class="field-group" style="margin-top:16px"><label class="field-label" for="user-name">What should we call you? <span style="text-transform:none">(optional)</span></label><input class="input" id="user-name" maxlength="28" placeholder="Your name" value="${safeText(user.name)}"></div><div class="field-group onboarding-account-group"><span class="field-label">ACCOUNT (OPTIONAL)</span><p>Create an account to use your workouts on other devices. You can also do this later in Preferences.</p><button class="button button-secondary button-small" data-action="onboard-account">CREATE ACCOUNT OR LOG IN</button></div>`;
   const skipButton = isEntry ? '' : '<button class="button-plain" data-action="skip-onboarding">Skip for now</button>';
   const progress = isEntry ? '' : `<div class="step-dots">${[0, 1, 2].map(index => `<span class="${index === step ? 'active' : ''}"></span>`).join('')}</div><div class="onboard-footer">${step > 0 ? '<button class="button-plain" data-action="onboard-back">← BACK</button>' : '<span></span>'}<button class="button button-primary" data-action="onboard-next" data-step="${step}">${step === 2 ? 'LET’S GO' : 'CONTINUE'} <span>→</span></button></div>`;
   root.innerHTML = `<div class="onboarding-overlay"><section class="onboarding-panel"><div class="onboard-top"><div><div class="eyebrow">SETLIST · GETTING STARTED</div><h2>${title}</h2></div>${skipButton}</div><p class="onboard-copy">${subtitle}</p>${body}${progress}</section></div>`;
 }
 function initializeBuilderModal() {
+  const library = $('.builder-exercises');
   renderBuilderSelection();
-  const library = $('.builder-exercises'), headings = document.createElement('div');
-  $('.builder-column-headings', library)?.remove();
-  const focusGroup = $('[data-builder-part]', $('.modal-panel'))?.closest('.field-group');
-  if (focusGroup) $('#builder-selection')?.after(focusGroup);
-  headings.className = 'builder-column-headings';
-  headings.innerHTML = '<span></span><span>EXERCISE</span>';
-  library?.prepend(headings);
+  updateBuilderSummary();
+  const addButton = document.createElement('button');
+  addButton.type = 'button'; addButton.className = 'button button-secondary builder-add-exercises';
+  addButton.dataset.action = 'open-builder-exercise-picker'; addButton.textContent = 'ADD EXERCISES';
+  if (!$('.builder-add-exercises')) $('#builder-selection')?.after(addButton);
+  library?.remove();
   $('.modal-actions.spread .template-meta', $('.modal-panel'))?.remove();
-  linkExerciseLabels(library, $$('[data-builder-select]', library).map(input => ({ exerciseId: input.dataset.builderSelect })), '.builder-exercise', 'span');
   linkExerciseLabels($('#builder-selection'), state.builderDraft.items, '.builder-selected-row');
-  stopBuilderDrag = initializeBuilderDrag($('#builder-selection'));
+  initializeBuilderDrag($('#builder-selection'));
   updateBuilderFocusVisibility();
 }
 function captureBuilderPosition() {
-  return { modalScrollTop: $('.modal-panel')?.scrollTop || 0, libraryScrollTop: $('.builder-exercises')?.scrollTop || 0 };
+  return { modalScrollTop: $('.modal-panel')?.scrollTop || 0 };
 }
 function restoreBuilderPosition(position) {
   if (!position) return;
-  const panel = $('.modal-panel'), library = $('.builder-exercises');
+  const panel = $('.modal-panel');
   if (panel) panel.scrollTop = position.modalScrollTop;
-  if (library) library.scrollTop = position.libraryScrollTop;
 }
 function openModal(html, mode = null) {
-  stopBuilderDrag?.(); stopBuilderDrag = null;
   state.modalMode = mode; document.body.classList.add('modal-open'); $('#modal-root').innerHTML = `<div class="modal-backdrop"><section class="modal-panel">${html}</section></div>`;
   if (mode) $('.modal-panel').dataset.modalMode = mode;
   if (mode === 'builder') initializeBuilderModal();
@@ -408,21 +509,30 @@ function openModal(html, mode = null) {
   }
 }
 function updateBuilderFocusVisibility() {
-  const draft = state.builderDraft, library = $('.builder-exercises');
-  if (!draft || !library) return;
+  const draft = state.builderDraft;
+  if (!draft) return;
   const chosenParts = draft.parts || ['Full Body'];
   const selected = new Set(draft.items.map(item => item.exerciseId));
   $$('.option-chip[data-builder-part]', $('.modal-panel')).forEach(button => button.classList.toggle('selected', chosenParts.includes(button.dataset.builderPart)));
-  $$('.builder-exercise', library).forEach(row => {
+  const pickerList = $('#builder-picker-list');
+  if (!pickerList) return;
+  const query = $('#builder-exercise-search')?.value.trim().toLowerCase() || '';
+  $$('.builder-picker-row', pickerList).forEach(row => {
     const exercise = exerciseById(row.dataset.builderRow);
     const isSelected = selected.has(row.dataset.builderRow), checkbox = $('[data-builder-select]', row);
     if (checkbox) checkbox.checked = isSelected;
-    $$('[data-builder-sets], [data-builder-reps]', row).forEach(input => { input.disabled = !isSelected; });
     row.classList.toggle('selected', isSelected);
-    const hidden = !isSelected && !chosenParts.some(part => focusMatches(exercise, part));
+    const hidden = Boolean(query && !row.dataset.search.includes(query)) || (!isSelected && !chosenParts.some(part => focusMatches(exercise, part)));
     row.hidden = hidden;
-    row.classList.toggle('is-hidden', hidden);
   });
+}
+function updateBuilderSummary() {
+  const draft = state.builderDraft;
+  if (!draft) return;
+  const count = $('#builder-count'), estimate = $('#builder-estimate'), pickerCount = $('#builder-picker-count');
+  if (count) count.textContent = draft.items.length;
+  if (estimate) estimate.textContent = estimateWorkout(draft.items);
+  if (pickerCount) pickerCount.textContent = `${draft.items.length} selected`;
 }
 function closeModal() {
   const previous = state.modalReturn;
@@ -535,7 +645,8 @@ function generateQuickWorkout(focus, duration, equipmentMode) {
       const usageScore = -Math.min(24, (usage.get(exercise.id) || 0) * 7);
       const overlap = exercise.parts.filter(part => chosenParts.has(part)).length;
       const setItem = { exerciseId: exercise.id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight, completedSets: [] };
-      const addedMinutes = (exercise.work + exercise.rest) * exercise.sets / 60;
+      const work = exercise.unit === 'sec' ? exercise.reps : exercise.work;
+      const addedMinutes = (work + exercise.rest) * exercise.sets / 60;
       const fitScore = estimated + addedMinutes <= duration ? 12 : -Math.min(45, (estimated + addedMinutes - duration) * 6);
       const score = (favorite ? 34 : 0) + recencyScore + usageScore - overlap * 13 + fitScore + Math.random() * 10;
       return { exercise, setItem, score, addedMinutes };
@@ -574,15 +685,11 @@ function migrateUntouchedStarterWorkouts() {
 }
 function showQuickPreview(draft) {
   state.quickDraft = draft;
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${quickSummaryRowsHtml(draft)}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button><button class="button button-secondary" data-action="save-quick-template">SAVE TO WORKOUTS</button></div></div>`, 'quick-preview');
-  const heading = $('.modal-heading', $('#modal-root'));
-  const close = $('.modal-close', heading);
-  const headingActions = document.createElement('div');
-  const back = document.createElement('button');
-  headingActions.className = 'quick-preview-heading-actions';
-  back.className = 'button button-secondary button-small'; back.dataset.action = 'back-quick-config'; back.textContent = '← BACK';
-  back.setAttribute('aria-label', 'Back to Quick Workout setup');
-  close.replaceWith(headingActions); headingActions.append(back, close);
+  const saved = Store.data.workouts.some(template => template.id === draft.id);
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">YOUR QUICK WORKOUT</div><h2>${safeText(draft.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">About ${estimateWorkout(draft.items)} minutes · ${draft.items.length} exercises. Adjust the lineup or build another.</p><div class="quick-summary-list">${quickSummaryRowsHtml(draft)}</div><div class="modal-actions spread"><button class="button button-secondary" data-action="regenerate-quick">↻ REGENERATE</button><div><button class="button button-plain" data-action="add-quick-exercise">＋ ADD</button><button class="button button-primary" data-action="start-quick">START WORKOUT →</button><button class="button button-secondary" data-action="save-quick-template" ${saved ? 'disabled' : ''}>${saved ? 'SAVED TO WORKOUTS' : 'SAVE TO WORKOUTS'}</button></div></div>`, 'quick-preview');
+  const close = $('.modal-close', $('#modal-root'));
+  close.dataset.action = 'back-quick-config';
+  close.setAttribute('aria-label', 'Back to Quick Workout setup');
   const actions = $('.modal-actions.spread');
   if (actions) {
     const start = $('[data-action="start-quick"]', actions), regenerate = $('[data-action="regenerate-quick"]', actions), add = $('[data-action="add-quick-exercise"]', actions), save = $('[data-action="save-quick-template"]', actions);
@@ -592,7 +699,7 @@ function showQuickPreview(draft) {
   linkExerciseLabels($('#modal-root'), draft.items, '.quick-summary-row');
 }
 function quickSummaryRowsHtml(draft) {
-  return draft.items.map(item => `<div class="quick-summary-row" data-quick-exercise-id="${safeText(item.exerciseId)}"><strong>${safeText(itemExercise(item)?.name)}</strong><button type="button" class="button-plain quick-shuffle-button" data-action="shuffle-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Shuffle ${safeText(itemExercise(item)?.name || 'exercise')} for another match" title="Shuffle to a different matching exercise">⟲</button><button type="button" class="button-plain quick-remove-button" data-action="remove-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}" title="Remove exercise">×</button></div>`).join('');
+  return draft.items.map(item => `<div class="quick-summary-row" data-quick-exercise-id="${safeText(item.exerciseId)}"><strong>${safeText(itemExercise(item)?.name)}</strong><span>${itemSets(item)} sets × ${itemMetric(item)}</span><button type="button" class="button-plain quick-shuffle-button" data-action="shuffle-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Shuffle ${safeText(itemExercise(item)?.name || 'exercise')} for another match" title="Shuffle to a different matching exercise">⟲</button><button type="button" class="button-plain quick-remove-button" data-action="remove-quick-item" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')}" title="Remove exercise">×</button></div>`).join('');
 }
 function updateQuickPreviewList() {
   const draft = state.quickDraft, list = $('.quick-summary-list', $('#modal-root'));
@@ -617,107 +724,124 @@ function shuffleQuickItem(exerciseId) {
 }
 function openBuilder(workout = null) {
   state.builderDraft = workout ? JSON.parse(JSON.stringify(workout)) : { id: null, name: '', items: [] };
-  state.builderDraft.items = (state.builderDraft.items || []).map(item => ({ ...item, completedSets: [] }));
+  state.builderDraft.items = (state.builderDraft.items || []).map(item => ({ ...item, weight: isBodyweight(item) ? 0 : item.weight, completedSets: [] }));
   showBuilder();
 }
 function showBuilder() {
   const draft = state.builderDraft, selected = new Set(draft.items.map(item => item.exerciseId));
   const parts = ['Full Body', 'Upper Body', 'Lower Body', 'Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'];
   const chosenParts = draft.parts || ['Full Body'];
-  const exercises = [...draft.items.map(item => exerciseById(item.exerciseId)).filter(Boolean), ...EXERCISES.filter(exercise => !selected.has(exercise.id))];
+  const exercises = [];
   openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT BUILDER</div><h2>${draft.id ? 'Edit workout' : 'Make it yours.'}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">Pick your focus, then build the lineup. You can fine-tune the details later.</p><div class="field-group"><label class="field-label" for="builder-name">WORKOUT NAME</label><input class="input" id="builder-name" placeholder="e.g. Upper Body + Core" maxlength="45" value="${safeText(draft.name)}"></div><div class="field-group"><span class="field-label">FOCUS</span><div class="option-row">${parts.map(part => `<button class="option-chip ${chosenParts.includes(part) ? 'selected' : ''}" data-builder-part="${part}">${part}</button>`).join('')}</div></div><div class="field-group"><label class="field-label">LINEUP</label><div style="padding-top:11px;color:var(--muted);font-size:10px"><strong id="builder-count">${draft.items.length}</strong> selected · ~<span id="builder-estimate">${estimateWorkout(draft.items)}</span> min</div></div><div class="builder-exercises">${exercises.map(exercise => { const item = draft.items.find(entry => entry.exerciseId === exercise.id) || { exerciseId: exercise.id, sets: exercise.sets, reps: exercise.reps, weight: exercise.weight }; return `<div class="builder-exercise ${selected.has(exercise.id) ? 'selected' : ''}" data-builder-row="${exercise.id}"><input type="checkbox" data-builder-select="${exercise.id}" ${selected.has(exercise.id) ? 'checked' : ''}><span>${safeText(exercise.name)}</span><input aria-label="Sets for ${safeText(exercise.name)}" data-builder-sets="${exercise.id}" type="number" min="1" max="10" value="${itemSets(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}><input aria-label="Reps for ${safeText(exercise.name)}" data-builder-reps="${exercise.id}" type="number" min="1" max="100" value="${itemReps(item)}" ${selected.has(exercise.id) ? '' : 'disabled'}></div>`; }).join('')}</div><div class="modal-actions spread"><span class="template-meta">SETS &nbsp;&nbsp;&nbsp; REPS</span><div><button class="button button-secondary" data-action="close-modal">CANCEL</button><button class="button button-primary" data-action="save-template">SAVE WORKOUT</button></div></div>`, 'builder');
 }
 function updateBuilderFromModal() {
   if (!state.builderDraft) return;
-  const draft = state.builderDraft, name = $('#builder-name')?.value || '';
-  draft.name = name;
-  const selectedInputs = $$('[data-builder-select]').filter(input => input.checked);
-  const selectedIds = new Set(selectedInputs.map(input => input.dataset.builderSelect));
-  const existingItems = new Map(draft.items.map(item => [item.exerciseId, item]));
-  const orderedIds = [...draft.items.map(item => item.exerciseId).filter(id => selectedIds.has(id)), ...selectedInputs.map(input => input.dataset.builderSelect).filter(id => !existingItems.has(id))];
-  draft.items = orderedIds.map(id => {
-    const existing = existingItems.get(id), exercise = exerciseById(id);
-    return { ...existing, exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || existing?.sets || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || existing?.reps || 10, weight: existing?.weight ?? exercise?.weight ?? 0, completedSets: [] };
-  });
-  const count = $('#builder-count'), estimate = $('#builder-estimate');
-  if (count) count.textContent = draft.items.length;
-  if (estimate) estimate.textContent = estimateWorkout(draft.items);
+  const draft = state.builderDraft, name = $('#builder-name');
+  if (name) draft.name = name.value;
+  const selectionInputs = $$('[data-builder-select]');
+  if (selectionInputs.length) {
+    const selectedInputs = selectionInputs.filter(input => input.checked);
+    const selectedIds = new Set(selectedInputs.map(input => input.dataset.builderSelect));
+    const existingItems = new Map(draft.items.map(item => [item.exerciseId, item]));
+    const orderedIds = [...draft.items.map(item => item.exerciseId).filter(id => selectedIds.has(id)), ...selectedInputs.map(input => input.dataset.builderSelect).filter(id => !existingItems.has(id))];
+    draft.items = orderedIds.map(id => {
+      const existing = existingItems.get(id), exercise = exerciseById(id);
+      return { ...existing, exerciseId: id, sets: Number($(`[data-builder-sets="${id}"]`)?.value) || existing?.sets || exercise?.sets || 3, reps: Number($(`[data-builder-reps="${id}"]`)?.value) || existing?.reps || exercise?.reps || 10, weight: isBodyweight({ exerciseId: id }) ? 0 : existing?.weight ?? exercise?.weight ?? 0, completedSets: [] };
+    });
+  }
+  updateBuilderSummary();
   renderBuilderSelection();
+  updateBuilderFocusVisibility();
 }
 function renderBuilderSelection() {
-  const library = $('.builder-exercises'), draft = state.builderDraft;
-  if (!library || !draft) return;
+  const draft = state.builderDraft;
+  if (!draft) return;
   let panel = $('#builder-selection');
   if (!panel) {
+    const summary = $('#builder-count')?.closest('.field-group');
     panel = document.createElement('section'); panel.id = 'builder-selection'; panel.className = 'builder-selection';
-    library.before(panel);
+    const library = $('.builder-exercises');
+    if (library) library.before(panel);
+    else if (summary) summary.after(panel);
+    else return;
   }
-  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map(item => `<div class="builder-selected-row" data-builder-selected-id="${safeText(item.exerciseId)}"><button type="button" class="builder-remove-exercise" data-action="remove-builder-exercise" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')} from workout">×</button><div class="builder-selected-main"><div class="builder-selected-name-line"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong></div><div class="builder-selected-settings-line"><button type="button" class="builder-selected-settings" data-action="builder-exercise-settings" data-id="${safeText(item.exerciseId)}" aria-label="Change weight, sets, and reps for ${safeText(itemExercise(item)?.name || 'exercise')}"><span class="builder-selected-count">${item.weight ? `${item.weight} lb · ` : ''}${itemSets(item)} sets × ${itemReps(item)} reps</span><span aria-hidden="true">↗</span></button></div></div></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
+  panel.innerHTML = `<div class="builder-selection-heading"><strong>SELECTED EXERCISES</strong><span>${draft.items.length} selected</span></div>${draft.items.length ? draft.items.map(item => `<div class="builder-selected-row" data-builder-selected-id="${safeText(item.exerciseId)}"><button type="button" class="builder-remove-exercise" data-action="remove-builder-exercise" data-id="${safeText(item.exerciseId)}" aria-label="Remove ${safeText(itemExercise(item)?.name || 'exercise')} from workout">×</button><button type="button" class="builder-reorder-handle" aria-label="Drag to reorder ${safeText(itemExercise(item)?.name || 'exercise')}" title="Drag to reorder"><span aria-hidden="true">⋮⋮</span></button><div class="builder-selected-main"><div class="builder-selected-name-line"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong></div><div class="builder-selected-settings-line"><button type="button" class="builder-selected-settings" data-action="builder-exercise-settings" data-id="${safeText(item.exerciseId)}" aria-label="${isBodyweight(item) ? 'Change sets and' : 'Change weight, sets, and'} ${itemMeasureLabel(item)} for ${safeText(itemExercise(item)?.name || 'exercise')}"><span class="builder-selected-count">${!isBodyweight(item) && itemWeight(item) ? `${itemWeight(item)} lb · ` : ''}${itemSets(item)} sets × ${itemMetric(item)}</span><span aria-hidden="true">↗</span></button></div></div></div>`).join('') : '<p class="builder-selection-empty">Select movements below to build your lineup.</p>'}`;
   linkExerciseLabels(panel, draft.items, '.builder-selected-row');
+}
+function initializeBuilderDrag(panel) {
+  if (!panel) return;
+  let draggedRow = null, draggedPointerId = null;
+  const finishDrag = () => {
+    if (!draggedRow) return;
+    draggedRow.classList.remove('dragging');
+    const itemsById = new Map(state.builderDraft.items.map(item => [item.exerciseId, item]));
+    state.builderDraft.items = $$('.builder-selected-row', panel).map(row => itemsById.get(row.dataset.builderSelectedId)).filter(Boolean);
+    draggedRow = null; draggedPointerId = null;
+  };
+  panel.addEventListener('pointerdown', event => {
+    const target = event.target instanceof Element ? event.target : null;
+    const handle = target?.closest('.builder-reorder-handle');
+    if (!handle || !panel.contains(handle)) return;
+    draggedRow = handle.closest('.builder-selected-row');
+    if (!draggedRow) return;
+    draggedPointerId = event.pointerId;
+    event.preventDefault();
+    handle.setPointerCapture(event.pointerId);
+    draggedRow.classList.add('dragging');
+  });
+  panel.addEventListener('pointermove', event => {
+    if (!draggedRow || event.pointerId !== draggedPointerId) return;
+    event.preventDefault();
+    const targetRow = document.elementFromPoint(event.clientX, event.clientY)?.closest('.builder-selected-row');
+    if (!targetRow || targetRow === draggedRow || !panel.contains(targetRow)) return;
+    const bounds = targetRow.getBoundingClientRect();
+    panel.insertBefore(draggedRow, event.clientY < bounds.top + bounds.height / 2 ? targetRow : targetRow.nextSibling);
+  });
+  panel.addEventListener('pointerup', event => { if (event.pointerId === draggedPointerId) finishDrag(); });
+  panel.addEventListener('pointercancel', event => { if (event.pointerId === draggedPointerId) finishDrag(); });
+}
+function openBuilderExercisePicker() {
+  updateBuilderFromModal();
+  const draft = state.builderDraft, selected = new Set(draft.items.map(item => item.exerciseId));
+  state.modalReturn = { mode: 'builder', html: $('#modal-root').innerHTML, position: captureBuilderPosition() };
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT BUILDER</div><h2>Add exercises</h2></div><button class="modal-close" data-action="back-to-previous-modal" aria-label="Back to workout setup">×</button></div><p class="modal-copy">Choose movements for this workout.</p><label class="search-wrap"><span>⌕</span><input class="search-input" id="builder-exercise-search" placeholder="Search exercises" autocomplete="off"></label><div class="builder-picker-count" id="builder-picker-count">${draft.items.length} selected</div><div class="exercise-list builder-picker-list" id="builder-picker-list">${ALPHABETICAL_EXERCISES.map(exercise => `<label class="builder-picker-row ${selected.has(exercise.id) ? 'selected' : ''}" data-builder-row="${exercise.id}" data-search="${safeText(`${exercise.name} ${exercise.parts.join(' ')}`.toLowerCase())}"><input type="checkbox" data-builder-select="${exercise.id}" aria-label="Add ${safeText(exercise.name)} to workout" ${selected.has(exercise.id) ? 'checked' : ''}><span><strong>${safeText(exercise.name)}</strong><small>${safeText(exercise.parts.join(' · '))}</small></span></label>`).join('')}</div>`, 'builder-exercise-picker');
+  updateBuilderFocusVisibility();
 }
 function openBuilderExerciseSettings(exerciseId) {
   updateBuilderFromModal();
   const item = state.builderDraft?.items.find(entry => entry.exerciseId === exerciseId), exercise = exerciseById(exerciseId);
   if (!item || !exercise) return;
+  const measureLabel = exercise.unit === 'sec' ? 'SECONDS' : 'REPS';
+  const measureCopy = exercise.unit === 'sec' ? 'hold duration' : 'reps';
+  const weightField = isBodyweight(item) ? '' : `<div class="field-group"><label class="field-label" for="builder-item-weight">WEIGHT</label><input class="input" id="builder-item-weight" type="number" min="0" step="2.5" value="${itemWeight(item)}"></div>`;
+  const settingsCopy = isBodyweight(item) ? `Adjust sets and ${measureCopy} for this movement.` : `Adjust the suggested weight, sets, and ${measureCopy} for this movement.`;
   state.modalReturn = { mode: 'builder', html: $('#modal-root').innerHTML, position: captureBuilderPosition() };
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">SELECTED EXERCISE</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="back-to-previous-modal" aria-label="Back to workout builder">×</button></div><p class="modal-copy">Adjust the suggested weight, sets, and reps for this movement.</p><div class="form-row"><div class="field-group"><label class="field-label" for="builder-item-weight">WEIGHT</label><input class="input" id="builder-item-weight" type="number" min="0" step="2.5" value="${item.weight || 0}"></div><div class="field-group"><label class="field-label" for="builder-item-sets">SETS</label><input class="input" id="builder-item-sets" type="number" min="1" max="10" value="${itemSets(item)}"></div></div><div class="field-group"><label class="field-label" for="builder-item-reps">REPS</label><input class="input" id="builder-item-reps" type="number" min="1" max="100" value="${itemReps(item)}"></div><div class="modal-actions"><button class="button button-secondary" data-action="back-to-previous-modal">CANCEL</button><button class="button button-primary" data-action="save-builder-exercise" data-id="${safeText(exerciseId)}">SAVE CHANGES</button></div>`, 'builder-exercise-settings');
-}
-function initializeBuilderDrag(panel) {
-  if (!panel) return;
-  let draggedRow = null;
-  let draggedPointerId = null;
-  const onPointerDown = event => {
-    const target = event.target instanceof Element ? event.target : null;
-    if (!target || target.closest('.builder-selected-settings, .builder-remove-exercise, input, select, textarea')) return;
-    draggedRow = target.closest('.builder-selected-row');
-    if (!draggedRow || !panel.contains(draggedRow)) return;
-    if (!draggedRow) return;
-    event.preventDefault();
-    draggedPointerId = event.pointerId;
-    draggedRow.classList.add('dragging');
-  };
-  const onPointerMove = event => {
-    if (!draggedRow || event.pointerId !== draggedPointerId) return;
-    const targetRow = document.elementFromPoint(event.clientX, event.clientY)?.closest('.builder-selected-row');
-    if (!targetRow || targetRow === draggedRow || !panel.contains(targetRow)) return;
-    const bounds = targetRow.getBoundingClientRect();
-    panel.insertBefore(draggedRow, event.clientY < bounds.top + bounds.height / 2 ? targetRow : targetRow.nextSibling);
-  };
-  const finishDrag = () => {
-    if (!draggedRow) return;
-    draggedRow.classList.remove('dragging');
-    const itemsById = new Map(state.builderDraft.items.map(item => [item.exerciseId, item]));
-    const selectedRows = $$('.builder-selected-row', panel);
-    state.builderDraft.items = selectedRows.map(row => itemsById.get(row.dataset.builderSelectedId)).filter(Boolean);
-    draggedRow = null; draggedPointerId = null;
-  };
-  const onPointerUp = event => { if (event.pointerId === draggedPointerId) finishDrag(); };
-  const onPointerCancel = event => { if (event.pointerId === draggedPointerId) finishDrag(); };
-  document.addEventListener('pointerdown', onPointerDown);
-  document.addEventListener('pointermove', onPointerMove);
-  document.addEventListener('pointerup', onPointerUp);
-  document.addEventListener('pointercancel', onPointerCancel);
-  return () => {
-    document.removeEventListener('pointerdown', onPointerDown);
-    document.removeEventListener('pointermove', onPointerMove);
-    document.removeEventListener('pointerup', onPointerUp);
-    document.removeEventListener('pointercancel', onPointerCancel);
-  };
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">SELECTED EXERCISE</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="back-to-previous-modal" aria-label="Back to workout builder">×</button></div><p class="modal-copy">${settingsCopy}</p><div class="form-row builder-settings-fields ${isBodyweight(item) ? 'bodyweight' : ''}">${weightField}<div class="field-group"><label class="field-label" for="builder-item-sets">SETS</label><input class="input" id="builder-item-sets" type="number" min="1" max="10" value="${itemSets(item)}"></div><div class="field-group"><label class="field-label" for="builder-item-reps">${measureLabel}</label><input class="input" id="builder-item-reps" type="number" min="1" max="100" value="${itemReps(item)}"></div></div><div class="modal-actions"><button class="button button-secondary" data-action="back-to-previous-modal">CANCEL</button><button class="button button-primary" data-action="save-builder-exercise" data-id="${safeText(exerciseId)}">SAVE CHANGES</button></div>`, 'builder-exercise-settings');
 }
 function showExerciseDetail(id) {
   const exercise = exerciseById(id), history = Store.data.history.flatMap(workout => (workout.items || []).filter(item => item.exerciseId === id).map(item => ({ ...item, date: workout.endedAt }))).sort((a, b) => new Date(b.date) - new Date(a.date));
-  const latest = history[0], best = history.reduce((winner, item) => !winner || volumeItem(item) > volumeItem(winner) ? item : winner, null);
+  const latest = history[0], best = history.reduce((winner, item) => !winner || volumeItem(item) > volumeItem(winner) ? item : winner, null), showWeight = !isBodyweight({ exerciseId: id });
   if (state.modalMode === 'builder') updateBuilderFromModal();
   const returnModal = state.modalMode === 'exercise-detail' ? state.modalReturn : state.modalMode ? { html: $('#modal-root').innerHTML, mode: state.modalMode, position: state.modalMode === 'builder' ? captureBuilderPosition() : null } : null;
   const isFavorite = Store.data.user.favorites.includes(id);
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">${safeText(exercise.parts.join(' · '))}</div><h2>${safeText(exercise.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(exercise.equipment.join(' · '))} · Suggested ${exercise.weight ? `${exercise.weight} lb × ` : ''}${exercise.reps} × ${exercise.sets}</p><div class="simple-metric"><span>Last</span><strong>${latest ? `${latest.weight || 0} lb × ${latest.reps} × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet'}</strong></div><div class="simple-metric"><span>Best logged volume</span><strong>${best ? `${formatNumber(volumeItem(best))} lb · ${dateLabel(best.date)}` : '—'}</strong></div><div class="modal-actions"><button type="button" class="favorite-button exercise-detail-favorite ${isFavorite ? 'is-favorite' : ''}" data-action="favorite" data-id="${id}" aria-label="${isFavorite ? 'Remove favorite' : 'Add favorite'}" aria-pressed="${isFavorite}">${isFavorite ? '★' : '☆'}</button>${currentWorkout() ? `<button class="button button-primary" data-action="add-active-item" data-id="${id}">ADD TO WORKOUT</button>` : '<button class="button button-primary" data-action="close-modal">DONE</button>'}</div>`, 'exercise-detail');
+  const favoriteButton = `<button type="button" class="favorite-button exercise-detail-favorite ${isFavorite ? 'is-favorite' : ''}" data-action="favorite" data-id="${id}" aria-label="${isFavorite ? 'Remove favorite' : 'Add favorite'}" aria-pressed="${isFavorite}">${isFavorite ? '★' : '☆'}</button>`;
+  const workoutAction = currentWorkout() ? `<div class="modal-actions"><button class="button button-primary" data-action="add-active-item" data-id="${id}">ADD TO WORKOUT</button></div>` : '';
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">${safeText(exercise.parts.join(' · '))}</div><div class="exercise-detail-title"><h2>${safeText(exercise.name)}</h2>${favoriteButton}</div></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${safeText(exercise.equipment.join(' · '))} · Suggested ${showWeight && exercise.weight ? `${exercise.weight} lb × ` : ''}${exercise.reps} × ${exercise.sets}</p><div class="simple-metric"><span>Last</span><strong>${latest ? `${showWeight ? `${latest.weight || 0} lb × ` : ''}${latest.reps} × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet'}</strong></div><div class="simple-metric"><span>Best logged volume</span><strong>${best && showWeight ? `${formatNumber(volumeItem(best))} lb · ${dateLabel(best.date)}` : '—'}</strong></div>${workoutAction}`, 'exercise-detail');
   if (returnModal) {
     state.modalReturn = returnModal;
-    $$('[data-action="close-modal"]', $('#modal-root')).forEach(button => {
-      button.className = 'button button-secondary button-small'; button.dataset.action = 'back-to-previous-modal'; button.textContent = '← BACK'; button.setAttribute('aria-label', 'Back to previous list');
-    });
+    const closeButton = $('.modal-heading .modal-close', $('#modal-root'));
+    if (closeButton) { closeButton.dataset.action = 'back-to-previous-modal'; closeButton.setAttribute('aria-label', 'Back to previous view'); }
   }
-  if (exercise.unit === 'sec') $('.modal-copy', $('#modal-root')).textContent = `${exercise.equipment.join(' · ')} · Suggested ${exercise.reps} sec hold × ${exercise.sets}`;
+  if (exercise.unit === 'sec') {
+    $('.modal-copy', $('#modal-root')).textContent = `${exercise.equipment.join(' · ')} · Suggested ${exercise.reps} sec hold × ${exercise.sets}`;
+    const metrics = $$('.simple-metric', $('#modal-root'));
+    if (metrics[0]) $('strong', metrics[0]).textContent = latest ? `${latest.reps} sec hold × ${latest.completedSets.length} · ${dateLabel(latest.date)}` : 'No history yet';
+    if (metrics[1]) {
+      const bestHold = history.reduce((winner, item) => !winner || item.reps > winner.reps ? item : winner, null);
+      $('span', metrics[1]).textContent = 'Best hold duration';
+      $('strong', metrics[1]).textContent = bestHold ? `${bestHold.reps} sec · ${dateLabel(bestHold.date)}` : '—';
+    }
+  }
   const instructions = document.createElement('section');
   instructions.className = 'exercise-instructions';
   const description = document.createElement('p'); description.innerHTML = renderTechnicalText(exercise.description);
@@ -741,17 +865,38 @@ function showTechnicalTerm(term) {
 }
 function volumeItem(item) { return (item.completedSets || []).reduce((sum, set) => sum + set.weight * set.reps, 0); }
 function startWorkout(source) {
-  if (currentWorkout() && !currentWorkout().completed) { closeModal(); state.view = 'active'; render(); toast('Your current workout is still in progress.'); return; }
+  if (currentWorkout() && !currentWorkout().completed) { showActiveWorkout(); toast('Your current workout is still in progress.'); return; }
   const workout = JSON.parse(JSON.stringify(source));
+  const savedQuickTemplate = workout.quick ? Store.data.workouts.find(template => template.id === workout.id) : null;
+  if (savedQuickTemplate) {
+    savedQuickTemplate.name = workout.name;
+    savedQuickTemplate.items = workout.items.map(item => ({ ...item, weight: itemWeight(item), completedSets: [] }));
+    workout.quick = false;
+  }
   workout.items = workout.items.map(item => {
     const exercise = itemExercise(item), previous = latestExerciseHistory(item.exerciseId);
-    return { ...item, sets: item.sets ?? exercise?.sets ?? 3, reps: item.reps ?? previous?.reps ?? exercise?.reps ?? 10, weight: item.weight ?? previous?.weight ?? exercise?.weight ?? 0, completedSets: [], skipped: false };
+    return { ...item, sets: item.sets ?? exercise?.sets ?? 3, reps: item.reps ?? previous?.reps ?? exercise?.reps ?? 10, weight: isBodyweight(item) ? 0 : item.weight ?? previous?.weight ?? exercise?.weight ?? 0, completedSets: [], skipped: false };
   });
   workout.startedAt = Date.now(); workout.pausedAt = null; workout.pausedSeconds = 0; workout.currentIndex = 0; workout.restIntervals = []; workout.lastSetAt = null; workout.completed = false; workout.state = 'active';
   Store.data.active = workout;
   const template = Store.data.workouts.find(item => item.id === workout.id);
   if (template) template.lastUsed = new Date().toISOString();
-  Store.save(); state.view = 'active'; closeModal(); render(); toast('Workout started. Your progress is saved as you go.');
+  Store.save(); showActiveWorkout(); toast('Workout started. Your progress is saved as you go.');
+}
+function canSaveQuickWorkout(workout) {
+  return Boolean(workout?.quick && !Store.data.workouts.some(template => template.id === workout.id));
+}
+function saveActiveWorkoutAsTemplate() {
+  const workout = currentWorkout();
+  if (!canSaveQuickWorkout(workout)) return;
+  const template = {
+    id: `workout-${Date.now()}`, name: workout.name || 'Quick Workout',
+    items: workout.items.map(item => ({ exerciseId: item.exerciseId, sets: itemSets(item), reps: itemReps(item), weight: itemWeight(item), completedSets: [] })),
+    uses: 0, lastUsed: new Date().toISOString()
+  };
+  Store.data.workouts.push(template); workout.id = template.id; workout.quick = false;
+  if (workout.completed) Object.assign(workout, calculateWorkoutXp(workout));
+  saveAndRender(); toast('Workout saved to your workouts.');
 }
 function exercisePerformance(item) {
   const sets = item.completedSets || [];
@@ -804,7 +949,7 @@ function completeWorkoutState(workout) {
 function finishWorkout() {
   const workout = currentWorkout(); if (!workout) return;
   completeWorkoutState(workout);
-  state.view = 'active'; saveAndRender();
+  Store.save(); showActiveWorkout();
 }
 function saveCompletedWorkout() {
   const workout = currentWorkout(); if (!workout?.completed) return;
@@ -819,7 +964,7 @@ function saveCompletedWorkout() {
 function addItemToActive(id) {
   const workout = currentWorkout(); if (!workout || workout.items.some(item => item.exerciseId === id && !itemDone(item))) { closeModal(); toast('That movement is already in today’s lineup.'); return; }
   const exercise = exerciseById(id), last = latestExerciseHistory(id);
-  workout.items.push({ exerciseId: id, sets: exercise.sets, reps: last?.reps || exercise.reps, weight: last?.weight || exercise.weight, completedSets: [] });
+  workout.items.push({ exerciseId: id, sets: exercise.sets, reps: last?.reps || exercise.reps, weight: isBodyweight({ exerciseId: id }) ? 0 : last?.weight || exercise.weight, completedSets: [] });
   if (workout.items.filter(item => !itemDone(item)).length === 1) workout.currentIndex = workout.items.length - 1;
   closeModal(); saveAndRender(); toast(`${exercise.name} added to today’s lineup.`);
 }
@@ -837,11 +982,11 @@ function removeActiveItem(index) {
 }
 function renderAddExerciseModal() {
   const workouts = currentWorkout(), ids = new Set(workouts.items.filter(item => !itemDone(item)).map(item => item.exerciseId));
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Add a movement</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">This only changes today’s session, not your saved workout.</p><label class="search-wrap"><span>⌕</span><input class="search-input" id="add-exercise-search" placeholder="Search movements"></label><div class="exercise-list" id="add-exercise-results" style="margin-top:14px">${EXERCISES.filter(exercise => !ids.has(exercise.id)).slice(0, 12).map(exercise => `<div class="exercise-row"><div class="exercise-details"><strong>${safeText(exercise.name)}</strong><small>${exercise.parts.join(' · ')}</small></div><button class="button button-secondary button-small" data-action="add-active-item" data-id="${exercise.id}">ADD</button></div>`).join('')}</div>`, 'add-exercise');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Add a movement</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">This only changes today’s session, not your saved workout.</p><label class="search-wrap"><span>⌕</span><input class="search-input" id="add-exercise-search" placeholder="Search movements"></label><div class="exercise-list" id="add-exercise-results" style="margin-top:14px">${ALPHABETICAL_EXERCISES.filter(exercise => !ids.has(exercise.id)).slice(0, 12).map(exercise => `<div class="exercise-row"><div class="exercise-details"><strong>${safeText(exercise.name)}</strong><small>${exercise.parts.join(' · ')}</small></div><button class="button button-secondary button-small" data-action="add-active-item" data-id="${exercise.id}">ADD</button></div>`).join('')}</div>`, 'add-exercise');
 }
 function refreshAddExerciseResults() {
   const query = $('#add-exercise-search')?.value.toLowerCase() || '', active = currentWorkout(), ids = new Set(active.items.filter(item => !itemDone(item)).map(item => item.exerciseId));
-  const matches = EXERCISES.filter(exercise => !ids.has(exercise.id) && exercise.name.toLowerCase().includes(query)).slice(0, 15);
+  const matches = ALPHABETICAL_EXERCISES.filter(exercise => !ids.has(exercise.id) && exercise.name.toLowerCase().includes(query)).slice(0, 15);
   $('#add-exercise-results').innerHTML = matches.length ? matches.map(exercise => `<div class="exercise-row"><div class="exercise-details"><strong>${safeText(exercise.name)}</strong><small>${exercise.parts.join(' · ')}</small></div><button class="button button-secondary button-small" data-action="add-active-item" data-id="${exercise.id}">ADD</button></div>`).join('') : '<div class="empty-state">No movements found.</div>';
   linkExerciseLabels($('#add-exercise-results'), matches.map(exercise => ({ exerciseId: exercise.id })), '.exercise-row', '.exercise-details strong');
 }
@@ -872,8 +1017,7 @@ function handleAction(action, target) {
       if (!previous) { closeModal(); break; }
       if (previous.kind === 'onboarding') { closeModal(); break; }
       if (previous.mode === 'builder') {
-        $('#modal-root').innerHTML = previous.html; state.modalMode = 'builder'; state.modalReturn = null;
-        document.body.classList.add('modal-open'); initializeBuilderModal(); restoreBuilderPosition(previous.position); break;
+        state.modalReturn = null; showBuilder(); restoreBuilderPosition(previous.position); break;
       }
       $('#modal-root').innerHTML = previous.html; state.modalMode = previous.mode; state.modalReturn = previous.returnModal || null;
       document.body.classList.add('modal-open'); break;
@@ -886,7 +1030,7 @@ function handleAction(action, target) {
       $('.onboard-exercise-indicator', target).textContent = description.hidden ? '＋' : '−';
       break;
     }
-    case 'toggle-favorites': state.favoritesOnly = !state.favoritesOnly; render(); break;
+    case 'toggle-favorites': state.favoritesOnly = !state.favoritesOnly; renderPreservingFilterPillPosition(); break;
     case 'favorite': {
       const favorites = Store.data.user.favorites; Store.data.user.favorites = favorites.includes(id) ? favorites.filter(item => item !== id) : [...favorites, id];
       Store.save();
@@ -905,17 +1049,15 @@ function handleAction(action, target) {
     case 'exercise-detail': showExerciseDetail(id); break;
     case 'technical-term': showTechnicalTerm(target.dataset.term); break;
     case 'builder-exercise-settings': openBuilderExerciseSettings(id); break;
+    case 'open-builder-exercise-picker': openBuilderExercisePicker(); break;
     case 'remove-builder-exercise': {
       updateBuilderFromModal();
       state.builderDraft.items = state.builderDraft.items.filter(item => item.exerciseId !== id);
-      const row = $(`[data-builder-row="${id}"]`), checkbox = $(`[data-builder-select="${id}"]`);
-      if (row) { row.classList.remove('selected'); row.hidden = false; row.classList.remove('is-hidden'); }
-      if (checkbox) checkbox.checked = false;
-      renderBuilderSelection(); updateBuilderFocusVisibility(); break;
+      updateBuilderSummary(); renderBuilderSelection(); updateBuilderFocusVisibility(); break;
     }
     case 'start-template': case 'open-template': {
       const template = Store.data.workouts.find(item => item.id === id); if (!template) break;
-      if (action === 'open-template' || target.closest('.template-card')) { openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT TEMPLATE</div><h2>${safeText(template.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${template.items.length} exercises · estimated ${estimateWorkout(template.items)} minutes</p><div class="quick-summary-list">${template.items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} × ${itemReps(item)}</span></div>`).join('')}</div><div class="modal-actions"><button class="button button-secondary" data-action="edit-template" data-id="${id}">EDIT</button><button class="button button-primary" data-action="start-template" data-id="${id}">START WORKOUT →</button></div>`, 'template-detail'); }
+      if (action === 'open-template' || target.closest('.template-card')) { openModal(`<div class="modal-heading"><div><div class="eyebrow">WORKOUT TEMPLATE</div><h2>${safeText(template.name)}</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">${template.items.length} exercises · estimated ${estimateWorkout(template.items)} minutes</p><div class="quick-summary-list">${template.items.map(item => `<div class="quick-summary-row"><strong>${safeText(itemExercise(item)?.name || 'Exercise')}</strong><span>${itemSets(item)} sets × ${itemMetric(item)}</span></div>`).join('')}</div><div class="modal-actions"><button class="button button-secondary" data-action="edit-template" data-id="${id}">EDIT</button><button class="button button-primary" data-action="start-template" data-id="${id}">START WORKOUT →</button></div>`, 'template-detail'); }
       else startWorkout(template); break;
     }
     case 'edit-template': { const template = Store.data.workouts.find(item => item.id === id); if (template) openBuilder(template); break; }
@@ -928,7 +1070,7 @@ function handleAction(action, target) {
     case 'confirm-delete-template':
       Store.data.workouts = Store.data.workouts.filter(template => template.id !== id);
       closeModal(); state.view = 'workouts'; saveAndRender(); toast('Workout removed from your bank.'); break;
-    case 'return-workout': state.view = 'active'; closeModal(); render(); break;
+    case 'return-workout': showActiveWorkout(); break;
     case 'generate-quick': {
       const focus = $$('.option-chip[data-quick-part].selected').map(button => button.dataset.quickPart);
       if (!focus.length) focus.push('Full Body');
@@ -948,8 +1090,9 @@ function handleAction(action, target) {
     case 'save-quick-template': {
       const draft = state.quickDraft;
       if (!draft?.items.length) { toast('Add at least one movement first.'); break; }
-      Store.data.workouts.push({ id: `workout-${Date.now()}`, name: draft.name || 'Quick Workout', items: draft.items.map(item => ({ ...item, completedSets: [] })), uses: 0, lastUsed: null });
-      Store.save(); toast('Saved to your workouts.'); break;
+      if (Store.data.workouts.some(template => template.id === draft.id)) { toast('This workout is already saved.'); break; }
+      Store.data.workouts.push({ id: draft.id, name: draft.name || 'Quick Workout', items: draft.items.map(item => ({ ...item, completedSets: [] })), uses: 0, lastUsed: null });
+      Store.save(); showQuickPreview(draft); toast('Saved to your workouts.'); break;
     }
     case 'save-template': {
       updateBuilderFromModal(); const draft = state.builderDraft;
@@ -962,7 +1105,7 @@ function handleAction(action, target) {
     case 'save-builder-exercise': {
       const item = state.builderDraft?.items.find(entry => entry.exerciseId === id);
       if (!item) break;
-      item.weight = Math.max(0, Number($('#builder-item-weight')?.value) || 0);
+      item.weight = isBodyweight(item) ? 0 : Math.max(0, Number($('#builder-item-weight')?.value) || 0);
       item.sets = Math.max(1, Math.min(10, Number($('#builder-item-sets')?.value) || itemSets(item)));
       item.reps = Math.max(1, Math.min(100, Number($('#builder-item-reps')?.value) || itemReps(item)));
       const position = state.modalReturn?.position;
@@ -970,17 +1113,26 @@ function handleAction(action, target) {
     }
     case 'complete-set': {
       if (!workout || workout.pausedAt) break;
-      const item = activeItem(workout), weight = Math.max(0, Number($('[data-set-field="weight"]')?.value ?? item.weight) || 0), reps = Math.max(1, Number($('[data-set-field="reps"]')?.value ?? item.reps) || 1), now = Date.now();
+      const item = activeItem(workout), weight = isBodyweight(item) ? 0 : Math.max(0, Number($('[data-set-field="weight"]')?.value ?? item.weight) || 0), reps = Math.max(1, Number($('[data-set-field="reps"]')?.value ?? item.reps) || 1), now = Date.now();
       item.weight = weight; item.reps = reps; item.completedSets ||= [];
       if (workout.lastSetAt) workout.restIntervals.push(Math.max(0, Math.round((now - workout.lastSetAt) / 1000)));
       item.completedSets.push({ weight, reps, timestamp: now }); workout.lastSetAt = now;
+      if (itemDone(item)) {
+        const nextIndex = nextWorkoutItemIndex(workout, workout.currentIndex);
+        if (nextIndex >= 0) workout.currentIndex = nextIndex;
+      }
       saveAndRender(); break;
     }
     case 'change-sets': {
       const item = activeItem(workout); item.sets = Math.max((item.completedSets?.length || 0) + 1, Math.min(10, itemSets(item) + Number(target.dataset.delta))); saveAndRender(); break;
     }
     case 'skip-exercise': { const item = activeItem(workout); item.skipped = true; const next = workout.items.findIndex(entry => !itemDone(entry)); if (next >= 0) workout.currentIndex = next; saveAndRender(); toast('Skipped for today. Your template is unchanged.'); break; }
-    case 'select-next': workout.currentIndex = Number(target.dataset.index); saveAndRender(); break;
+    case 'select-next': {
+      workout.currentIndex = Number(target.dataset.index);
+      saveAndRender();
+      $('.active-exercise-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      break;
+    }
     case 'choose-exercise': renderAddExerciseModal(); break;
     case 'add-exercise-active': renderAddExerciseModal(); break;
     case 'add-active-item': addItemToActive(id); break;
@@ -990,7 +1142,8 @@ function handleAction(action, target) {
     case 'finish-workout': openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Finish this session?</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">Your workout will be marked complete. You can review it before saving it to history.</p><div class="modal-actions"><button class="button button-secondary" data-action="close-modal">KEEP WORKING OUT</button><button class="button button-primary" data-action="confirm-finish-workout">FINISH WORKOUT</button></div>`, 'confirm-finish-workout'); break;
     case 'confirm-finish-workout': closeModal(); finishWorkout(); break;
     case 'discard-workout': openModal(`<div class="modal-heading"><div><div class="eyebrow">ACTIVE WORKOUT</div><h2>Discard this session?</h2></div><button class="modal-close" data-action="close-modal">×</button></div><p class="modal-copy">This removes today’s progress. Your saved workout template won’t be changed.</p><div class="modal-actions"><button class="button button-secondary" data-action="close-modal">KEEP WORKING OUT</button><button class="button button-danger" data-action="confirm-discard">DISCARD SESSION</button></div>`, 'confirm-discard'); break;
-    case 'confirm-discard': closeModal(); Store.data.active = null; state.view = 'home'; saveAndRender(); toast('Session discarded.'); break;
+    case 'confirm-discard': closeModal(); Store.data.active = null; state.view = 'home'; saveAndRender(); window.scrollTo(0, 0); toast('Session discarded.'); break;
+    case 'save-active-workout': saveActiveWorkoutAsTemplate(); break;
     case 'save-completed': saveCompletedWorkout(); break;
     case 'finish-without-saving': Store.data.active = null; state.view = 'home'; saveAndRender(); toast('Workout finished without saving.'); break;
     case 'skip-onboarding': Store.data.user.onboarded = true; seedStarterWorkouts(); saveAndRender(); break;
@@ -1039,6 +1192,8 @@ function handleAction(action, target) {
       break;
     }
     case 'account-sign-out': signOutAccount(); break;
+    case 'open-history-session': showHistorySession(id); break;
+    case 'save-history-workout': saveHistoryWorkout(id); break;
     case 'remove-history': {
       const session = Store.data.history.find(item => item.id === id);
       if (!session) break;
@@ -1060,7 +1215,7 @@ function handleAction(action, target) {
   }
 }
 function renderQuickAdd() {
-  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK WORKOUT</div><h2>Add a movement</h2></div><button class="modal-close" data-action="close-modal">×</button></div><button class="button-plain quick-back-button" data-action="back-quick-preview">← BACK TO QUICK WORKOUT</button><p class="modal-copy">Pick an extra from your library.</p><div class="exercise-list">${EXERCISES.filter(item => !state.quickDraft.items.some(selected => selected.exerciseId === item.id)).slice(0, 18).map(item => `<div class="exercise-row"><div class="exercise-details"><strong>${safeText(item.name)}</strong><small>${item.parts.join(' · ')}</small></div><button class="button button-secondary button-small" data-action="add-to-quick" data-id="${item.id}">ADD</button></div>`).join('')}</div>`, 'quick-add');
+  openModal(`<div class="modal-heading"><div><div class="eyebrow">QUICK WORKOUT</div><h2>Add a movement</h2></div><button class="modal-close" data-action="close-modal">×</button></div><button class="button-plain quick-back-button" data-action="back-quick-preview">← BACK TO QUICK WORKOUT</button><p class="modal-copy">Pick an extra from your library.</p><div class="exercise-list">${ALPHABETICAL_EXERCISES.filter(item => !state.quickDraft.items.some(selected => selected.exerciseId === item.id)).slice(0, 18).map(item => `<div class="exercise-row"><div class="exercise-details"><strong>${safeText(item.name)}</strong><small>${item.parts.join(' · ')}</small></div><button class="button button-secondary button-small" data-action="add-to-quick" data-id="${item.id}">ADD</button></div>`).join('')}</div>`, 'quick-add');
   const backButton = $('.modal-heading .modal-close');
   backButton.className = 'button button-secondary button-small'; backButton.dataset.action = 'back-quick-preview'; backButton.textContent = '← BACK'; backButton.setAttribute('aria-label', 'Back to quick workout');
   $('.quick-back-button')?.remove();
@@ -1082,7 +1237,7 @@ document.addEventListener('click', event => {
   const viewButton = event.target.closest('[data-view]');
   if (viewButton) { setView(viewButton.dataset.view); return; }
   const category = event.target.closest('[data-category]');
-  if (category) { state.categoryFilter = category.dataset.category; render(); return; }
+  if (category) { state.categoryFilter = category.dataset.category; renderPreservingFilterPillPosition(); return; }
   const quickPart = event.target.closest('[data-quick-part]');
   if (quickPart) {
     const part = quickPart.dataset.quickPart, selected = new Set(Array.isArray(state.quickFocus) ? state.quickFocus : [state.quickFocus || 'Full Body']);
@@ -1123,10 +1278,11 @@ document.addEventListener('click', event => {
 document.addEventListener('input', event => {
   if (event.target.id === 'exercise-search') { state.query = event.target.value; const position = event.target.selectionStart; render(); const input = $('#exercise-search'); input.focus(); input.setSelectionRange(position, position); }
   if (event.target.id === 'add-exercise-search') refreshAddExerciseResults();
+  if (event.target.id === 'builder-exercise-search') updateBuilderFocusVisibility();
   if (event.target.id === 'quick-duration' && event.target.value === 'custom') $('#quick-custom-duration').style.display = '';
   if (event.target.matches('[data-builder-select]')) {
     const id = event.target.dataset.builderSelect, row = $(`[data-builder-row="${id}"]`);
-    row.classList.toggle('selected', event.target.checked); $$(`[data-builder-sets="${id}"], [data-builder-reps="${id}"]`).forEach(input => input.disabled = !event.target.checked); updateBuilderFromModal();
+    row?.classList.toggle('selected', event.target.checked); $$(`[data-builder-sets="${id}"], [data-builder-reps="${id}"]`).forEach(input => input.disabled = !event.target.checked); updateBuilderFromModal();
   }
   if (event.target.matches('[data-builder-sets], [data-builder-reps], #builder-name')) updateBuilderFromModal();
   const setField = event.target.closest('[data-set-field]');
