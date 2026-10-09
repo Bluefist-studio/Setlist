@@ -3,4 +3,11 @@ Bug and features:
 
 
 
-Before rebuilding, run npm.cmd ci, then npm.cmd run cap:sync; that reinstalls dependencies and regenerates www.
+Before rebuilding, run 
+npm.cmd ci, 
+then 
+
+
+npm.cmd run cap:sync 
+that reinstalls dependencies and regenerates www.
+run .\gradlew.bat assembleDebug
