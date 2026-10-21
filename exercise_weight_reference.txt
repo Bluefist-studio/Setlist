@@ -13,6 +13,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -20,7 +25,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A bodyweight pressing exercise targeting the chest, shoulders, and triceps.",
-    "howTo": "Start in a plank position with hands slightly wider than your shoulders. Lower your chest toward the floor, then push back up."
+    "howTo": "Start in a plank position with hands slightly wider than your shoulders. Lower your chest toward the floor, then push back up.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "incline-push-up",
@@ -33,8 +44,14 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Chest",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -43,7 +60,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An easier push-up variation performed with your hands elevated.",
-    "howTo": "Place your hands on a stable elevated surface and keep your body straight. Lower your chest toward the surface and push back up."
+    "howTo": "Place your hands on a stable elevated surface and keep your body straight. Lower your chest toward the surface and push back up.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Upper Chest"
   },
   {
     "id": "decline-push-up",
@@ -56,8 +79,14 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -66,7 +95,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A push-up variation with your feet elevated, increasing the challenge for your upper body.",
-    "howTo": "Place your feet on a stable elevated surface and hands on the floor. Lower your chest toward the floor and press back up."
+    "howTo": "Place your feet on a stable elevated surface and hands on the floor. Lower your chest toward the floor and press back up.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "bench-press",
@@ -79,17 +114,29 @@
     "equipment": [
       "Barbell"
     ],
+    "equipmentOptions": [["Barbell"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 45,
-    "defaultRestSeconds": 60,
+    "defaultRestSeconds": 120,
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A barbell pressing exercise primarily targeting the chest.",
-    "howTo": "Lie on the bench and lower the bar toward your chest. Press the bar upward until your arms are extended."
+    "howTo": "Lie on the bench and lower the bar toward your chest. Press the bar upward until your arms are extended.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "incline-bench-press",
@@ -102,17 +149,29 @@
     "equipment": [
       "Barbell"
     ],
+    "equipmentOptions": [["Barbell"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Chest",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 35,
-    "defaultRestSeconds": 60,
+    "defaultRestSeconds": 120,
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A bench press performed on an incline to emphasize the upper chest.",
-    "howTo": "Lie on an inclined bench and lower the bar toward your upper chest. Press the bar upward until your arms are extended."
+    "howTo": "Lie on an inclined bench and lower the bar toward your upper chest. Press the bar upward until your arms are extended.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Upper Chest"
   },
   {
     "id": "db-bench",
@@ -125,8 +184,14 @@
     "equipment": [
       "Dumbbells"
     ],
+    "equipmentOptions": [["Dumbbells"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -135,7 +200,13 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A chest press using two dumbbells instead of a barbell.",
-    "howTo": "Lie on a bench with a dumbbell in each hand. Lower the dumbbells toward your chest and press them back up."
+    "howTo": "Lie on a bench with a dumbbell in each hand. Lower the dumbbells toward your chest and press them back up.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "incline-dumbbell-press",
@@ -148,8 +219,14 @@
     "equipment": [
       "Dumbbells"
     ],
+    "equipmentOptions": [["Dumbbells"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Chest",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -158,7 +235,13 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A dumbbell press performed on an incline to emphasize the upper chest.",
-    "howTo": "Lie on an inclined bench with a dumbbell in each hand. Lower them toward your upper chest and press them upward."
+    "howTo": "Lie on an inclined bench with a dumbbell in each hand. Lower them toward your upper chest and press them upward.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Upper Chest"
   },
   {
     "id": "chest-fly",
@@ -169,8 +252,12 @@
     "equipment": [
       "Dumbbells"
     ],
+    "equipmentOptions": [["Dumbbells"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -179,7 +266,10 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "An isolation exercise that works the chest through a wide arm movement.",
-    "howTo": "Lie on a bench with dumbbells above your chest. Slowly lower your arms out to the sides, then bring them back together."
+    "howTo": "Lie on a bench with dumbbells above your chest. Slowly lower your arms out to the sides, then bring them back together.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "band-chest-press",
@@ -192,8 +282,14 @@
     "equipment": [
       "Resistance bands"
     ],
+    "equipmentOptions": [["Resistance bands"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -202,7 +298,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A chest pressing movement using resistance bands.",
-    "howTo": "Anchor the band behind you and press your hands forward until your arms are extended. Return under control."
+    "howTo": "Anchor the band behind you and press your hands forward until your arms are extended. Return under control.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "band-chest-fly",
@@ -213,8 +315,12 @@
     "equipment": [
       "Resistance bands"
     ],
+    "equipmentOptions": [["Resistance bands"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -223,7 +329,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A chest isolation exercise using resistance bands.",
-    "howTo": "With the bands anchored behind you, bring your hands together in front of your chest. Slowly return to the starting position."
+    "howTo": "With the bands anchored behind you, bring your hands together in front of your chest. Slowly return to the starting position.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "machine-chest-press",
@@ -239,6 +348,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 20,
@@ -246,7 +360,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A machine-based pressing exercise targeting the chest and triceps.",
-    "howTo": "Sit with your back against the pad and press the handles forward. Return the handles slowly."
+    "howTo": "Sit with your back against the pad and press the handles forward. Return the handles slowly.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "dips",
@@ -259,8 +379,14 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Triceps",
+      "Front Delts"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
@@ -269,7 +395,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A bodyweight pushing exercise targeting the chest and triceps.",
-    "howTo": "Support yourself on parallel bars and lower your body by bending your elbows. Press yourself back up."
+    "howTo": "Support yourself on parallel bars and lower your body by bending your elbows. Press yourself back up.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Pectorals"
   },
   {
     "id": "pull-up",
@@ -282,8 +414,15 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Lats",
+      "Upper Back",
+      "Trapezius",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 6,
@@ -292,7 +431,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A bodyweight pulling exercise that primarily targets the upper back and lats.",
-    "howTo": "Hang from the bar with your palms facing away. Pull your chest toward the bar, then lower yourself with control."
+    "howTo": "Hang from the bar with your palms facing away. Pull your chest toward the bar, then lower yourself with control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Lats"
   },
   {
     "id": "chin-up",
@@ -304,8 +449,13 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Lats",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 6,
@@ -314,7 +464,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A pulling exercise using an underhand grip with strong involvement from the biceps.",
-    "howTo": "Grip the bar with your palms facing toward you. Pull your chin over the bar, then lower yourself under control."
+    "howTo": "Grip the bar with your palms facing toward you. Pull your chin over the bar, then lower yourself under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Lats"
   },
   {
     "id": "inverted-row",
@@ -327,8 +482,15 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -337,7 +499,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A horizontal bodyweight pulling exercise for the back and arms.",
-    "howTo": "Position yourself under a secure horizontal bar and pull your chest toward it while keeping your body straight."
+    "howTo": "Position yourself under a secure horizontal bar and pull your chest toward it while keeping your body straight.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "lat-pulldown",
@@ -347,10 +515,14 @@
       "Arms"
     ],
     "equipment": [
-      "Machines"
+      "Cable Machine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Lats",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -359,7 +531,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A machine exercise that primarily targets the lat muscles of the back.",
-    "howTo": "Pull the bar down toward your upper chest while keeping your torso relatively upright. Slowly return the bar upward."
+    "howTo": "Pull the bar down toward your upper chest while keeping your torso relatively upright. Slowly return the bar upward.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Lats"
   },
   {
     "id": "barbell-row",
@@ -375,6 +552,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 35,
@@ -382,7 +565,13 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A compound pulling exercise targeting the back and arms.",
-    "howTo": "Hinge forward while keeping your back stable. Pull the bar toward your lower ribs, then lower it under control."
+    "howTo": "Hinge forward while keeping your back stable. Pull the bar toward your lower ribs, then lower it under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "db-row",
@@ -397,6 +586,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 15,
@@ -404,7 +599,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A single-arm pulling exercise targeting the back and arms.",
-    "howTo": "Support yourself with one hand and pull the dumbbell toward your hip. Lower it slowly and repeat."
+    "howTo": "Complete the prescribed reps per arm, supporting yourself with your free hand. Pull the dumbbell toward your hip, then lower it slowly. Switch arms after each set.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Lats"
   },
   {
     "id": "kb-row",
@@ -420,6 +620,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 20,
@@ -427,7 +633,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A pulling exercise that targets the upper back and lats.",
-    "howTo": "Hinge forward with a stable back and pull the kettlebell toward your hip. Lower it under control."
+    "howTo": "Hinge forward with a stable back and pull the kettlebell toward your hip. Lower it under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Lats"
   },
   {
     "id": "cable-row",
@@ -437,10 +649,16 @@
       "Arms"
     ],
     "equipment": [
-      "Machines"
+      "Cable Machine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -449,7 +667,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A seated pulling exercise targeting the middle and upper back.",
-    "howTo": "Pull the handle toward your torso while keeping your back controlled. Slowly extend your arms again."
+    "howTo": "Pull the handle toward your torso while keeping your back controlled. Slowly extend your arms again.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "machine-row",
@@ -464,6 +687,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 30,
@@ -471,7 +700,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A machine-based horizontal pulling exercise for the back.",
-    "howTo": "Sit against the pad and pull the handles toward your torso. Return them slowly to the starting position."
+    "howTo": "Sit against the pad and pull the handles toward your torso. Return them slowly to the starting position.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "face-pull",
@@ -482,10 +716,16 @@
     ],
     "equipment": [
       "Resistance bands",
-      "Machines"
+      "Cable Machine"
     ],
+    "equipmentOptions": [["Resistance bands"], ["Cable Machine"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Rear Delts",
+      "Upper Back",
+      "Trapezius"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -494,7 +734,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A pulling exercise targeting the upper back and rear shoulders.",
-    "howTo": "Pull the band or cable toward your face while driving your elbows outward. Slowly return to the starting position."
+    "howTo": "Pull the band or cable toward your face while driving your elbows outward. Slowly return to the starting position.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Back"
+    ],
+    "mainMuscle": "Rear Delts"
   },
   {
     "id": "band-row",
@@ -506,8 +751,15 @@
     "equipment": [
       "Resistance bands"
     ],
+    "equipmentOptions": [["Resistance bands"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -516,7 +768,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A rowing movement using resistance bands to train the back.",
-    "howTo": "Anchor the band in front of you and pull your hands toward your torso. Return slowly."
+    "howTo": "Anchor the band in front of you and pull your hands toward your torso. Return slowly.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "straight-arm-pulldown",
@@ -526,10 +783,14 @@
     ],
     "equipment": [
       "Resistance bands",
-      "Machines"
+      "Cable Machine"
     ],
+    "equipmentOptions": [["Resistance bands"], ["Cable Machine"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Lats"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -538,10 +799,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A back isolation exercise emphasizing the lats.",
-    "howTo": "Keep your arms mostly straight and pull the band or cable down toward your thighs. Return slowly."
+    "howTo": "Keep your arms mostly straight and pull the band or cable down toward your thighs. Return slowly.",
+    "mainFocus": "Back",
+    "secondaryFocus": [],
+    "mainMuscle": "Lats"
   },
   {
-    "id": "overhead-squat",
+    "id": "overhead-press",
     "name": "Overhead Press",
     "bodyParts": [
       "Shoulders",
@@ -554,6 +818,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Triceps",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 25,
@@ -561,11 +831,18 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A compound pressing exercise primarily targeting the shoulders.",
-    "howTo": "Start with the bar at shoulder height and press it overhead until your arms are extended. Lower it under control."
+    "howTo": "Start with the bar at shoulder height and press it overhead until your arms are extended. Lower it under control.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "dumbbell-shoulder-press",
     "name": "Dumbbell Shoulder Press",
+    "variationGroup": "overhead-shoulder-press",
     "bodyParts": [
       "Shoulders",
       "Arms"
@@ -576,6 +853,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Triceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
@@ -583,11 +865,17 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A shoulder pressing exercise performed with dumbbells.",
-    "howTo": "Hold the dumbbells at shoulder height and press them overhead. Lower them back to shoulder level."
+    "howTo": "Hold the dumbbells at shoulder height and press them overhead. Lower them back to shoulder level.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "kb-press",
     "name": "Kettlebell Press",
+    "variationGroup": "overhead-shoulder-press",
     "bodyParts": [
       "Shoulders",
       "Arms",
@@ -599,6 +887,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Triceps",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 15,
@@ -606,7 +900,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A single-arm overhead press using a kettlebell.",
-    "howTo": "Hold the kettlebell at shoulder height and press it overhead. Lower it slowly back to the starting position."
+    "howTo": "Complete the prescribed reps per arm. Hold the kettlebell at shoulder height and press it overhead, then lower it slowly. Switch arms after each set.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "arnold-press",
@@ -621,6 +921,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Triceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 8,
@@ -628,7 +933,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A dumbbell shoulder press that combines rotation with the pressing movement.",
-    "howTo": "Start with palms facing you at shoulder height. Rotate your palms outward as you press the dumbbells overhead."
+    "howTo": "Start with palms facing you at shoulder height. Rotate your palms outward as you press the dumbbells overhead.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "lateral-raise",
@@ -643,6 +953,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Side Delts"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
     "defaultWeight": 5,
@@ -650,7 +963,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An isolation exercise targeting the side of the shoulders.",
-    "howTo": "Raise your arms out to the sides until roughly shoulder height. Lower them slowly."
+    "howTo": "Raise your arms out to the sides until roughly shoulder height. Lower them slowly.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [],
+    "mainMuscle": "Side Delts"
   },
   {
     "id": "front-raise",
@@ -665,6 +981,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Front Delts"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
     "defaultWeight": 5,
@@ -672,7 +991,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An isolation exercise targeting the front of the shoulders.",
-    "howTo": "Raise your arms in front of you to about shoulder height. Lower them slowly."
+    "howTo": "Raise your arms in front of you to about shoulder height. Lower them slowly.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "rear-delt-fly",
@@ -688,6 +1010,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Rear Delts",
+      "Upper Back",
+      "Trapezius"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
     "defaultWeight": 5,
@@ -695,7 +1022,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An exercise targeting the rear shoulders and upper back.",
-    "howTo": "Hinge forward and raise your arms out to the sides. Lower them slowly while keeping your torso stable."
+    "howTo": "Hinge forward and raise your arms out to the sides. Lower them slowly while keeping your torso stable.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Back"
+    ],
+    "mainMuscle": "Rear Delts"
   },
   {
     "id": "band-pull-apart",
@@ -711,6 +1043,11 @@
       "Strength",
       "Mobility"
     ],
+    "muscles": [
+      "Rear Delts",
+      "Upper Back",
+      "Trapezius"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -718,7 +1055,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A light resistance exercise for the rear shoulders and upper back.",
-    "howTo": "Hold the band in front of you and pull your hands apart until the band reaches your chest. Return slowly."
+    "howTo": "Hold the band in front of you and pull your hands apart until the band reaches your chest. Return slowly.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Back"
+    ],
+    "mainMuscle": "Rear Delts"
   },
   {
     "id": "bicep-curl",
@@ -734,6 +1076,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 8,
@@ -741,7 +1086,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An isolation exercise targeting the biceps.",
-    "howTo": "Keep your elbows close to your sides and curl the weight toward your shoulders. Lower it slowly."
+    "howTo": "Keep your elbows close to your sides and curl the weight toward your shoulders. Lower it slowly.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Biceps"
   },
   {
     "id": "hammer-curl",
@@ -756,6 +1104,10 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Biceps",
+      "Forearms & Grip"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 8,
@@ -763,7 +1115,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A biceps and forearm exercise using a neutral hand position.",
-    "howTo": "Keep your palms facing each other and curl the weights toward your shoulders. Lower them slowly."
+    "howTo": "Keep your palms facing each other and curl the weights toward your shoulders. Lower them slowly.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Biceps"
   },
   {
     "id": "barbell-curl",
@@ -777,6 +1132,10 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Biceps",
+      "Forearms & Grip"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 20,
@@ -784,7 +1143,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A barbell isolation exercise for the biceps.",
-    "howTo": "Hold the bar with an underhand grip and curl it toward your shoulders. Lower it under control."
+    "howTo": "Hold the bar with an underhand grip and curl it toward your shoulders. Lower it under control.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Biceps"
   },
   {
     "id": "concentration-curl",
@@ -798,6 +1160,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Biceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 8,
@@ -805,7 +1170,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A seated single-arm curl that focuses on the biceps.",
-    "howTo": "Rest your upper arm against your inner thigh and curl the dumbbell toward your shoulder. Lower it slowly."
+    "howTo": "Complete the prescribed reps per arm. Rest your upper arm against your inner thigh and curl the dumbbell toward your shoulder, then lower it slowly. Switch arms after each set.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Biceps"
   },
   {
     "id": "tricep-pushdown",
@@ -814,11 +1182,14 @@
       "Arms"
     ],
     "equipment": [
-      "Machines",
+      "Cable Machine",
       "Resistance bands"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -827,7 +1198,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An isolation exercise targeting the triceps.",
-    "howTo": "Keep your elbows close to your sides and push the handle or band downward. Return under control."
+    "howTo": "Keep your elbows close to your sides and push the handle or band downward. Return under control.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Triceps"
   },
   {
     "id": "overhead-tricep-extension",
@@ -843,6 +1217,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Triceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 8,
@@ -850,7 +1227,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An isolation exercise that targets the triceps from an overhead position.",
-    "howTo": "Hold the weight overhead and bend your elbows to lower it behind your head. Extend your arms to return."
+    "howTo": "Hold the weight overhead and bend your elbows to lower it behind your head. Extend your arms to return.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Triceps"
   },
   {
     "id": "skull-crusher",
@@ -861,8 +1241,12 @@
     "equipment": [
       "Barbell"
     ],
+    "equipmentOptions": [["Barbell"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -871,7 +1255,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A lying triceps exercise performed with a barbell.",
-    "howTo": "Lie on a bench and hold the bar above your chest. Bend your elbows to lower the bar toward your forehead, then extend your arms."
+    "howTo": "Lie on a bench and hold the bar above your chest. Bend your elbows to lower the bar toward your forehead, then extend your arms.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Triceps"
   },
   {
     "id": "close-grip-push-up",
@@ -886,6 +1273,10 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Triceps",
+      "Pectorals"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -893,7 +1284,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A push-up variation that places more emphasis on the triceps.",
-    "howTo": "Place your hands closer together than a standard push-up. Lower your chest and press back up."
+    "howTo": "Place your hands closer together than a standard push-up. Lower your chest and press back up.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [
+      "Chest"
+    ],
+    "mainMuscle": "Triceps"
   },
   {
     "id": "bodyweight-squat",
@@ -908,6 +1304,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -915,7 +1316,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A basic lower-body movement using only bodyweight.",
-    "howTo": "Sit your hips back and bend your knees to lower your body. Drive through your feet to stand back up."
+    "howTo": "Sit your hips back and bend your knees to lower your body. Drive through your feet to stand back up.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "goblet-squat",
@@ -931,6 +1337,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 15,
@@ -938,7 +1349,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A squat variation performed while holding a weight in front of your chest.",
-    "howTo": "Hold the weight close to your chest and squat down while keeping your torso upright. Stand back up."
+    "howTo": "Hold the weight close to your chest and squat down while keeping your torso upright. Stand back up.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "back-squat",
@@ -953,14 +1369,24 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 45,
-    "defaultRestSeconds": 60,
+    "defaultRestSeconds": 120,
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A barbell squat with the bar positioned across your upper back.",
-    "howTo": "Place the bar across your upper back and squat down by bending your hips and knees. Drive through your feet to stand."
+    "howTo": "Place the bar across your upper back and squat down by bending your hips and knees. Drive through your feet to stand.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "front-squat",
@@ -975,14 +1401,24 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 35,
-    "defaultRestSeconds": 60,
+    "defaultRestSeconds": 120,
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A barbell squat with the weight held in front of the body.",
-    "howTo": "Hold the bar across the front of your shoulders and squat down. Keep your torso upright as you stand back up."
+    "howTo": "Hold the bar across the front of your shoulders and squat down. Keep your torso upright as you stand back up.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "romanian-deadlift",
@@ -999,6 +1435,12 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Hamstrings",
+      "Glutes",
+      "Lower Back",
+      "Erector Spinae"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 30,
@@ -1006,7 +1448,12 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A hip-hinge exercise emphasizing the hamstrings and glutes.",
-    "howTo": "Keep the weight close to your body and push your hips backward while keeping your back stable. Drive your hips forward to stand."
+    "howTo": "Keep the weight close to your body and push your hips backward while keeping your back stable. Drive your hips forward to stand.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back"
+    ],
+    "mainMuscle": "Hamstrings"
   },
   {
     "id": "deadlift",
@@ -1022,14 +1469,28 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Lower Back",
+      "Erector Spinae",
+      "Forearms & Grip"
+    ],
     "defaultSets": 3,
     "defaultReps": 5,
     "defaultWeight": 45,
-    "defaultRestSeconds": 60,
+    "defaultRestSeconds": 120,
     "estimatedTime": 8,
     "unit": "reps",
     "description": "A compound lift involving the legs, hips, back, and core.",
-    "howTo": "Start with the bar near your shins and lift by driving through your feet while extending your hips. Lower the bar under control."
+    "howTo": "Start with the bar near your shins and lift by driving through your feet while extending your hips. Lower the bar under control.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Core",
+      "Arms"
+    ],
+    "mainMuscle": "Glutes"
   },
   {
     "id": "reverse-lunge",
@@ -1046,6 +1507,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1053,7 +1519,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A single-leg exercise that works the legs and challenges balance.",
-    "howTo": "Step one foot backward and lower your body toward the floor. Push through the front foot to return to standing."
+    "howTo": "Perform the prescribed reps per leg. Step one foot backward and lower your body toward the floor. Push through the front foot to return to standing, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "walking-lunge",
@@ -1070,6 +1541,11 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1077,7 +1553,42 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A moving lunge exercise that trains the legs and balance.",
-    "howTo": "Step forward into a lunge, then bring the rear leg forward into the next lunge. Continue alternating legs."
+    "howTo": "Complete the prescribed reps per leg, alternating legs as you step forward into each lunge.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
+  },
+  {
+    "id": "side-lunge",
+    "name": "Side Lunge",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Adductors",
+      "Glutes",
+      "Quadriceps",
+      "Hamstrings"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A lateral lunge that trains the legs, with strong involvement from the inner thighs and glutes.",
+    "howTo": "Perform the prescribed reps per side. Stand with your feet apart, shift your hips to one side, and bend that knee while keeping the other leg extended. Push through the bent leg to return to standing, then switch sides.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Adductors"
   },
   {
     "id": "bulgarian-split-squat",
@@ -1091,8 +1602,14 @@
       "Dumbbells",
       "Kettlebell"
     ],
+    "equipmentOptions": [["Bodyweight"], ["Dumbbells"], ["Kettlebell"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
@@ -1101,7 +1618,12 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A single-leg squat variation with the rear foot elevated.",
-    "howTo": "Place one foot behind you on an elevated surface and lower your body toward the floor. Push through the front foot to rise."
+    "howTo": "Perform the prescribed reps per leg. Place one foot behind you on an elevated surface and lower your body toward the floor. Push through the front foot to rise, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "step-up",
@@ -1115,8 +1637,14 @@
       "Dumbbells",
       "Kettlebell"
     ],
+    "equipmentOptions": [["Bodyweight"], ["Dumbbells"], ["Kettlebell"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1125,7 +1653,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A single-leg exercise performed by stepping onto an elevated surface.",
-    "howTo": "Place one foot on the platform and drive through that leg to step up. Step back down under control."
+    "howTo": "Perform the prescribed reps per leg. Place one foot on the platform and drive through that leg to step up. Step back down under control, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "leg-press",
@@ -1139,6 +1672,10 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 50,
@@ -1146,7 +1683,10 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A machine-based exercise targeting the major muscles of the legs.",
-    "howTo": "Place your feet on the platform and bend your knees to lower the weight. Press through your feet to extend your legs."
+    "howTo": "Place your feet on the platform and bend your knees to lower the weight. Press through your feet to extend your legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "leg-extension",
@@ -1160,6 +1700,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Quadriceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
     "defaultWeight": 20,
@@ -1167,7 +1710,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A machine isolation exercise targeting the quadriceps.",
-    "howTo": "Sit against the pad and extend your knees to raise the weight. Lower it slowly."
+    "howTo": "Sit against the pad and extend your knees to raise the weight. Lower it slowly.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "leg-curl",
@@ -1181,6 +1727,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Hamstrings"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
     "defaultWeight": 20,
@@ -1188,7 +1737,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A machine isolation exercise targeting the hamstrings.",
-    "howTo": "Bend your knees to pull the machine pad toward your body. Slowly return to the starting position."
+    "howTo": "Bend your knees to pull the machine pad toward your body. Slowly return to the starting position.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Hamstrings"
   },
   {
     "id": "calf-raise",
@@ -1205,6 +1757,9 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Calves"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -1212,7 +1767,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An exercise that targets the calf muscles.",
-    "howTo": "Rise onto the balls of your feet, lifting your heels as high as comfortable. Lower your heels slowly."
+    "howTo": "Rise onto the balls of your feet, lifting your heels as high as comfortable. Lower your heels slowly.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Calves"
   },
   {
     "id": "plank",
@@ -1226,6 +1784,10 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Deep Core",
+      "Abs"
+    ],
     "defaultSets": 3,
     "defaultReps": 30,
     "defaultWeight": 0,
@@ -1233,7 +1795,259 @@
     "estimatedTime": 4,
     "unit": "seconds",
     "description": "A static core exercise that trains the muscles responsible for keeping your torso stable.",
-    "howTo": "Support your body on your forearms and toes while keeping your body in a straight line. Hold the position."
+    "howTo": "Support your body on your forearms and toes while keeping your body in a straight line. Hold the position.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Deep Core"
+  },
+  {
+    "id": "spider-man-plank",
+    "name": "Spider-Man Plank",
+    "bodyParts": [
+      "Core",
+      "Shoulders",
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Core",
+      "Conditioning"
+    ],
+    "muscles": [
+      "Deep Core",
+      "Obliques",
+      "Front Delts",
+      "Quadriceps"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 4,
+    "unit": "reps",
+    "description": "A dynamic plank variation that brings each knee toward the same-side elbow to challenge core stability.",
+    "howTo": "Start in a high plank with your body straight and hands under your shoulders. Bring one knee toward the outside of the same-side elbow without twisting your hips, return to plank, and alternate sides.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Legs"
+    ],
+    "mainMuscle": "Deep Core"
+  },
+  {
+    "id": "spider-man-lunge",
+    "name": "Spider-Man Lunge",
+    "bodyParts": [
+      "Legs",
+      "Hips",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength",
+      "Mobility"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings",
+      "Adductors",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A deep lunge and hip-opening movement that combines lower-body strength with controlled mobility.",
+    "howTo": "Step one foot forward into a deep lunge and place both hands on the floor inside the front foot. Keep your back leg extended and chest lifted, pause comfortably, then step back and switch sides.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
+  },
+  {
+    "id": "medicine-ball-slam",
+    "name": "Medicine Ball Slam",
+    "bodyParts": [
+      "Full Body",
+      "Core",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Medicine Ball"
+    ],
+    "categories": [
+      "Power",
+      "Conditioning"
+    ],
+    "muscles": [
+      "Abs",
+      "Obliques",
+      "Front Delts",
+      "Lats"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 6,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A full-body power exercise that drives a medicine ball forcefully into the floor.",
+    "howTo": "Stand with feet about shoulder-width apart and hold the ball overhead. Brace your core, hinge slightly, and slam the ball into the floor in front of you. Retrieve it with control and repeat.",
+    "mainFocus": "Full Body",
+    "secondaryFocus": [
+      "Core",
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Abs"
+  },
+  {
+    "id": "medicine-ball-wall-ball",
+    "name": "Medicine Ball Wall Ball",
+    "bodyParts": [
+      "Legs",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Medicine Ball"
+    ],
+    "categories": [
+      "Strength",
+      "Conditioning"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 5,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A squat-to-throw exercise that sends a medicine ball toward a high wall target.",
+    "howTo": "Face a sturdy wall while holding the ball at chest height. Squat until your thighs are near parallel, stand powerfully, and throw the ball toward a high target. Catch it softly and descend into the next squat.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
+  },
+  {
+    "id": "medicine-ball-russian-twist",
+    "name": "Medicine Ball Russian Twist",
+    "bodyParts": [
+      "Core"
+    ],
+    "equipment": [
+      "Medicine Ball"
+    ],
+    "categories": [
+      "Core"
+    ],
+    "muscles": [
+      "Obliques",
+      "Abs"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 4,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A seated rotational core exercise performed while holding a medicine ball.",
+    "howTo": "Sit with knees bent and lean back slightly while keeping your spine long. Hold the ball close to your torso and rotate your shoulders from side to side under control.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Obliques"
+  },
+  {
+    "id": "medicine-ball-chest-pass",
+    "name": "Medicine Ball Chest Pass",
+    "bodyParts": [
+      "Chest",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Medicine Ball"
+    ],
+    "categories": [
+      "Power"
+    ],
+    "muscles": [
+      "Pectorals",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 4,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An explosive horizontal throw that trains pressing power through the chest and arms.",
+    "howTo": "Stand facing a sturdy wall with the ball held at your chest. Brace your core and explosively pass the ball straight forward into the wall. Catch it softly and reset before each throw.",
+    "mainFocus": "Chest",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Pectorals"
+  },
+  {
+    "id": "medicine-ball-overhead-throw",
+    "name": "Medicine Ball Overhead Throw",
+    "bodyParts": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Medicine Ball"
+    ],
+    "categories": [
+      "Power"
+    ],
+    "muscles": [
+      "Front Delts",
+      "Triceps",
+      "Abs",
+      "Lats"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 4,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An explosive overhead throw that develops upper-body power and trunk coordination.",
+    "howTo": "Stand facing a sturdy wall with feet stable and hold the ball overhead. Brace your core, bring the ball slightly behind your head without arching your back, then throw it forward into the wall. Retrieve it under control.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "side-plank",
@@ -1247,6 +2061,10 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Obliques",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 30,
     "defaultWeight": 0,
@@ -1254,7 +2072,10 @@
     "estimatedTime": 4,
     "unit": "seconds",
     "description": "A static exercise that emphasizes the sides of the core.",
-    "howTo": "Support yourself on one forearm and the side of your foot. Keep your body straight and hold the position."
+    "howTo": "Support yourself on one forearm and the side of your foot. Keep your body straight and hold for the prescribed time, then repeat on the other side.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Obliques"
   },
   {
     "id": "dead-bug",
@@ -1268,6 +2089,10 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Deep Core",
+      "Abs"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1275,7 +2100,10 @@
     "estimatedTime": 4,
     "unit": "reps",
     "description": "A core stability exercise that trains control while moving the arms and legs.",
-    "howTo": "Lie on your back with arms and legs raised. Slowly extend the opposite arm and leg while keeping your lower back controlled."
+    "howTo": "Complete the prescribed reps per side, alternating sides. Lie on your back with arms and legs raised, then slowly extend the opposite arm and leg while keeping your lower back controlled.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Deep Core"
   },
   {
     "id": "bird-dog",
@@ -1290,6 +2118,11 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Deep Core",
+      "Lower Back",
+      "Glutes"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1297,7 +2130,12 @@
     "estimatedTime": 4,
     "unit": "reps",
     "description": "A core stability exercise performed from a hands-and-knees position.",
-    "howTo": "Extend one arm and the opposite leg while keeping your torso stable. Return to the starting position and switch sides."
+    "howTo": "Complete the prescribed reps per side, alternating sides. Extend one arm and the opposite leg while keeping your torso stable, then return to the starting position.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Back"
+    ],
+    "mainMuscle": "Deep Core"
   },
   {
     "id": "crunch",
@@ -1311,6 +2149,9 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Abs"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -1318,7 +2159,10 @@
     "estimatedTime": 4,
     "unit": "reps",
     "description": "A basic abdominal exercise using a short curling motion.",
-    "howTo": "Lie on your back with knees bent. Lift your shoulders toward your knees, then lower back down."
+    "howTo": "Lie on your back with knees bent. Lift your shoulders toward your knees, then lower back down.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Abs"
   },
   {
     "id": "bicycle-crunch",
@@ -1332,6 +2176,10 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Abs",
+      "Obliques"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -1339,7 +2187,10 @@
     "estimatedTime": 4,
     "unit": "reps",
     "description": "An abdominal exercise combining trunk rotation with alternating leg movement.",
-    "howTo": "Lie on your back and alternate bringing each elbow toward the opposite knee while extending the other leg."
+    "howTo": "Lie on your back and alternate bringing each elbow toward the opposite knee while extending the other leg.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Abs"
   },
   {
     "id": "hanging-knee-raise",
@@ -1350,8 +2201,13 @@
     "equipment": [
       "Bodyweight"
     ],
+    "equipmentOptions": [["Bodyweight"]],
     "categories": [
       "Core"
+    ],
+    "muscles": [
+      "Abs",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1360,7 +2216,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A hanging core exercise performed by raising the knees toward the torso.",
-    "howTo": "Hang from a bar and raise your knees toward your chest. Lower your legs slowly."
+    "howTo": "Hang from a bar and raise your knees toward your chest. Lower your legs slowly.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Abs"
   },
   {
     "id": "leg-raise",
@@ -1374,6 +2233,10 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Abs",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1381,7 +2244,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A core exercise performed by raising the legs while lying down.",
-    "howTo": "Lie on your back and raise your legs upward. Lower them slowly without losing control of your lower back."
+    "howTo": "Lie on your back and raise your legs upward. Lower them slowly without losing control of your lower back.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Abs"
   },
   {
     "id": "pallof-press",
@@ -1391,10 +2257,15 @@
     ],
     "equipment": [
       "Resistance bands",
-      "Machines"
+      "Cable Machine"
     ],
+    "equipmentOptions": [["Resistance bands"], ["Cable Machine"]],
     "categories": [
       "Core"
+    ],
+    "muscles": [
+      "Obliques",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1403,7 +2274,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A core stability exercise that challenges you to resist rotation.",
-    "howTo": "Stand sideways to the anchor and hold the band at your chest. Press your hands straight forward while resisting the pull."
+    "howTo": "Stand sideways to the anchor and hold the band at your chest. Press your hands straight forward while resisting the pull.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Obliques"
   },
   {
     "id": "russian-twist",
@@ -1419,14 +2293,21 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Obliques",
+      "Abs"
+    ],
     "defaultSets": 3,
     "defaultReps": 12,
-    "defaultWeight": 0,
+    "defaultWeight": 5,
     "defaultRestSeconds": 60,
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A seated core exercise involving controlled rotation of the torso.",
-    "howTo": "Sit with your knees bent and rotate your torso from side to side. Hold a weight if desired."
+    "howTo": "Sit with your knees bent and rotate your torso from side to side. Hold a weight if desired.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Obliques"
   },
   {
     "id": "weighted-sit-up",
@@ -1441,6 +2322,9 @@
     "categories": [
       "Core"
     ],
+    "muscles": [
+      "Abs"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 5,
@@ -1448,16 +2332,19 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A sit-up performed while holding additional weight.",
-    "howTo": "Lie on your back holding the weight near your chest. Sit up by curling your torso forward, then lower back down."
+    "howTo": "Lie on your back holding the weight near your chest. Sit up by curling your torso forward, then lower back down.",
+    "mainFocus": "Core",
+    "secondaryFocus": [],
+    "mainMuscle": "Abs"
   },
   {
     "id": "kb-swing",
     "name": "Kettlebell Swing",
+    "variationGroup": "hip-hinge-swing",
     "bodyParts": [
       "Legs",
       "Back",
-      "Core",
-      "Shoulders"
+      "Core"
     ],
     "equipment": [
       "Kettlebell"
@@ -1466,6 +2353,13 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Deep Core",
+      "Lower Back",
+      "Erector Spinae"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 15,
@@ -1473,7 +2367,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A dynamic hip-hinge exercise that trains the hips, legs, back, and core.",
-    "howTo": "Swing the kettlebell between your legs and drive your hips forward to bring it up to about chest height."
+    "howTo": "Swing the kettlebell between your legs and drive your hips forward to bring it up to about chest height.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Core"
+    ],
+    "mainMuscle": "Glutes"
   },
   {
     "id": "turkish-get-up",
@@ -1492,6 +2392,11 @@
       "Strength",
       "Mobility"
     ],
+    "muscles": [
+      "Deep Core",
+      "Side Delts",
+      "Glutes"
+    ],
     "defaultSets": 3,
     "defaultReps": 3,
     "defaultWeight": 10,
@@ -1499,11 +2404,18 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A full-body movement that combines strength, stability, and controlled transitions from the floor to standing.",
-    "howTo": "Start lying down while holding the weight overhead and move through a series of controlled positions until standing. Reverse the movement to return to the floor."
+    "howTo": "Complete 3 reps per side, alternating sides. Start lying down while holding the weight overhead and move through a series of controlled positions until standing. Reverse the movement to return to the floor.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Legs"
+    ],
+    "mainMuscle": "Deep Core"
   },
   {
     "id": "kettlebell-clean",
     "name": "Kettlebell Clean",
+    "variationGroup": "single-arm-clean",
     "bodyParts": [
       "Legs",
       "Back",
@@ -1517,6 +2429,12 @@
       "Strength",
       "Power"
     ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Front Delts",
+      "Forearms & Grip"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 15,
@@ -1524,11 +2442,19 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A dynamic movement that brings a kettlebell from the floor or between the legs to the shoulder.",
-    "howTo": "Drive through your hips to swing the kettlebell upward and guide it into the rack position at your shoulder."
+    "howTo": "Complete the prescribed reps per arm. Drive through your hips to swing the kettlebell upward and guide it into the rack position at your shoulder. Switch arms after each set.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Glutes"
   },
   {
     "id": "kettlebell-snatch",
     "name": "Kettlebell Snatch",
+    "variationGroup": "single-arm-snatch",
     "bodyParts": [
       "Legs",
       "Back",
@@ -1544,6 +2470,13 @@
       "Power",
       "Conditioning"
     ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Front Delts",
+      "Deep Core",
+      "Forearms & Grip"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 10,
@@ -1551,7 +2484,15 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A dynamic full-body movement that drives a kettlebell from the swing position overhead.",
-    "howTo": "Use your hips to drive the kettlebell upward and guide it smoothly overhead. Lower it under control."
+    "howTo": "Complete the prescribed reps per arm. Use your hips to drive the kettlebell upward and guide it smoothly overhead. Lower it under control, then switch arms.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Glutes"
   },
   {
     "id": "burpee",
@@ -1565,6 +2506,13 @@
     "categories": [
       "Conditioning"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Pectorals",
+      "Front Delts",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 0,
@@ -1572,7 +2520,14 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A full-body conditioning exercise combining a squat, plank position, and jump.",
-    "howTo": "Squat down, place your hands on the floor, move your feet back, then return to standing and jump."
+    "howTo": "Squat down, place your hands on the floor, move your feet back, then return to standing and jump.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Chest",
+      "Shoulders",
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "mountain-climber",
@@ -1588,6 +2543,11 @@
     "categories": [
       "Conditioning"
     ],
+    "muscles": [
+      "Deep Core",
+      "Front Delts",
+      "Quadriceps"
+    ],
     "defaultSets": 3,
     "defaultReps": 20,
     "defaultWeight": 0,
@@ -1595,7 +2555,13 @@
     "estimatedTime": 4,
     "unit": "reps",
     "description": "A dynamic bodyweight exercise that challenges the core and raises your heart rate.",
-    "howTo": "Start in a plank position and alternate driving your knees toward your chest."
+    "howTo": "Complete the prescribed reps per leg, alternating knees toward your chest from a plank position.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Legs"
+    ],
+    "mainMuscle": "Deep Core"
   },
   {
     "id": "farmer-carry",
@@ -1613,6 +2579,10 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Forearms & Grip",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 30,
     "defaultWeight": 15,
@@ -1620,11 +2590,17 @@
     "estimatedTime": 5,
     "unit": "seconds",
     "description": "A loaded carry that trains grip, core stability, and full-body strength.",
-    "howTo": "Hold a weight in each hand and walk while keeping your torso upright and controlled."
+    "howTo": "Hold a weight in each hand and walk while keeping your torso upright and controlled.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Forearms & Grip"
   },
   {
     "id": "kettlebell-clean-press",
     "name": "Kettlebell Clean & Press",
+    "variationGroup": "single-arm-clean-and-press",
     "bodyParts": [
       "Full Body",
       "Shoulders",
@@ -1638,6 +2614,13 @@
       "Strength",
       "Power"
     ],
+    "muscles": [
+      "Glutes",
+      "Quadriceps",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 6,
     "defaultWeight": 10,
@@ -1645,7 +2628,14 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A full-body movement combining a kettlebell clean with an overhead press.",
-    "howTo": "Clean the kettlebell into the rack position, then press it overhead. Lower it and repeat."
+    "howTo": "Complete the prescribed reps per arm. Clean the kettlebell into the rack position, then press it overhead. Lower it and switch arms after each set.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Legs",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "thruster",
@@ -1665,6 +2655,13 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
@@ -1672,7 +2669,14 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A full-body exercise combining a squat with an overhead press.",
-    "howTo": "Squat while holding the weight at your shoulders, then drive upward and press the weight overhead."
+    "howTo": "Squat while holding the weight at your shoulders, then drive upward and press the weight overhead.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "cat-cow",
@@ -1686,6 +2690,10 @@
     "categories": [
       "Mobility"
     ],
+    "muscles": [
+      "Lower Back",
+      "Deep Core"
+    ],
     "defaultSets": 2,
     "defaultReps": 8,
     "defaultWeight": 0,
@@ -1693,7 +2701,43 @@
     "estimatedTime": 3,
     "unit": "reps",
     "description": "A gentle spinal mobility movement that alternates between arching and rounding the back.",
-    "howTo": "Start on hands and knees. Gently arch your back and lift your chest, then round your spine and tuck your chin. Move slowly between positions."
+    "howTo": "Start on hands and knees. Gently arch your back and lift your chest, then round your spine and tuck your chin. Move slowly between positions.",
+    "mainFocus": "Back",
+    "secondaryFocus": [],
+    "mainMuscle": "Lower Back"
+  },
+  {
+    "id": "superman",
+    "name": "Superman",
+    "bodyParts": [
+      "Back",
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Lower Back",
+      "Erector Spinae",
+      "Glutes",
+      "Hamstrings"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 45,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A prone bodyweight exercise that strengthens the lower back and posterior chain.",
+    "howTo": "Lie face down with your arms extended overhead. Brace your core and gently lift your arms, chest, and legs from the floor. Pause briefly, then lower with control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Legs"
+    ],
+    "mainMuscle": "Erector Spinae"
   },
   {
     "id": "glute-bridge",
@@ -1708,6 +2752,10 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings"
+    ],
     "defaultSets": 3,
     "defaultReps": 15,
     "defaultWeight": 0,
@@ -1715,7 +2763,96 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A bodyweight hip-extension exercise targeting the glutes and hamstrings.",
-    "howTo": "Lie on your back with knees bent and feet flat. Brace your core, press through your feet, and lift your hips. Lower them under control."
+    "howTo": "Lie on your back with knees bent and feet flat. Brace your core, press through your feet, and lift your hips. Lower them under control.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Glutes"
+  },
+  {
+    "id": "hip_abduction_machine",
+    "name": "Hip Abduction Machine",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Legs"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hip Abductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 20,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "Strengthens the outer hips and glutes.",
+    "howTo": "Sit in the machine with your knees against the pads. Push your legs outward against the resistance, then slowly return to the starting position.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Hip Abductors"
+  },
+  {
+    "id": "hip_adduction_machine",
+    "name": "Hip Adduction Machine",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Machines"
+    ],
+    "categories": [
+      "Legs"
+    ],
+    "muscles": [
+      "Adductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 20,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "Strengthens the inner thigh muscles.",
+    "howTo": "Sit in the machine with your legs positioned against the pads. Squeeze your legs inward against the resistance, then slowly return to the starting position.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Adductors"
+  },
+  {
+    "id": "hip_thrust",
+    "name": "Hip Thrust",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Barbell"
+    ],
+    "equipmentOptions": [["Barbell"]],
+    "categories": [
+      "Legs"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 45,
+    "defaultRestSeconds": 90,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "Builds glute strength and hip extension power.",
+    "howTo": "Sit on the floor with your upper back against a stable bench and a padded barbell positioned over your hips. Keep your feet flat and knees bent. Drive through your feet to lift your hips until your torso is roughly parallel to the floor. Squeeze your glutes, then lower your hips under control.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Glutes"
   },
   {
     "id": "tricep-extension",
@@ -1727,8 +2864,12 @@
       "Dumbbells",
       "Resistance bands"
     ],
+    "equipmentOptions": [["Dumbbells"], ["Resistance bands"]],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Triceps"
     ],
     "defaultSets": 3,
     "defaultReps": 12,
@@ -1737,7 +2878,10 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "An arm exercise that targets the triceps using a dumbbell or resistance band.",
-    "howTo": "Hold the weight overhead or anchor a band securely. Bend your elbows to lower your hands, then extend your arms without flaring your elbows."
+    "howTo": "Hold the weight overhead or anchor a band securely. Bend your elbows to lower your hands, then extend your arms without flaring your elbows.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [],
+    "mainMuscle": "Triceps"
   },
   {
     "id": "landmine-press",
@@ -1749,10 +2893,16 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Front Delts",
+      "Pectorals",
+      "Triceps",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1761,7 +2911,14 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A pressing exercise using the free end of a barbell anchored at one end.",
-    "howTo": "Hold the end of the bar near your shoulder and press it upward and forward until your arm is extended. Lower it under control."
+    "howTo": "Hold the end of the bar near your shoulder and press it upward and forward until your arm is extended. Lower it under control.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Chest",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "landmine-row",
@@ -1772,10 +2929,17 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1784,21 +2948,31 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A rowing exercise using the free end of a barbell anchored at one end.",
-    "howTo": "Hinge forward and pull the end of the bar toward your torso. Lower it slowly while maintaining a stable position."
+    "howTo": "Hinge forward and pull the end of the bar toward your torso. Lower it slowly while maintaining a stable position.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "landmine-squat",
     "name": "Landmine Squat",
     "bodyParts": [
       "Legs",
-      "Core",
-      "Shoulders"
+      "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1807,7 +2981,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A squat variation using the free end of an anchored barbell.",
-    "howTo": "Hold the end of the bar near your chest and squat down. Drive through your feet to return to standing."
+    "howTo": "Hold the end of the bar near your chest and squat down. Drive through your feet to return to standing.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "landmine-reverse-lunge",
@@ -1817,10 +2996,16 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Hamstrings",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
@@ -1829,7 +3014,12 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A reverse lunge performed while holding the end of an anchored barbell.",
-    "howTo": "Hold the bar near your chest and step one foot backward into a lunge. Push through the front foot to return to standing."
+    "howTo": "Perform the prescribed reps per leg. Hold the bar near your chest and step one foot backward into a lunge. Push through the front foot to return to standing, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "landmine-rotation",
@@ -1839,11 +3029,16 @@
       "Shoulders"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength",
       "Core"
+    ],
+    "muscles": [
+      "Obliques",
+      "Deep Core",
+      "Front Delts"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1852,7 +3047,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A rotational core exercise using the free end of an anchored barbell.",
-    "howTo": "Hold the end of the bar with both hands and move it in an arc from one side of your body to the other while rotating your torso."
+    "howTo": "Hold the end of the bar with both hands and move it in an arc from one side of your body to the other while rotating your torso.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders"
+    ],
+    "mainMuscle": "Obliques"
   },
   {
     "id": "landmine-t-bar-row",
@@ -1863,10 +3063,17 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Upper Back",
+      "Trapezius",
+      "Lats",
+      "Biceps",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1875,7 +3082,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A supported or handle-assisted row using the free end of an anchored barbell.",
-    "howTo": "Hinge forward, grip the bar or handle, and pull it toward your torso. Lower it under control."
+    "howTo": "Hinge forward, grip the bar or handle, and pull it toward your torso. Lower it under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Upper Back"
   },
   {
     "id": "landmine-romanian-deadlift",
@@ -1886,10 +3099,16 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength"
+    ],
+    "muscles": [
+      "Hamstrings",
+      "Glutes",
+      "Lower Back",
+      "Erector Spinae"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1898,7 +3117,13 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A hip-hinge movement using the free end of an anchored barbell.",
-    "howTo": "Hold the bar and push your hips backward while keeping your back stable. Drive your hips forward to return to standing."
+    "howTo": "Hold the bar and push your hips backward while keeping your back stable. Drive your hips forward to return to standing.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Core"
+    ],
+    "mainMuscle": "Hamstrings"
   },
   {
     "id": "landmine-clean-press",
@@ -1910,11 +3135,18 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength",
       "Power"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 8,
@@ -1923,7 +3155,14 @@
     "estimatedTime": 7,
     "unit": "reps",
     "description": "A full-body movement combining a landmine clean with an overhead press.",
-    "howTo": "Use your hips to bring the bar toward your shoulder, then press the end of the bar upward and forward."
+    "howTo": "Use your hips to bring the bar toward your shoulder, then press the end of the bar upward and forward.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Legs",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "landmine-thruster",
@@ -1935,11 +3174,18 @@
       "Core"
     ],
     "equipment": [
-      "Barbell"
+      "Landmine"
     ],
     "categories": [
       "Strength",
       "Conditioning"
+    ],
+    "muscles": [
+      "Quadriceps",
+      "Glutes",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
     ],
     "defaultSets": 3,
     "defaultReps": 10,
@@ -1948,14 +3194,20 @@
     "estimatedTime": 6,
     "unit": "reps",
     "description": "A full-body movement combining a squat with a landmine press.",
-    "howTo": "Squat while holding the bar near your chest, then drive upward and press the bar away from you."
+    "howTo": "Squat while holding the bar near your chest, then drive upward and press the bar away from you.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Quadriceps"
   },
   {
     "id": "kettlebell-slingshot",
     "name": "Kettlebell Slingshot",
     "bodyParts": [
       "Core",
-      "Shoulders",
       "Arms"
     ],
     "equipment": [
@@ -1965,6 +3217,10 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Forearms & Grip",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
@@ -1972,7 +3228,12 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A kettlebell movement where the weight is passed from hand to hand around the body.",
-    "howTo": "Hold the kettlebell in one hand and pass it around your body to the opposite hand. Continue smoothly in one direction or alternate directions."
+    "howTo": "Hold the kettlebell in one hand and pass it around your body to the opposite hand. Continue smoothly in one direction or alternate directions.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Forearms & Grip"
   },
   {
     "id": "kettlebell-halo",
@@ -1989,6 +3250,11 @@
       "Strength",
       "Mobility"
     ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 8,
     "defaultWeight": 10,
@@ -1996,7 +3262,13 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A kettlebell movement that circles the weight around the head.",
-    "howTo": "Hold the kettlebell close to your chest and circle it around your head while keeping your torso controlled. Reverse direction between sets."
+    "howTo": "Hold the kettlebell close to your chest and circle it around your head while keeping your torso controlled. Reverse direction between sets.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Core",
+      "Arms"
+    ],
+    "mainMuscle": "Front Delts"
   },
   {
     "id": "kettlebell-gravedigger",
@@ -2013,6 +3285,11 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Obliques",
+      "Deep Core",
+      "Front Delts"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
@@ -2020,14 +3297,20 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A kneeling kettlebell movement that combines a digging motion with controlled rotation.",
-    "howTo": "Kneel while holding the kettlebell with both hands. Mimic digging into the ground in front of you, then swing the kettlebell up and to one side of your head as if throwing the dirt away, alternating sides."
+    "howTo": "Kneel while holding the kettlebell with both hands. Mimic digging into the ground in front of you, then swing the kettlebell up and to one side of your head as if throwing the dirt away, alternating sides.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Obliques"
   },
   {
     "id": "kettlebell-pullover",
-    "name": "Kettlebell Pullover",
+    "name": "Standing Kettlebell Pullover",
     "bodyParts": [
+      "Back",
       "Shoulders",
-      "Chest",
       "Arms",
       "Core"
     ],
@@ -2037,14 +3320,92 @@
     "categories": [
       "Strength"
     ],
+    "muscles": [
+      "Lats",
+      "Triceps",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
     "defaultRestSeconds": 60,
     "estimatedTime": 5,
     "unit": "reps",
-    "description": "A kettlebell movement that takes the weight from hip height over and behind the head.",
-    "howTo": "Hold the kettlebell with both hands at hip height and raise it overhead. Continue the movement behind your head, then reverse the motion back toward your hips."
+    "description": "A standing straight-arm movement that trains the lats as you lower a kettlebell from overhead.",
+    "howTo": "Stand tall and hold the kettlebell securely with both hands overhead, arms slightly bent. Brace your core and lower the weight in a controlled arc toward your thighs, then return it overhead without arching your back.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Lats"
+  },
+  {
+    "id": "lying-dumbbell-pullover",
+    "name": "Lying Dumbbell Pullover",
+    "bodyParts": [
+      "Back",
+      "Chest",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "equipmentOptions": [["Dumbbells"]],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Lats",
+      "Pectorals",
+      "Triceps"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 10,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A lying dumbbell movement that works the lats and chest through shoulder extension.",
+    "howTo": "Lie on a bench holding one dumbbell securely with both hands above your chest. Keep a slight bend in your elbows and lower the weight in an arc behind your head, then bring it back over your chest under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Chest",
+      "Arms"
+    ],
+    "mainMuscle": "Lats"
+  },
+  {
+    "id": "shrug",
+    "name": "Shrug",
+    "bodyParts": [
+      "Back",
+      "Shoulders"
+    ],
+    "equipment": [
+      "Dumbbells",
+      "Barbell"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Trapezius",
+      "Upper Back"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 10,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A shoulder-elevation exercise that primarily targets the trapezius.",
+    "howTo": "Stand tall holding dumbbells at your sides or a barbell in front of your thighs. Raise your shoulders straight toward your ears without rolling them, pause briefly, then lower under control.",
+    "mainFocus": "Back",
+    "secondaryFocus": [
+      "Shoulders"
+    ],
+    "mainMuscle": "Trapezius"
   },
   {
     "id": "kettlebell-figure-8",
@@ -2061,6 +3422,12 @@
       "Strength",
       "Conditioning"
     ],
+    "muscles": [
+      "Forearms & Grip",
+      "Glutes",
+      "Adductors",
+      "Deep Core"
+    ],
     "defaultSets": 3,
     "defaultReps": 10,
     "defaultWeight": 10,
@@ -2068,11 +3435,18 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A dynamic kettlebell movement where the weight is passed between the legs in a figure-eight pattern.",
-    "howTo": "Stand with your feet apart and pass the kettlebell between and around your legs, transferring it from hand to hand to create a figure-eight pattern."
+    "howTo": "Stand with your feet apart and pass the kettlebell between and around your legs, transferring it from hand to hand to create a figure-eight pattern.",
+    "mainFocus": "Arms",
+    "secondaryFocus": [
+      "Core",
+      "Legs"
+    ],
+    "mainMuscle": "Forearms & Grip"
   },
   {
     "id": "kettlebell-windmill",
     "name": "Kettlebell Windmill",
+    "variationGroup": "overhead-windmill",
     "bodyParts": [
       "Core",
       "Shoulders",
@@ -2085,6 +3459,12 @@
       "Strength",
       "Mobility"
     ],
+    "muscles": [
+      "Obliques",
+      "Deep Core",
+      "Side Delts",
+      "Glutes"
+    ],
     "defaultSets": 3,
     "defaultReps": 6,
     "defaultWeight": 5,
@@ -2092,6 +3472,419 @@
     "estimatedTime": 5,
     "unit": "reps",
     "description": "A kettlebell movement combining a hip hinge and torso rotation while stabilizing the weight overhead.",
-    "howTo": "Hold the kettlebell overhead and turn your feet slightly outward. Push your hips to the side and lower your free hand toward the floor while keeping the kettlebell overhead."
+    "howTo": "Hold the kettlebell overhead and turn your feet slightly outward. Push your hips to the side and lower your free hand toward the floor while keeping the kettlebell overhead.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Legs"
+    ],
+    "mainMuscle": "Obliques"
+  },
+  {
+    "id": "standing-cable-hip-abduction",
+    "name": "Standing Cable Hip Abduction",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Cable Machine"
+    ],
+    "equipmentOptions": [["Cable Machine"]],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hip Abductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the outer hips and gluteus medius.",
+    "howTo": "Perform the prescribed reps per leg. Attach an ankle strap to a low cable pulley and stand sideways to the machine. Move the outside leg laterally away from your body, return slowly, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Hip Abductors"
+  },
+  {
+    "id": "side-lying-hip-abduction",
+    "name": "Side-Lying Hip Abduction",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hip Abductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A bodyweight exercise targeting the gluteus medius and other outer hip muscles.",
+    "howTo": "Perform the prescribed reps per side. Lie on your side with your legs straight and hips stacked. Keeping the top leg straight, lift it upward without rotating your pelvis. Lower slowly, then switch sides.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Hip Abductors"
+  },
+  {
+    "id": "banded-lateral-walk",
+    "name": "Banded Lateral Walk",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Resistance bands"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hip Abductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A resistance band exercise that strengthens the outer hips and improves hip stability.",
+    "howTo": "Place a resistance band around your thighs or ankles. Bend your knees slightly and take controlled lateral steps while maintaining tension on the band. Complete the prescribed repetitions in each direction.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Hip Abductors"
+  },
+  {
+    "id": "standing-cable-hip-adduction",
+    "name": "Standing Cable Hip Adduction",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Cable Machine"
+    ],
+    "equipmentOptions": [["Cable Machine"]],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Adductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "An isolation exercise targeting the inner thigh muscles responsible for bringing the leg toward the body's midline.",
+    "howTo": "Perform the prescribed reps per leg. Attach an ankle strap to a low cable pulley and stand sideways to the machine. Move the cable-side leg inward across the front of your body, return slowly, then switch legs.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Adductors"
+  },
+  {
+    "id": "side-lying-hip-adduction",
+    "name": "Side-Lying Hip Adduction",
+    "bodyParts": [
+      "Legs"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Adductors"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 12,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A bodyweight isolation exercise targeting the inner thigh muscles.",
+    "howTo": "Perform the prescribed reps per side. Lie on your side with your bottom leg straight and your top leg bent, with its foot placed in front of you. Lift the bottom leg toward the ceiling, then lower it slowly and switch sides.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [],
+    "mainMuscle": "Adductors"
+  },
+  {
+    "id": "copenhagen-plank",
+    "name": "Copenhagen Plank",
+    "bodyParts": [
+      "Legs",
+      "Core"
+    ],
+    "equipment": [
+      "Bodyweight"
+    ],
+    "equipmentOptions": [["Bodyweight"]],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Adductors",
+      "Obliques",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 30,
+    "defaultWeight": 0,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "seconds",
+    "description": "A challenging lateral plank variation that strengthens the inner thigh muscles and core.",
+    "howTo": "Lie on your side beside a bench and place your top leg on the bench. Lift your hips off the floor, supporting your body through your forearm and top leg. Hold for 30 seconds per side, then lower under control and switch sides. Use a bent-knee variation to reduce difficulty.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Core"
+    ],
+    "mainMuscle": "Adductors"
+  },
+  {
+    "id": "dumbbell-swing",
+    "name": "Dumbbell Swing",
+    "variationGroup": "hip-hinge-swing",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Core"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Conditioning"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Deep Core",
+      "Lower Back",
+      "Erector Spinae"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 15,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 75,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A dynamic hip-hinge exercise performed with a dumbbell held securely in both hands.",
+    "howTo": "Hold one dumbbell securely with both hands. Hinge at your hips and guide it between your thighs, then drive your hips forward to swing it to about chest height. Keep your arms relaxed and lower it under control.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Core"
+    ],
+    "mainMuscle": "Glutes"
+  },
+  {
+    "id": "dumbbell-clean",
+    "name": "Dumbbell Clean",
+    "variationGroup": "single-arm-clean",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Shoulders",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Power"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Front Delts",
+      "Forearms & Grip"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 15,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-arm power movement that brings a dumbbell from a hanging position to the shoulder.",
+    "howTo": "Complete the prescribed reps per arm. Hinge at your hips, then drive through your legs and hips to bring the dumbbell close to your body. Guide it smoothly to your shoulder without letting it flip over your wrist. Lower under control and switch arms after each set.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Shoulders",
+      "Arms"
+    ],
+    "mainMuscle": "Glutes"
+  },
+  {
+    "id": "dumbbell-snatch",
+    "name": "Dumbbell Snatch",
+    "variationGroup": "single-arm-snatch",
+    "bodyParts": [
+      "Legs",
+      "Back",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Power",
+      "Conditioning"
+    ],
+    "muscles": [
+      "Glutes",
+      "Hamstrings",
+      "Front Delts",
+      "Deep Core",
+      "Forearms & Grip"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 10,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-arm power movement that drives a dumbbell from a hanging position to overhead.",
+    "howTo": "Complete the prescribed reps per arm. Hinge at your hips and drive through your legs and hips to accelerate the dumbbell close to your body. Punch your hand overhead to stabilize it, then lower under control and switch arms.",
+    "mainFocus": "Legs",
+    "secondaryFocus": [
+      "Back",
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Glutes"
+  },
+  {
+    "id": "dumbbell-clean-press",
+    "name": "Dumbbell Clean & Press",
+    "variationGroup": "single-arm-clean-and-press",
+    "bodyParts": [
+      "Full Body",
+      "Shoulders",
+      "Legs",
+      "Core",
+      "Arms"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Power"
+    ],
+    "muscles": [
+      "Glutes",
+      "Quadriceps",
+      "Front Delts",
+      "Triceps",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 6,
+    "defaultWeight": 10,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A full-body movement combining a single-arm dumbbell clean with an overhead press.",
+    "howTo": "Complete the prescribed reps per arm. Clean the dumbbell to your shoulder, then press it overhead. Lower it to the rack position, guide it back down under control, and switch arms after each set.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Legs",
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
+  },
+  {
+    "id": "single-arm-dumbbell-shoulder-press",
+    "name": "Single-Arm Dumbbell Shoulder Press",
+    "variationGroup": "overhead-shoulder-press",
+    "bodyParts": [
+      "Shoulders",
+      "Arms",
+      "Core"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength"
+    ],
+    "muscles": [
+      "Front Delts",
+      "Side Delts",
+      "Triceps",
+      "Deep Core"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 8,
+    "defaultWeight": 10,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 6,
+    "unit": "reps",
+    "description": "A single-arm overhead press that challenges shoulder stability and core control.",
+    "howTo": "Complete the prescribed reps per arm. Hold one dumbbell at shoulder height and press it overhead without leaning to the side. Lower it slowly and switch arms after each set.",
+    "mainFocus": "Shoulders",
+    "secondaryFocus": [
+      "Arms",
+      "Core"
+    ],
+    "mainMuscle": "Front Delts"
+  },
+  {
+    "id": "dumbbell-windmill",
+    "name": "Dumbbell Windmill",
+    "variationGroup": "overhead-windmill",
+    "bodyParts": [
+      "Core",
+      "Shoulders",
+      "Legs"
+    ],
+    "equipment": [
+      "Dumbbells"
+    ],
+    "categories": [
+      "Strength",
+      "Mobility"
+    ],
+    "muscles": [
+      "Obliques",
+      "Deep Core",
+      "Side Delts",
+      "Glutes"
+    ],
+    "defaultSets": 3,
+    "defaultReps": 6,
+    "defaultWeight": 5,
+    "defaultRestSeconds": 60,
+    "estimatedTime": 5,
+    "unit": "reps",
+    "description": "A controlled hip hinge and torso rotation performed while stabilizing a dumbbell overhead.",
+    "howTo": "Complete the prescribed reps per side. Hold one dumbbell overhead and turn your feet slightly outward. Push your hips to the side and lower your free hand toward the floor while keeping the dumbbell steady overhead. Return to standing under control, then switch sides.",
+    "mainFocus": "Core",
+    "secondaryFocus": [
+      "Shoulders",
+      "Legs"
+    ],
+    "mainMuscle": "Obliques"
   }
 ]
